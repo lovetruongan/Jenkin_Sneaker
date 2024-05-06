@@ -1,0 +1,150 @@
+.contact {
+  margin-top: 30px !important;
+
+  .contact-header {
+    height: 280px;
+    width: 100%;
+    background: url("../images/introCover.jpg") no-repeat;
+    background-size: 100%;
+    background-position: 31% 40%;
+    margin-top: 40px;
+
+    .contact-header-wrap {
+      position: relative;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+
+      >h4 {
+        font-size: 35px;
+        position: absolute;
+        top: 48%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+
+      >h5 {
+        font-size: 25px;
+        position: absolute;
+        top: 65%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+    }
+  }
+
+  .contact-content {
+    .container-lg {
+      .row {
+        .footer-address-container {
+          h2 {
+            margin-left: 25%;
+          }
+
+          .footer-address-list {
+            .footer-address-item {
+              display: flex;
+              margin: 16px 0 16px -30px;
+
+              i {
+                display: flex;
+                align-items: center;
+                margin-right: 12px;
+              }
+
+              p {
+                margin: 0;
+                font-size: 16px;
+              }
+            }
+          }
+
+          .footer-address-social {
+            display: flex;
+            padding-left: 0;
+            margin-left: -20px;
+
+            .footer-address-social-item {
+              i {
+                font-size: 25px;
+                margin: 5px 15px;
+              }
+            }
+          }
+        }
+
+        .footer-letter {
+          .footer-letter-info input {
+            outline: none;
+            border: 1px rgb(194, 194, 194) solid;
+            line-height: 40px;
+            font-size: 16px;
+            padding-left: 15px;
+            width: 100%;
+          }
+
+          .footer-letter-info-note textarea {
+            height: 100px;
+            width: 97%;
+            outline: none;
+            border: 1px rgb(194, 194, 194) solid;
+            color: gray;
+            font-size: 16px;
+          }
+
+          .footer-letter-button {
+            button {
+              width: 200px;
+              height: 30px;
+              border: 1px rgb(255, 0, 0) solid !important;
+              outline: none;
+              font-size: 20px;
+              line-height: 25px;
+              border-radius: 5px;
+
+              &:hover {
+                background-color: rgb(188, 8, 8) !important;
+              }
+            }
+          }
+        }
+
+      }
+    }
+  }
+}
+
+.pi-facebook:hover {
+  color: blue;
+}
+
+.pi-instagram:hover {
+  color: rgb(183, 19, 147);
+}
+
+.pi-youtube:hover {
+  color: red;
+}
+
+.pi-telegram:hover {
+  color: rgb(32, 186, 237)
+}
+
+.pi-twitter:hover {
+  color: rgb(232, 228, 34);
+}
+
+@media only screen and (max-width: 575px) {}
+
+@media only screen and (min-width: 576px) and (max-width: 767px) {}
+
+@media only screen and (min-width: 768px) and (max-width: 991px) {
+  .contact-content div .row .footer-address-container {
+    margin-left: 190px;
+  }
+}
+
+@media only screen and (min-width: 992px) and (max-width: 1199px) {}
+
+@media only screen and (min-width: 1200px) and (max-width: 1400px) {}
+
+@media only screen and (min-width: 1401px) and (max-width: 1899px) {}

@@ -1,0 +1,118 @@
+<!-- banner -->
+<div class="home">
+  <section class="banner">
+    <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
+      <div class="carousel-indicators">
+        <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active"
+          aria-current="true" aria-label="Slide 1"></button>
+        <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1"
+          aria-label="Slide 2"></button>
+        <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2"
+          aria-label="Slide 3"></button>
+      </div>
+      <div class="carousel-inner">
+        <div class="carousel-item active">
+          <img src="../../../../assets/images/bannerGiay.jpg" class="d-block w-100" alt="bannerGiay">
+        </div>
+        <div class="carousel-item">
+          <img src="../../../../assets/images/bannerGiay2.jpg" class="d-block w-100" alt="bannerGiay2">
+        </div>
+        <div class="carousel-item">
+          <img src="../../../../assets/images/bannerGiay3.jpg" class="d-block w-100" alt="bannerGiay3">
+        </div>
+      </div>
+    </div>
+
+    <div class="container-lg">
+      <div class="row my-5 align-items-center justify-content-center gx-4 gx-lg-5 gx-xl-5">
+        @for(product of productsHighlight; track product){
+          <div (click)="navigateToDetail(product.id)" class="col-6 col-lg-3 col-xl-4 banner-content--item">
+            <div class="card border-0">
+              <div class="card-body py-4">
+                <img [src]="apiImage + product.thumbnail" alt="giay-converse" class="img-fluid thumbnail">
+                <h3 class="product-highlight-name">{{product.name}}</h3>
+                <button>
+                  <p>Xem sản phẩm</p>
+                </button>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- giay -->
+  <section class="product">
+    <div class="product-header d-flex justify-content-center align-items-center">
+      <div class="product-header-item bg-light text-secondary text-center text-uppercase active">
+        <p>Sản phẩm mới</p>
+      </div>
+    </div>
+
+    <div class="product-content">
+      <div class="container-lg">
+        <div class="row my-5 align-items-center justify-content-center g-5">
+          @for(product of productNewest; track product){
+            <div (click)="navigateToDetail(product.id)" class="col-6 col-lg-3 product-content--item">
+              <div class="card border-0">
+                <div class="card-body py-3">
+                  <img [src]="apiImage + product.thumbnail" alt="giaycv" class="img-fluid">
+                </div>
+                <div class="card-footer text-center tw-bold border-0">
+                  <p class="lead card-title text-secondary">{{product.name}}</p>
+                  <p class="my-2 text-danger fw-bold">{{product.price | currency:'VND':'symbol':'1.0-0'}}</p>
+                </div>
+              </div>
+            </div>
+          }
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- san pham giam gia -->
+  <section class="discount">
+    <div class="discount-banner d-flex justify-content-center">
+      <h3>KHUYẾN MÃI <span>GIẢM GIÁ 50%</span></h3>
+      <div class="container-fluid discount-banner-wrap">
+      </div>
+      <button type="button" class="btn btn-outline-light discount-btn">
+        <h4 style="margin: 0 auto; padding: 5px;">Xem tất cả</h4>
+      </button>
+    </div>
+
+    <div class="discount-product">
+      <div class="discount-product-header d-flex justify-content-center align-items-center">
+        <div class=" discount-product-item bg-light text-dark text-center text-uppercase">
+          <p>Sản phẩm giảm giá</p>
+        </div>
+      </div>
+
+      <div class="discount-product-content">
+        <div class="container-lg">
+          <div class="row my-5 align-items-center justify-content-center g-5">
+            @for(product of productsDiscount; track product){
+              <div (click)="navigateToDetail(product.id)" class="col-6 col-lg-3">
+                <div class="card border-0">
+                  <div class="card-body py-3">
+                    <p-badge [value]="-product.discount + '%'" severity="danger"></p-badge>
+                    <img [src]="apiImage + product.thumbnail" alt="giaycv" class="img-fluid">
+                  </div>
+                  <div class="card-footer text-center tw-bold border-0">
+                    <p class="lead card-title text-secondary">{{product.name}}</p>
+                    <p class="my-2 text-danger fw-bold" style="font-size: 16px;"><s>{{product.price / (1-product.discount/100) | currency:'VND':'symbol':'1.0-0'}}</s></p>
+                    <p class="my-2 text-danger fw-bold">{{product.price | currency:'VND':'symbol':'1.0-0'}}</p>
+                  </div>
+                </div>
+              </div>
+            }
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+</div>

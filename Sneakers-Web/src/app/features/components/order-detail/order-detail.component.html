@@ -1,0 +1,91 @@
+@if(orderInfor){
+    <div class="order-detail">
+        <div class="container">
+            <div class="row">
+                <div class="col-8 col-lg-8 offset-lg-2 infor-wrapper">
+                    <div class="app-logo-detail justify-content-center">
+                       <img src="../../../../assets/images/logo.jpg" alt="" class="img-fluid">
+                    </div>
+                    <h3>Thông tin đơn hàng</h3>
+                    <p>Xin chào {{orderInfor.fullname}}</p>
+                    <span>Xin vui lòng để ý điện thoại với số: {{orderInfor.phone_number}}</span>
+                    <p>Đơn hàng của bạn sẽ được giao trong thời gian sớm nhất</p>
+                    <div class="d-flex">
+                        <p style="margin-right: 6px;">Trạng thái giao hàng: </p>
+                        <div class="font-bold" [ngSwitch]="orderInfor.status">  
+                            <p *ngSwitchCase="'pending'">Đang chờ</p>
+                            <p *ngSwitchCase="'success'">Đã giao hàng</p>
+                            <p *ngSwitchCase="'cancelled'">Đã hủy</p>
+                            <p *ngSwitchCase="'processing'">Đang xử lý</p>
+                            <p *ngSwitchCase="'delivered'">Đã được giao</p>
+                            <p *ngSwitchCase="'shipped'">Đang được giao</p>
+                        </div>
+                    </div>
+                    <div class="row basic-info-wrapper">
+                        <div class="col-lg-3">
+                            <p>Ngày đặt hàng</p>
+                            <span class="font-bold">{{orderInfor.order_date | date: 'dd/MM/yyyy'}}</span>
+                        </div>
+                        <div class="col-lg-3">
+                            <p>Mã đơn</p>
+                            <span class="font-bold">{{orderInfor.id}}</span>
+                        </div>
+                        <div class="col-lg-3">
+                            <p>Hình thức</p>
+                            <span class="font-bold">{{orderInfor.shipping_method}}</span>
+                        </div>
+                        <div class="col-lg-3">
+                            <p>Địa chỉ</p>
+                            <span class="font-bold">{{orderInfor.address}}</span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <ul class="order-product-list">
+                            @for(item of productOrderd; track item){
+                                <li class="d-flex row order-product-item">
+                                    <div class="col-3 col-lg-3">
+                                        <img [src]="apiImage + item.product.thumbnail" alt="Giày">
+                                    </div>
+                                    <div class="col-6 col-lg-6 name-product-wrapper">
+                                        <div>
+                                            <span class="font-bold name-product">{{item.product.name}}</span>
+                                            <span>x{{item.numberOfProducts}}</span>
+                                        </div>
+                                        <span class="font-bold">Size: {{item.size}}</span>
+                                    </div>
+                                    <div class="col-3 col-lg-3">
+                                        <p class="font-bold">{{item.totalMoney| currency:'VND':'symbol':'1.0-0'}}</p>
+                                    </div>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                    <div class="row">
+                        <span>Ghi chú: </span>
+                        <span class="font-bold">{{notion}}</span>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-4 offset-8">
+                            <div class="d-flex">
+                                <p style="flex: 1;">Tổng tiền hàng</p>
+                                <p class="font-bold">{{totalMoney | currency:'VND':'symbol':'1.0-0'}}</p>
+                            </div>
+                            <div class="d-flex">
+                                <p style="flex: 1;">Phí vận chuyển</p>
+                                <p class="font-bold">{{shipCost | currency:'VND':'symbol':'1.0-0'}}</p>
+                            </div>
+                            <div class="d-flex">
+                                <p style="flex: 1;">Tổng thanh toán</p>
+                                <p class="font-bold">{{totalMoney + shipCost | currency:'VND':'symbol':'1.0-0'}}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <p>Chúng tôi đã gửi thông tin đến email cho bạn</p>
+                        <p>Cảm ơn đã mua hàng tại Sneaker Store</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}

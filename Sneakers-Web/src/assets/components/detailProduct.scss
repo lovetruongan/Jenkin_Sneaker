@@ -1,0 +1,203 @@
+.detail {
+  .intro-section {
+    padding: 20px;
+    padding-left: 0;
+    margin-top: 90px;
+  }
+
+  .detail-shoe {
+    .col-md-6 {
+      .carousel.slide {
+
+        .carousel-control-prev:hover .carousel-control-prev-icon {
+          background-color: red;
+        }
+
+        .carousel-control-next:hover .carousel-control-next-icon {
+          background-color: red;
+        }
+
+        // css these 2 button next/previous
+        .p-galleria .p-galleria-item-nav {
+          color: rgb(126, 2, 2);
+        }
+      }
+    }
+
+    .details {
+      .sizes {
+        label.radio {
+          cursor: pointer;
+          margin: 10px;
+
+          &:hover {
+            background-color: red;
+
+            span {
+              color: white;
+            }
+
+          }
+
+          span {
+            padding: 2px 9px;
+            border: 2px solid #ff0000;
+            display: inline-block;
+            color: #ff0000;
+            border-radius: 3px;
+            text-transform: uppercase
+          }
+
+          input {
+            position: absolute;
+            top: 0;
+            left: 0;
+            visibility: hidden;
+            pointer-events: none;
+
+            &:checked+span {
+              border-color: #ff0000;
+              background-color: #ff0000;
+              color: #fff
+            }
+          }
+        }
+
+      }
+      .price-wrapper {
+        .old-price {
+          text-decoration: line-through;
+          color: #797979;
+          margin-left: 24px;
+        }
+      }
+    }
+
+    .product-details {
+      padding: 20px;
+      margin-top: -20px;
+
+      .product-quantity {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        margin-top: 10px;
+
+        .border-wrapper {
+          border: none;
+        }
+
+        button {
+          background-color: transparent;
+          border: none;
+          color: rgb(255, 0, 0);
+          font-size: 25px;
+          cursor: pointer;
+        }
+
+        input {
+          background-color: transparent;
+          border: 2px #cbcbcb solid;
+          border-radius: 10px;
+          color: rgb(255, 0, 0);
+          font-size: 16px;
+          text-align: center;
+          width: 40px;
+          margin: 0 10px;
+
+          &:focus {
+            outline: none;
+          }
+        }
+      }
+
+      .product-actions {
+        display: flex;
+        justify-content: flex-start;
+        margin-top: 20px;
+
+        button {
+          margin-right: 10px;
+        }
+
+        i {
+          margin-left: 10px;
+          margin-top: 5px;
+          font-size: 32px;
+          color: red;
+          cursor: pointer;
+        }
+      }
+    }
+  }
+
+  .suggest {
+    margin-top: 100px;
+
+    .container-lg {
+      .row {
+        .col-8 {
+          .card:hover {
+            box-shadow: 2px 2px 3px 2px rgb(230, 181, 173);
+          }
+        }
+      }
+    }
+  }
+}
+
+// css detailed product img
+.p-galleria-item-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.p-galleria-item {
+  max-width: 540px;
+  max-height: 410px;
+  overflow: hidden;
+}
+
+img {
+  max-width: 100% !important;
+  height: auto;
+  object-fit: contain;
+}
+
+.product-image {
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+}
+
+.thumbnail-container {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.thumbnail-item {
+  width: 100px;
+  height: 100px;
+  margin-right: 5px;
+}
+
+.thumbnail-item:hover {
+  cursor: pointer;
+  box-shadow: 1px 1px 5px rgb(120, 74, 74);
+}
+
+.thumbnail-item:last-child {
+  margin-right: 0;
+}
+
+.thumbnail-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.thumbnail-item.active {
+  border: 2px solid rgb(239, 155, 155);
+}

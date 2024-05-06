@@ -1,0 +1,60 @@
+.order-page {
+    min-height: 100vh;
+    margin-top: 90px;
+    .container {
+        .order-page-form {
+            flex-direction: column;
+            .input-form-container {
+                flex-direction: column;
+                margin: 18px 0;
+                label {
+                    margin-bottom: 8px;
+                }
+            }
+        }
+
+        .order-info-container {
+            border: 2px solid #000;
+            flex-direction: column;
+            padding: 40px;
+            thead {
+                border-bottom: 3px solid #ccc;
+                height: 52px;
+                .col-right {
+                    text-align: right;
+                }
+            }
+            tbody{
+                tr {
+                    border-bottom: 1px solid #d5d5d5;
+                    height: 52px;
+                    .col-right {
+                        text-align: right;
+                    }
+                }
+            }
+            .payMethod-list {
+                padding: 0;
+                .payMethod-item {
+                    margin: 12px 0;
+                    .p-radiobutton {
+                        margin-right: 12px;
+                    }
+                }
+            }
+            .order-button {
+                font-weight: 700;
+                border: none;
+                color: #fff;
+                width: 104px;
+                height: 48px;
+                border-radius: 4px;
+                background-color: #dc3545;
+                &:hover {
+                    opacity: 0.8;
+                }
+            }
+        }
+        
+    }
+}

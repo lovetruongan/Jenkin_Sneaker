@@ -1,0 +1,66 @@
+@import "./assets/base/common";
+@import "primeng/resources/themes/lara-light-blue/theme.css";
+@import "primeng/resources/primeng.css";
+@import "primeicons/primeicons.css";
+
+// Import Bootstrap
+@import "../node_modules/bootstrap/dist/css/bootstrap-grid.css";
+
+//Import variable style
+@import "./assets/abstracts/variable.scss";
+
+// Import component style
+@import "./assets/components/app-layout.scss";
+@import "./assets/components/home.scss";
+@import "./assets/components/header.scss";
+@import "./assets/components/login.scss";
+@import "./assets/components/register.scss";
+@import "./assets/components/nav-bar.scss";
+@import "./assets/components/introduction.scss";
+@import "./assets/components/allProduct.scss";
+@import "./assets/components/news.scss";
+@import "./assets/components/shoppingCart.scss";
+@import "./assets/components/detailProduct.scss";
+@import "./assets/components/footer.scss";
+@import "./assets/components/contact.scss";
+@import "./assets/components/order.scss";
+@import "./assets/components/order-detail.scss";
+@import "./assets/components/historyOrder.scss";
+
+
+// Base
+html {
+  font-size: 14px;
+  height: 100%;
+}
+
+body {
+  height: 100%;
+  // font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,'Noto Sans',sans-serif,'Apple Color Emoji','Segoe UI Emoji','Segoe UI Symbol','Noto Color Emoji';
+  font-family: var(--font-family);
+  line-height: 1.5;
+  margin: 0;
+  box-sizing: content-box;
+  padding: 0;
+}
+
+body {
+  height: 100%;
+  // font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,'Noto Sans',sans-serif,'Apple Color Emoji','Segoe UI Emoji','Segoe UI Symbol','Noto Color Emoji';
+  font-family: var(--font-family);
+  line-height: 1.5;
+  margin: 0;
+}
+
+body {
+  box-sizing: content-box;
+  margin: 0;
+  padding: 0;
+}
+
+ul,
+li {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}

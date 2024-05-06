@@ -1,0 +1,192 @@
+<section class="allProduct">
+  <!-- header -->
+  <div class="allProduct-header">
+    <div class="container">
+      <div style="margin-bottom: 60px;" class="row justify-content-between align-items-center">
+        <div class="col-lg-3 col-md-4">
+          <h3> <span style="color: #c4c2c2">TRANG CHỦ / </span>TẤT CẢ SẢN PHẨM</h3>
+        </div>
+        <div class="allProduct-header_right col-lg-3 col-md-4 d-none d-md-flex d-flex align-items-center">
+          <div class="d-flex justify-content-between align-items-center px-4 mt-3">
+            <p-dropdown [options]="categoriesOptions" placeholder="Danh mục"
+              (onChange)="onCategoryChange($event)"></p-dropdown> 
+          </div>
+          <div class="d-flex justify-content-between align-items-center px-4 mt-3">
+            <p-dropdown [options]="sortOptions" placeholder="Sắp xếp theo giá"
+              (onChange)="onSortChange($event)"></p-dropdown> 
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- content -->
+  <div class="allProduct-content d-flex justify-content-center">
+    <div class="container" style="margin: 0; width: 100%; margin-top: -20px;">
+      <div class="row justify-content-between align-items-center d-flex flex-wrap">
+        <!-- left -->
+        <div class=" col-md-3 col-lg-3 d-none d-md-block d-flex allProduct-content-left">
+          <!-- price filter -->
+          <div class="allProduct-content-filter">
+            <h4 style="margin-bottom: -5px;">LỌC THEO GIÁ</h4>
+            <div class="range">
+              <p-slider [min]="1" [(ngModel)]="priceFilterValue" [range]="true" id="range1"></p-slider>
+            </div>
+            <div class="d-flex justify-content-between">
+              <button (click)="filterPrice()" style="position: relative;">
+                <span style="position: absolute; top: 5%;
+                left: 26%;">Lọc</span>
+              </button>
+              <p-slider [hidden]="true" [(ngModel)]="priceFilterValue" [range]="true" id="range1"></p-slider>
+
+              <h6 style="margin-top: 8px; text-align: end; font-size: 12px;" class="text-muted">Giá
+                <span class="fw-700 text-dark">{{priceFilterValue[0]*500000 | currency:'VND':'symbol':'1.0-0'}} -
+                  {{priceFilterValue[1]*500000 | currency:'VND':'symbol':'1.0-0'}}
+                </span>
+              </h6>
+            </div>
+          </div>
+
+          <!-- product suggestion -->
+          <div class="allProduct-content-product my-5">
+            <h4 class="text-dark">SẢN PHẨM</h4>
+            <div class="allProduct-content-product_table my-4">
+              <div class="container">
+                <p-dataView #dv [value]="productsHighlight">
+                  <ng-template pTemplate="list" let-products>
+                    @for(item of productsHighlight;track item){
+                    <div (click)="navigateToDetail(item.id)"
+                      class="row align-items-center justify-content-center allProduct-content-product_table-item">
+                      <div class="col-4">
+                        <img [src]="apiImage + item.thumbnail" alt="giaycv"
+                          class="img-fluid" style="margin-left: 10px;">
+                      </div>
+
+                      <div class="col-8">
+                        <p class="lead card-title text-secondary">{{item.name}}</p>
+                        <p class="my-2 text-dark fw-bold">{{item.price | currency:'VND':'symbol':'1.0-0'}}</p>
+                      </div>
+                    </div>
+                    }
+                  </ng-template>
+                </p-dataView>
+              </div>
+            </div>
+          </div>
+
+          <!-- post recommendation -->
+          <div class="allProduct-content-post my-5">
+            <h4 class="text-dark">BÀI VIẾT MỚI NHẤT</h4>
+            <div class="allProduct-content-post_table my-4">
+              <div class="container">
+                <div class="row g-5 align-items-center justify-content-center allProduct-content-post_table-item">
+                  <div class="col-4">
+                    <img src="../../../../assets/images/post1.jpg" alt="giaycv" class="img-fluid rounded-circle"
+                      style="margin-left: 10px; width: 60px; height:60px">
+                  </div>
+
+                  <div class="col-8">
+                    <p class="lead card-title text-secondary allProduct-content-post-item">Cảm xúc từ những tia nắng
+                      cuối cùng
+                      cho phép ý tưởng lộ
+                      nét...</p>
+                  </div>
+                </div>
+
+                <div class="row my-2 g-5 align-items-center justify-content-center allProduct-content-post_table-item">
+                  <div class="col-4">
+                    <img src="../../../../assets/images/post2.jpg" alt="giaycv" class="img-fluid rounded-circle"
+                      style="margin-left: 10px; width: 60px; height:60px">
+                  </div>
+
+                  <div class="col-8">
+                    <p class="lead card-title text-secondary allProduct-content-post-item">Đặc biệt, tên gọi khác của
+                      loại vải
+                      Corduroy sợi to (3-8
+                      sợi/inch)- ...</p>
+                  </div>
+                </div>
+
+                <div class="row my-2 g-5 align-items-center justify-content-center allProduct-content-post_table-item">
+                  <div class="col-4">
+                    <img src="../../../../assets/images/post3.jpg" alt="giaycv" class="img-fluid rounded-circle"
+                      style="margin-left: 10px; width: 60px; height:60px">
+                  </div>
+
+                  <div class="col-8">
+                    <p class="lead card-title text-secondary allProduct-content-post-item">Hẳn mọi người đã không mấy xa
+                      lạ với
+                      chất liệu Corduroy -
+                      Nhung...</p>
+                  </div>
+                </div>
+
+                <div class="row my-2 g-5 align-items-center justify-content-center allProduct-content-post_table-item">
+                  <div class="col-4">
+                    <img src="../../../../assets/images/post4.jpg" alt="giaycv" class="img-fluid rounded-circle"
+                      style="margin-left: 10px; width: 60px; height:60px">
+                  </div>
+
+                  <div class="col-8">
+                    <p class="lead card-title text-secondary allProduct-content-post-item">Hai yếu tố trên phối trộn
+                      cùng với
+                      những gam màu tươi tắn
+                      để...</p>
+                  </div>
+                </div>
+
+                <div class="row my-2 g-5 align-items-center justify-content-center allProduct-content-post_table-item">
+                  <div class="col-4">
+                    <img src="../../../../assets/images/post5.jpg" alt="giaycv" class="img-fluid rounded-circle"
+                      style="margin-left: 10px; width: 60px; height:60px">
+                  </div>
+
+                  <div class="col-8">
+                    <p class="lead card-title text-secondary allProduct-content-post-item">Chất liệu Corduroy lần đầu
+                      tiên được
+                      ứng dụng trên dáng
+                      giày...</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- right -->
+        <div class="col-md-8 col-lg-8 allProduct-content-shoes">
+          <p-dataView [value]="products" [paginator]="true" [rows]="12" [sortField]="sortField" [sortOrder]="sortOrder">
+            <ng-template let-products pTemplate="list">
+              <div class="row my-5 d-flex align-items-start justify-content-start g-5">
+                @for (item of products; track item) {
+                
+                <div (click)="navigateToDetail(item.id)" class="col-lg-3 col-6 col-sm-4">
+                  <div>
+                    <div class="card">
+                      <div class="card-body py-3">
+                        @if(item.discount){
+                          <p-badge [value]="-item.discount + '%'" severity="danger"></p-badge>
+                        }
+                        <img [src]="apiImage + item.thumbnail" alt="giaycv"
+                          class="img-fluid">
+                      </div>
+                      <div class="card-footer text-center tw-bold border-0">
+                        <p class="lead card-title text-secondary">{{item.name}}</p>
+                        <p class="my-2 text-danger fw-semibold" style="font-size: 15px;">{{item.price | currency:'VND':'symbol':'1.0-0'}}</p>
+                        @if (item.discount){
+                          <p class="my-2 fw-semibold old-price" style="font-size: 15px;">{{item.price / (1-item.discount/100) | currency:'VND':'symbol':'1.0-0'}}</p>
+                        }
+                      </div>
+                      <button class="btn btn-danger" id="btn-addCart">XEM CHI TIẾT</button>
+                    </div>
+                  </div>
+                </div>
+                }
+              </div>
+            </ng-template>
+          </p-dataView>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
