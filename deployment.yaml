@@ -73,7 +73,7 @@ services:
 #docker-compose -f ./deployment.yaml up -d sneaker-spring-container
 
 
-
+#test
 #docker-compose -f ./deployment.yaml rm -s -f sneaker-angular-container
 #docker-compose -f ./deployment.yaml up -d sneaker-angular-container
 
