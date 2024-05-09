@@ -6,6 +6,7 @@ import { AllProductDto } from '../dtos/AllProduct.dto';
 import { ProductToCartDto } from '../dtos/productToCart.dto';
 import { ProductFromCartDto } from '../dtos/ProductFromCart.dto';
 import { Observable } from 'rxjs';
+import { ProductUploadReq } from '../requestType/UploadProducts';
 
 @Injectable({
   providedIn: 'root'
@@ -85,5 +86,37 @@ export class ProductService {
 
   getRelatedProduct(id: string){
     return this.httpClient.get<AllProductDto>(`${this.apiUrl}products/related/${id}`)
+  }
+  deleteProduct(id: string){
+    return this.httpClient.delete(`${this.apiUrl}products/${id}`,{
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${this.token}`
+      })
+    })
+  }
+
+  uploadProduct(product: ProductUploadReq){
+    return this.httpClient.post<{productId: number, message: string}>(`${this.apiUrl}products`, product, {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${this.token}`
+      })
+    })
+  }
+
+  uploadImageProduct(files : FormData,id: number){
+    return this.httpClient.post<{message: string}>(`${this.apiUrl}products/uploads/${id}`, files, {
+      headers: new HttpHeaders({
+        Authorization: `Bearer ${this.token}`
+      })
+    })
+  }
+  updateProduct(product: ProductUploadReq, id: number){
+    return this.httpClient.put<{message: string}>(`${this.apiUrl}products/${id}`, product, {
+      headers: new HttpHeaders({
+        Authorization: `Bearer ${this.token}`
+      })
+    })
   }
 }

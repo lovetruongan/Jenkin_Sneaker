@@ -10,14 +10,14 @@
       }
       @else {
       <div class="header-avtar-container">
-        <p-avatar (click)="menu.toggle($event)">
+        <div (click)="menu.toggle($event)" class="avatar-name-wrapper">
           <div class="header-avtar-icon">
             <span class="pi pi-user"></span>
           </div>
-          <span class="userName">{{userName}}</span>
-
-          <div class="header-avtar-name"></div>
-        </p-avatar>
+        <div class="header-avtar-name">
+          <p class="userName">{{userName}}</p>
+        </div>
+      </div>
         <p-menu #menu [model]="itemsMenuAvatar" [popup]="true"></p-menu>
       </div>
       }
@@ -42,37 +42,39 @@
         <div class="line-right"></div>
       </div>
     </div>
-    <div class="col-lg-2 col-md-2 col-sm-1 col-6 text-right header-cart-container-wrapper">
-      <div class="header-cart-container" [routerLink]="['/shoppingCart']">
-        <p class="header-cart-text">Giỏ hàng</p>
-        <div class="header-cart-icon">
-          <div class="header-cart-icon--bag">
-            <p-badge [value]="quantityInCart.toString()"></p-badge>
+    @if(roleId == 1 || !roleId){
+      <div class="col-lg-2 col-md-2 col-sm-1 col-6 text-right header-cart-container-wrapper">
+        <div class="header-cart-container" [routerLink]="['/shoppingCart']">
+          <p class="header-cart-text">Giỏ hàng</p>
+          <div class="header-cart-icon">
+            <div class="header-cart-icon--bag">
+              <p-badge [value]="quantityInCart.toString()"></p-badge>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="previewCart">
-        <p-toast></p-toast>
-        <h5 class="previewCart__heading">Giỏ hàng</h5>
-        <ul class="wrapper-product-list">
-          @for (item of products;track item){
-            <li [routerLink]="['/shoppingCart']" class="wrapper-product-item flex flex-wrap p-2 align-items-center gap-3">
-              <p-button (click)="deleteProduct($event,item.id)" icon="pi pi-times" severity="danger" [outlined]="true"></p-button>
-              <div class="wrapper__image">
-                  <img [src]="apiImage + item.products.thumbnail" [alt]="item.products.name" class="w-4rem shadow-2 flex-shrink-0 border-round" />
-                  <div class="wrapper-info">
-                      <span>Size: {{ item.size }}</span>
-                      <span class="font-bold text-900">{{ item.products.price | currency:'VND':'symbol':'1.0-0'}}</span>
-                      <span>x{{ item.quantity }}</span>
+        <div class="previewCart">
+          <p-toast></p-toast>
+          <h5 class="previewCart__heading">Giỏ hàng</h5>
+          <ul class="wrapper-product-list">
+            @for (item of products;track item){
+              <li [routerLink]="['/shoppingCart']" class="wrapper-product-item flex flex-wrap p-2 align-items-center gap-3">
+                <p-button (click)="deleteProduct($event,item.id)" icon="pi pi-times" severity="danger" [outlined]="true"></p-button>
+                <div class="wrapper__image">
+                    <img [src]="apiImage + item.products.thumbnail" [alt]="item.products.name" class="w-4rem shadow-2 flex-shrink-0 border-round" />
+                    <div class="wrapper-info">
+                        <span>Size: {{ item.size }}</span>
+                        <span class="font-bold text-900">{{ item.products.price | currency:'VND':'symbol':'1.0-0'}}</span>
+                        <span>x{{ item.quantity }}</span>
+                    </div>
                   </div>
-                </div>
-                <div class="flex-1 flex flex-column gap-2">
-                    <span class="font-bold">{{ item.products.name }}</span>
-                </div>
-            </li>
-          }
-        </ul>
+                  <div class="flex-1 flex flex-column gap-2">
+                      <span class="font-bold">{{ item.products.name }}</span>
+                  </div>
+                </li>
+              }
+            </ul>
+          </div>
       </div>
-    </div>
+    }
   </div>
 </div>

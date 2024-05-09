@@ -201,3 +201,39 @@ img {
 .thumbnail-item.active {
   border: 2px solid rgb(239, 155, 155);
 }
+
+.container.detail-admin{
+  padding: 20px;
+  padding-left: 0;
+  margin-top: 90px;
+  input {
+    width: 100%;
+  }
+  span {
+    width: 100%;
+  }
+  .form-group {
+    .wrapper {
+      display: flex;
+      flex-direction: column;
+      margin: 12px 0;
+    }
+    .upload-wrapper {
+      flex-direction: row;
+      align-items: center;
+      label {
+        margin-right: 24px;
+      }
+    }
+  }
+  .button-wrapper{
+    float: right;
+    .p-button {
+      border-radius: 4px;
+    }
+    .update-button {
+      margin-right: 24px;
+    }
+  }
+    
+}

@@ -2,11 +2,9 @@ package com.example.Sneakers.controllers;
 
 import com.example.Sneakers.components.LocalizationUtils;
 import com.example.Sneakers.dtos.OrderDTO;
+import com.example.Sneakers.dtos.StatusDTO;
 import com.example.Sneakers.models.Order;
-import com.example.Sneakers.responses.OrderHistoryResponse;
-import com.example.Sneakers.responses.OrderIdResponse;
-import com.example.Sneakers.responses.OrderListResponse;
-import com.example.Sneakers.responses.OrderResponse;
+import com.example.Sneakers.responses.*;
 import com.example.Sneakers.services.IOrderService;
 import com.example.Sneakers.services.OrderService;
 import com.example.Sneakers.utils.MessageKeys;
@@ -46,6 +44,18 @@ public class OrderController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+    @GetMapping("/admin")
+    public ResponseEntity<?> getALlOrders(
+            @RequestHeader("Authorization") String token){
+        try {
+            List<OrderHistoryResponse> orders = orderService.getAllOrders();
+            return ResponseEntity.ok(orders);
+        }
+        catch (Exception e ){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
     @GetMapping("/user")
     public ResponseEntity<?> getOrdersByUser(
             @RequestHeader("Authorization") String token){
@@ -57,6 +67,7 @@ public class OrderController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> getOrder(@Valid @PathVariable("id") Long orderId){
@@ -93,12 +104,32 @@ public class OrderController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+    @PutMapping("/update/{id}")
+    public ResponseEntity<?> updateOrderStatus(
+            @PathVariable("id") Long id,
+            @RequestBody StatusDTO statusDTO,
+            @RequestHeader("Authorization") String token
+            ){
+        try {
+            Order order = orderService.updateOrderStatus(id,statusDTO.getStatus());
+            return ResponseEntity.ok(MessageResponse
+                    .builder()
+                    .message("Update status successfully")
+                    .build());
+        }
+        catch (Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteOrder(@Valid @PathVariable Long id){
         //Xoá mềm => Cập nhật trường active = false
         orderService.deleteOrder(id);
         return ResponseEntity.ok(localizationUtils.getLocalizedMessage(MessageKeys.DELETE_ORDER_SUCCESSFULLY));
     }
+
     @GetMapping("/get-orders-by-keyword")
 //    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<OrderListResponse> getOrdersByKeyword(

@@ -17,10 +17,14 @@
 
   .header-avtar-container {
 
+    height: 100%;
+    display: flex;
+    align-items: center;
     p-avatar {
       position: relative;
       display: block;
       height: 50px;
+      text-align: left;
 
       .p-avatar {
         background-color: black !important;
@@ -28,7 +32,16 @@
         top: 50%;
       }
     }
+    .avatar-name-wrapper {
+      display: flex;
+      align-items: center;
+      height: 100%;
+    }
 
+    .userName {
+      margin-left: 12px;
+      margin-bottom: 0;
+    }
     ul {
       padding-left: 0;
       margin-bottom: 0;
@@ -242,8 +255,7 @@
 
 }
 
-@media only screen and (max-width: 575px) {
-
+@media only screen and (max-width: 489px) {
   .app-logo-header a {
     margin-top: 0px;
     margin-left: -200px;
@@ -262,7 +274,7 @@
   }
 
   .header-search-container i {
-    transform: translate(-110px, -20px) !important;
+    transform: translate(-30px, -20px) !important;
   }
 
   .line-right {
@@ -271,8 +283,63 @@
 
   .header-cart-container {
     position: absolute !important;
-    top: -15px;
-    right: 15px;
+    top: -25px;
+    right: -90%;
+    margin-top: 0 !important;
+    .header-cart-text {
+      display: none !important;
+    }
+  }
+
+  .img-fluid {
+    width: 130px !important;
+    transform: translateX(-40px) !important;
+  }
+
+  .app-header .app-logo-header a img {
+    transform: translate(0) !important;
+  }
+
+  .app-header .header-avtar-container p-avatar .p-avatar {
+    left: 20px;
+    top: 30%;
+  }
+}
+
+@media only screen and (min-width: 490px) and (max-width: 575px) {
+  .app-logo-header a {
+    margin-top: 0px;
+    margin-left: -200px;
+  }
+
+  .userName {
+    display: none;
+  }
+
+  .header-right {
+    position: absolute;
+  }
+
+  .header-search-container {
+    position: absolute;
+  }
+
+  .header-search-container i {
+    transform: translate(-40px, -20px) !important;
+  }
+
+  .line-right {
+    display: none;
+  }
+
+  .header-cart-container {
+    position: absolute !important;
+    top: -25px;
+    right: -90%;
+    margin-top: 0 !important;
+    .header-cart-text {
+      display: none !important;
+    }
   }
 
   .img-fluid {
@@ -285,10 +352,9 @@
     top: 30%;
   }
 
-  // .app-header .app-logo-header a img {
-  //   min-width: 180px !important;
-  //   transform: translate(20px, 25px) !important;
-  // }
+  .banner-content--item:nth-child(3) {
+    display: none !important;
+  }
 }
 
 @media only screen and (min-width: 576px) and (max-width: 767px) {

@@ -49,6 +49,7 @@ public class JwtTokenUtils {
         byte[] bytes = Decoders.BASE64.decode(secretKey);
         //Keys.hmacShaKeyFor(Decoders.BASE64.decode("TaqlmGv1iEDMRiFp/pHuID1+T84IABfuA0xXh4GhiUI="));
         //U0roD0fdqXHh6yEzmYciXkhmHlFsS7v2Xa3bLVPsyLQ=
+        //bd5WNAMWnnQukkW+AqFYD1NV63VfDa73KrV44gsGkvY=
         return Keys.hmacShaKeyFor(bytes);
     }
     private String generateSecretKey() {

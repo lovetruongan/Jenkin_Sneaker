@@ -23,6 +23,7 @@ import { DataViewModule } from 'primeng/dataview';
 import { ToastModule } from 'primeng/toast';
 import { CommonService } from '../../services/common.service';
 import { environment } from '../../../../environments/environment.development';
+import { UserDto } from '../../dtos/user.dto';
 
 @Component({
   selector: 'app-app-header',
@@ -50,6 +51,7 @@ import { environment } from '../../../../environments/environment.development';
 })
 export class AppHeaderComponent extends BaseComponent implements AfterViewInit,OnInit{
   public token: string | null = null;
+  public roleId: number = 100;
   public itemsMenuAvatar: MenuItem[] | undefined;
   public userName : string | undefined;
   public searchValue : string = "";
@@ -70,6 +72,7 @@ export class AppHeaderComponent extends BaseComponent implements AfterViewInit,O
     super();
     if (typeof localStorage !== 'undefined') {
       this.token = localStorage.getItem('token');
+      this.roleId = parseInt(JSON.parse(localStorage.getItem("userInfor") || '{"role_id": "0"}').role_id || '0');
     }
   }
 
@@ -84,9 +87,10 @@ export class AppHeaderComponent extends BaseComponent implements AfterViewInit,O
 
     if (this.token != null){
       this.userService.getInforUser(this.token).pipe(
-        filter((userInfo) => !!userInfo),
-        tap((userInfo) => {
+        filter((userInfo: UserDto) => !!userInfo),
+        tap((userInfo: UserDto) => {
           this.userName = userInfo.fullname;
+          this.roleId = userInfo.role.id;
         }),
         takeUntil(this.destroyed$),
         catchError((err) => of(err))
@@ -128,8 +132,10 @@ export class AppHeaderComponent extends BaseComponent implements AfterViewInit,O
   
   signOut(){
     localStorage.removeItem("token");
+    localStorage.removeItem("roleId");
+    localStorage.removeItem("userInfor");
     localStorage.removeItem("productOrder");
-    window.location.reload();
+    window.location.href = "/Home";
   }
 
   sendContentSearch(){

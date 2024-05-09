@@ -11,6 +11,7 @@ import com.example.Sneakers.models.Role;
 import com.example.Sneakers.models.User;
 import com.example.Sneakers.repositories.RoleRepository;
 import com.example.Sneakers.repositories.UserRepository;
+import com.example.Sneakers.responses.UserResponse;
 import com.example.Sneakers.utils.MessageKeys;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -21,7 +22,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -44,6 +47,7 @@ public class UserService implements IUserService{
         if(userDTO.getRoleId() == null){
             userDTO.setRoleId(1L);
         }
+
         Role role =roleRepository.findById(userDTO.getRoleId())
                 .orElseThrow(() -> new DataNotFoundException(
                         localizationUtils.getLocalizedMessage(MessageKeys.ROLE_DOES_NOT_EXISTS)));;
@@ -87,7 +91,7 @@ public class UserService implements IUserService{
                 throw new BadCredentialsException(localizationUtils.getLocalizedMessage(MessageKeys.WRONG_PHONE_PASSWORD));
             }
         }
-
+        //Thông tin xác thực
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                 phoneNumber, password,
                 existingUser.getAuthorities()
@@ -157,5 +161,27 @@ public class UserService implements IUserService{
         //existingUser.setRole(updatedRole);
         // Save the updated user
         return userRepository.save(existingUser);
+    }
+
+    @Override
+    public List<UserResponse> getAllUser() {
+        return userRepository.findAll()
+                .stream()
+                .map(UserResponse::fromUser)
+                .collect(Collectors.toList());
+    }
+    @Override
+    public User changeRoleUser(Long roleId, Long userId) throws Exception {
+        Role role = roleRepository.findById(roleId)
+                .orElseThrow(() -> new Exception("Cannot find role with id = " + roleId));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new Exception("Cannot find user with id = " + userId));
+        user.setRole(role);
+        return userRepository.save(user);
+    }
+
+    @Override
+    public void deleteUser(Long id) {
+        userRepository.deleteById(id);
     }
 }

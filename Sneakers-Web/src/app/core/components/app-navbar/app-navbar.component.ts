@@ -8,6 +8,8 @@ import { MenuItem } from 'primeng/api';
 import { CategoriesService } from '../../services/categories.service';
 import { catchError, filter, map, of, takeUntil, tap } from 'rxjs';
 import { CategoriesDto } from '../../dtos/categories.dto';
+import { UserService } from '../../services/user.service';
+import { UserDto } from '../../dtos/user.dto';
 
 @Component({
   selector: 'app-app-navbar',
@@ -22,15 +24,33 @@ import { CategoriesDto } from '../../dtos/categories.dto';
   styleUrl: './app-navbar.component.scss'
 })
 export class AppNavbarComponent extends BaseComponent implements OnInit {
+  public roleId: number = 100;
+  public token: string | null = null;
   categories: MenuItem[] = [];
   constructor(
     private categoriesService: CategoriesService,
+    private userService: UserService,
     private readonly router: Router
   ) {
     super();
+    if (typeof localStorage != 'undefined'){
+      this.token = localStorage.getItem("token");
+      this.roleId = parseInt(JSON.parse(localStorage.getItem("userInfor") || '{"role_id": "0"}').role_id || '0');
+    }
   }
 
   ngOnInit(): void {
+    if (this.token != null){
+      this.userService.getInforUser(this.token).pipe(
+        filter((userInfo: UserDto) => !!userInfo),
+        tap((userInfo: UserDto) => {
+          this.roleId = userInfo.role.id;
+        }),
+        takeUntil(this.destroyed$),
+        catchError((err) => of(err))
+      ).subscribe()
+    }
+
     this.categoriesService.getCategories().pipe(
       filter((categoriesVal: CategoriesDto[]) => !!categoriesVal),
       tap((categoriesVal: CategoriesDto[]) => {

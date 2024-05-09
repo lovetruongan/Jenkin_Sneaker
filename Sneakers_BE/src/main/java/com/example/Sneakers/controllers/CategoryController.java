@@ -50,6 +50,14 @@ public class CategoryController {
         List<Category> categories = categoryService.getAllCategories();
         return ResponseEntity.ok(categories);
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getCategoryById(
+        @PathVariable("id") Long id
+    ){
+        Category category = categoryService.getCategoryById(id);
+        return ResponseEntity.ok(category);
+    }
     @PutMapping("/{id}")
     public ResponseEntity<UpdateCategoryResponse> updateCategory(
             @Valid @PathVariable("id") Long id,

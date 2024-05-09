@@ -1,0 +1,32 @@
+<div class="container category-manage-admin">
+    <p-toast></p-toast>
+    <p-confirmDialog></p-confirmDialog>
+    <div class="row add-category-wrapper">
+        <div class="col col-lg-4 offset-lg-2">
+            <p-button (click)="visible = true" label="Thêm danh mục"></p-button>
+        </div>
+    </div>
+    <p-dialog [modal]="true" header="Thêm danh mục" [(visible)]="visible" [style]="{ width: '500px' }" [draggable]="false" [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }">
+        <input [(ngModel)]="categoryName" type="text" pInputText />
+        <ng-template pTemplate="footer">
+            <p-button icon="pi pi-check" (click)="addCategory()" label="Thêm" pAutoFocus [autofocus]="true"></p-button>
+        </ng-template>
+    </p-dialog>
+    @for (item of categoriesOptions; track item) {
+        <div class="row">
+            <div class="col col-lg-4 offset-lg-2">
+                <div class="category-wrapper">
+                    <label class="font-bold" [for]="item.name">Tên danh mục</label>
+                    <input [id]="item.name" type="text" pInputText [(ngModel)]="item.name" />
+                </div>
+            </div>
+            <div class="col col-lg-4 offset-lg-2 d-flex align-items-center">
+                <div class="button-wrapper">
+                    <p-button (click)="updateCategory(item.id, item.name)" class="update-button" label="Cập nhật danh mục"></p-button>
+                    <p-button (click)="confirmDelete(item.id)" label="Xóa danh mục" severity="danger"></p-button>
+                </div>
+            </div>
+        </div>
+    }
+
+</div>

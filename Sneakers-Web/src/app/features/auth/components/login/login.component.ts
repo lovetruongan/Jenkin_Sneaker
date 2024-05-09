@@ -15,6 +15,7 @@ import { loginDetailDto } from '../../../../core/dtos/login.dto';
 import { KeyFilterModule } from 'primeng/keyfilter';
 import { BlockUIModule } from 'primeng/blockui';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { UserDto } from '../../../../core/dtos/user.dto';
 
 @Component({
   selector: 'app-login',
@@ -40,6 +41,7 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
   styleUrl: './login.component.scss'
 })
 export class LoginComponent extends BaseComponent implements AfterViewInit {
+  private token: string | null = null;
   public loginForm: FormGroup;
   public formSubmitSubject = new Subject<void>();
   public formSubmit$ = this.formSubmitSubject.asObservable();
@@ -76,13 +78,23 @@ export class LoginComponent extends BaseComponent implements AfterViewInit {
           tap((loginVal : loginDetailDto) => {
             this.toastService.success(loginVal.message);
             localStorage.setItem("token",loginVal.token);
+            this.token = loginVal.token;
             this.blockUi();
           }),
           delay(1000),
+          switchMap(() => {
+            return this.userSerivce.getInforUser(this.token).pipe(
+              tap((userInfor: UserDto) => {
+                localStorage.setItem("userInfor", JSON.stringify(userInfor));
+              })
+            );
+          }),
           tap(() => {
-            this.router.navigateByUrl("/Home");
+            window.location.href = '/Home';
           }),
           catchError((error) => {
+            console.log(error);
+            
             this.toastService.fail(error.error.message);
             return of();
           })

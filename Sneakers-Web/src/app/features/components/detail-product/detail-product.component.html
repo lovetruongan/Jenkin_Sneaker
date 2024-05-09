@@ -1,105 +1,157 @@
-@if (mainProduct){
-<div class="container detail">
-  <div class="intro-section">
-    <h4><span class="text-secondary">Giày | Basas | </span>{{mainProduct.name}}</h4>
-    <div style="width: 100%; height: 2.5px; background-color: black;"></div>
-  </div>
-  <div class="row detail-shoe" style="margin-left: 20px;">
-    <div class="col-md-6">
-      <!-- main image -->
-      <div id="carouselExample" class="carousel slide" data-bs-ride="carousel" style="margin-left: -20px;">
-        <p-galleria [value]="images" [numVisible]="5" [circular]="true" [showItemNavigators]="true"
-          [responsiveOptions]="responsiveOptions" [containerStyle]="{ 'max-width': '640px' }">
-          <ng-template pTemplate="item" let-item>
-            <img [src]="apiImage + item.image_url"
-              style="width: 100%; display: block;" />
-          </ng-template>
-          <ng-template pTemplate="thumbnail" let-item>
-            <div class="grid grid-nogutter justify-content-center">
-              <img [src]="apiImage + item.image_url"
-                style="display: block; width: 80%" />
-            </div>
-          </ng-template>
-        </p-galleria>
-      </div>
+@if (mainProduct && (roleId == 1 || !roleId)){
+  <div class="container detail">
+    <div class="intro-section">
+      <h4><span class="text-secondary">Giày | Basas | </span>{{mainProduct.name}}</h4>
+      <div style="width: 100%; height: 2.5px; background-color: black;"></div>
     </div>
-
-    <!-- details -->
-    <div class="col-md-6 details">
-      <div class="mt-4 mb-3 position-relative">
-        <h2 class="text-uppercase fw-bold my-4">{{mainProduct.name}}</h2>
-        <p class="my-4">Mã sản phẩm: <span class="text-dark fw-bold">{{mainProduct.id}}</span></p>
-        <p class="my-4 position-absolute" style="top:27%; left: 60%">Tình trạng:
-          <span class="text-dark fw-bold">Còn hàng</span>
-        </p>
-        <div class="d-flex price-wrapper">
-          <h2 class="text-danger my-4">{{mainProduct.price | currency:'VND':'symbol':'1.0-0'}}</h2>
-          @if(mainProduct.discount){
-            <h2 class="my-4 old-price">{{mainProduct.price / (1-mainProduct.discount/100) | currency:'VND':'symbol':'1.0-0'}}</h2>
+    <div class="row detail-shoe" style="margin-left: 20px;">
+      <div class="col-md-6">
+        <!-- main image -->
+        <div id="carouselExample" class="carousel slide" data-bs-ride="carousel" style="margin-left: -20px;">
+          <p-galleria [value]="images" [numVisible]="5" [circular]="true" [showItemNavigators]="true"
+            [responsiveOptions]="responsiveOptions" [containerStyle]="{ 'max-width': '640px' }">
+            <ng-template pTemplate="item" let-item>
+              <img [src]="apiImage + item.image_url"
+                style="width: 100%; display: block;" />
+            </ng-template>
+            <ng-template pTemplate="thumbnail" let-item>
+              <div class="grid grid-nogutter justify-content-center">
+                <img [src]="apiImage + item.image_url"
+                  style="display: block; width: 80%" />
+              </div>
+            </ng-template>
+          </p-galleria>
+        </div>
+      </div>
+  
+      <!-- details -->
+      <div class="col-md-6 details">
+        <div class="mt-4 mb-3 position-relative">
+          <h2 class="text-uppercase fw-bold my-4">{{mainProduct.name}}</h2>
+          <p class="my-4">Mã sản phẩm: <span class="text-dark fw-bold">{{mainProduct.id}}</span></p>
+          <p class="my-4 position-absolute" style="top:27%; left: 60%">Tình trạng:
+            <span class="text-dark fw-bold">Còn hàng</span>
+          </p>
+          <div class="d-flex price-wrapper">
+            <h2 class="text-danger my-4">{{mainProduct.price | currency:'VND':'symbol':'1.0-0'}}</h2>
+            @if(mainProduct.discount){
+              <h2 class="my-4 old-price">{{mainProduct.price / (1-mainProduct.discount/100) | currency:'VND':'symbol':'1.0-0'}}</h2>
+            }
+          </div>
+        </div>
+        <hr>
+  
+        <h2 class="my-4">Thông tin chi tiết sản phẩm</h2>
+        <p class="about mb-4" style="font-size: 16px;">{{mainProduct.description}}</p>
+  
+        <hr>
+  
+        <div class="sizes mt-4">
+          <h6 class="text-uppercase" style="margin-left: 10px;">Size</h6>
+          @for (item of sizes; track item) {
+          <label class="radio">
+            <input type="radio" name="size" [value]="item" [(ngModel)]="size" checked>
+            <span>{{item}}</span>
+          </label>
           }
         </div>
-      </div>
-      <hr>
-
-      <h2 class="my-4">Thông tin chi tiết sản phẩm</h2>
-      <p class="about mb-4" style="font-size: 16px;">{{mainProduct.description}}</p>
-
-      <hr>
-
-      <div class="sizes mt-4">
-        <h6 class="text-uppercase" style="margin-left: 10px;">Size</h6>
-        @for (item of sizes; track item) {
-        <label class="radio">
-          <input type="radio" name="size" [value]="item" [(ngModel)]="size" checked>
-          <span>{{item}}</span>
-        </label>
-        }
-      </div>
-
-      <hr>
-
-      <div class="product-details">
-        <h5>Số lượng</h5>
-        <div class="product-quantity">
-          <div class="border-wrapper">
-            <p-inputNumber [min]="1" [(ngModel)]="quantity" buttonLayout="horizontal" inputId="horizontal"
-              [showButtons]="true" decrementButtonClass="p-button-secondary" incrementButtonClass="p-button-secondary"
-              incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus"></p-inputNumber>
-          </div>
-        </div>
-        <div class="product-actions">
-          <p-toast></p-toast>
-          <button (click)="addToCart()" class="btn btn-dark" style="font-size: 18px;">Thêm vào giỏ hàng</button>
-          <button class="btn btn-danger" style="font-size: 18px;">Mua ngay</button>
-          <i class="pi pi-heart" title="Thêm vào yêu thích"></i>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <hr class="mt-5">
-  <!-- suggestion -->
-  <div class="suggest my-5 d-none d-md-block">
-    <h3 class="text-center text-uppercase fw-bold">Sản phẩm liên quan</h3>
-
-    <div class="container-lg">
-      <div class="row my-4 align-items-center justify-content-center g-5">
-        @for(product of relatedProducts; track product){
-          <div (click)="goToDetail(product.id)" class="col-8 col-lg-3">
-            <div class="card border-0">
-              <div class="card-body py-3">
-                <img [src]="apiImage + product.thumbnail" alt="giaycv" class="img-fluid">
-              </div>
-              <div class="card-footer text-center tw-bold border-0">
-                <p class="lead card-title text-secondary">{{product.name}}</p>
-                <p class="my-2 text-danger fw-semibold" style="font-size: 15px;">{{product.price | currency:'VND':'symbol':'1.0-0'}}</p>
-              </div>
+  
+        <hr>
+  
+        <div class="product-details">
+          <h5>Số lượng</h5>
+          <div class="product-quantity">
+            <div class="border-wrapper">
+              <p-inputNumber [min]="1" [(ngModel)]="quantity" buttonLayout="horizontal" inputId="horizontal"
+                [showButtons]="true" decrementButtonClass="p-button-secondary" incrementButtonClass="p-button-secondary"
+                incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus"></p-inputNumber>
             </div>
           </div>
-        }
-
+          <div class="product-actions">
+            <p-toast></p-toast>
+            <button (click)="addToCart()" class="btn btn-dark" style="font-size: 18px;">Thêm vào giỏ hàng</button>
+            <button class="btn btn-danger" style="font-size: 18px;">Mua ngay</button>
+            <i class="pi pi-heart" title="Thêm vào yêu thích"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <hr class="mt-5">
+    <!-- suggestion -->
+    <div class="suggest my-5 d-none d-md-block">
+      <h3 class="text-center text-uppercase fw-bold">Sản phẩm liên quan</h3>
+  
+      <div class="container-lg">
+        <div class="row my-4 align-items-center justify-content-center g-5">
+          @for(product of relatedProducts; track product){
+            <div (click)="goToDetail(product.id)" class="col-8 col-lg-3">
+              <div class="card border-0">
+                <div class="card-body py-3">
+                  <img [src]="apiImage + product.thumbnail" alt="giaycv" class="img-fluid">
+                </div>
+                <div class="card-footer text-center tw-bold border-0">
+                  <p class="lead card-title text-secondary">{{product.name}}</p>
+                  <p class="my-2 text-danger fw-semibold" style="font-size: 15px;">{{product.price | currency:'VND':'symbol':'1.0-0'}}</p>
+                </div>
+              </div>
+            </div>
+          }
+  
+        </div>
       </div>
     </div>
   </div>
-</div>
-}
+  } 
+  @else if (mainProduct && roleId == 2) {
+    <div class="container detail-admin">
+      <p-toast></p-toast>
+      <p-confirmDialog></p-confirmDialog>
+      <div class="row">
+        <div class="col-8 col-lg-8 offset-lg-2">
+          <form class="form-group" [formGroup]="productForm">
+            <div class="wrapper">
+              <label class="font-bold" for="productName">Tên sản phẩm</label>
+              <input id="productName" type="text" pInputText formControlName="productName"/>
+            </div>
+            <div class="wrapper">
+              <label class="font-bold" for="price">Giá</label>
+              <p-inputNumber inputId="price" formControlName="price"></p-inputNumber>
+            </div>
+            <div class="wrapper">
+              <label class="font-bold" for="discount">Giảm giá (%)</label>
+              <p-inputNumber inputId="discount" formControlName="discount"></p-inputNumber>
+            </div>
+            <div class="wrapper dropdown-wrapper">
+              <p-dropdown [options]="categoriesOptions" [placeholder]="categoryNameOfProduct"
+                (onChange)="onCategoryChange($event)"></p-dropdown> 
+            </div>
+            <div class="wrapper upload-wrapper">
+              <label class="font-bold" for="discount">Tải lên ảnh</label>
+              <p-fileUpload [multiple]="true" mode="basic" chooseLabel="Choose" name="myFile[]" url="https://www.primefaces.org/cdn/api/upload.php" [auto]="true" accept="image/*" (onUpload)="onUpload($event)"></p-fileUpload>
+            </div>
+  
+            <div class="wrapper">
+              <ul>
+                @for (item of myFiles; track item) {
+                  <li class="font-bold">{{item.name}} -- {{(item.size / 1024).toFixed(0)}}KB</li>
+                }
+              </ul>
+            </div>
+            
+            <div class="wrapper">
+              <label class="font-bold" for="description">Mô tả</label>
+              <textarea id="description" rows="5" cols="100" pInputTextarea formControlName="description"></textarea>
+            </div>
+          </form>
+          <div class="button-wrapper">
+            <p-button (click)="updateProductAdmin()" class="update-button" label="Cập nhật sản phẩm"></p-button>
+            <p-button (click)="confirmDelete()" severity="danger" label="Xóa sản phẩm"></p-button>
+          </div>
+          
+        </div>
+  
+      </div>
+    </div>
+  }
+  @else if (mainProduct && roleId == 100) {}

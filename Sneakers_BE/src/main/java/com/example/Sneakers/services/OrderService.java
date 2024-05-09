@@ -117,6 +117,7 @@ public class OrderService implements IOrderService{
 
         // Lưu danh sách OrderDetail vào cơ sở dữ liệu
         orderDetailRepository.saveAll(orderDetails);
+        // Gửi mail thông báo cho người dùng
         Email email = new Email();
         String to = order.getEmail();
         String subject = "Đặt hàng thành công từ Sneaker Store - Đơn hàng #" + order.getId();
@@ -139,6 +140,12 @@ public class OrderService implements IOrderService{
     public OrderResponse getOrderByUser(Long orderId, String token) throws Exception {
         String extractedToken = token.substring(7);
         User user = userService.getUserDetailsFromToken(extractedToken);
+
+        if(user.getRole().getName().equals(Role.ADMIN)){
+            return OrderResponse.fromOrder(orderRepository.findById(orderId)
+                    .orElseThrow(() -> new Exception("Cannot find order with id = " + orderId)));
+
+        }
 
         Order order = orderRepository.findById(orderId).orElse(null);
         if(!user.getId().equals(order.getUser().getId())){
@@ -183,7 +190,24 @@ public class OrderService implements IOrderService{
     }
 
     @Override
+    public List<OrderHistoryResponse> getAllOrders() {
+        return orderRepository.findAll()
+                .stream()
+                .map(OrderHistoryResponse::fromOrder)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public Page<Order> getOrdersByKeyword(String keyword, Pageable pageable) {
         return orderRepository.findByKeyword(keyword, pageable);
     }
+
+    @Override
+    public Order updateOrderStatus(Long orderId, String status) throws Exception {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new Exception("Cannot find order with id = " + orderId));
+        order.setStatus(status);
+        return orderRepository.save(order);
+    }
+
 }

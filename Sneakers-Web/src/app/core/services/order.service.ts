@@ -46,4 +46,20 @@ export class OrderService {
       })
     });
   }
+  getAllOrders(){
+    return this.httpClient.get<HistoryOrderDto[]>(`${this.apiUrl}orders/admin`,{
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${this.token}`
+      })
+    });
+  }
+  changeOrderState(state: string, orderId: number){
+    return this.httpClient.put<{message: string}>(`${this.apiUrl}orders/update/${orderId}`, JSON.stringify(state) , {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${this.token}`
+      })
+    });
+  }
 }

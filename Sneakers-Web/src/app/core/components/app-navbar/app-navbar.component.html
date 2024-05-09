@@ -2,29 +2,52 @@
   <div class="container-fluid">
     <div class="collapse navbar-collapse justify-content-center" id="navbarNavAltMarkup">
       <ul class="navbar-nav">
-        <!-- <div class="navbar-collapse d-flex justify-content-center align-items-center"
-                    id="collapsibleNavbar">
-                    <ul class="navbar-nav text-uppercase fw-bold"> -->
 
-        <li class="nav-item mx-3">
-          <a class="nav-link" aria-current="true" href="#">Trang chủ</a>
-        </li>
+                      @if(roleId == 1 || !roleId){
+                        <li class="nav-item mx-3">
+                          <a class="nav-link" aria-current="true" href="#">Trang chủ</a>
+                        </li>
+                
+                        <li class="nav-item mx-3">
+                          <a class="nav-link" href="" [routerLink]="['/Intro']">Giới thiệu</a>
+                        </li>
+                
+                        <li class="nav-item mx-3">
+                          <a class="nav-link" href="" [routerLink]="['/news']">Tin tức</a>
+                        </li>
+                
+                        <li class="nav-item mx-3">
+                          <a class="nav-link" href="" [routerLink]="['/contact']">Liên hệ</a>
+                        </li>
+                
+                        <li class="nav-item mx-3">
+                          <a class="nav-link" href="" [routerLink]="['/allProduct']">Tất cả sản phẩm</a>
+                        </li>
+                      } @else if (roleId == 2) {
+                        <li class="nav-item mx-3">
+                          <a class="nav-link" aria-current="true" href="#">Trang chủ</a>
+                        </li>
 
-        <li class="nav-item mx-3">
-          <a class="nav-link" href="" [routerLink]="['/Intro']">Giới thiệu</a>
-        </li>
+                        <li class="nav-item mx-3">
+                          <a class="nav-link" href="" [routerLink]="['/userManage']">Quản lý người dùng</a>
+                        </li>
 
-        <li class="nav-item mx-3">
-          <a class="nav-link" href="" [routerLink]="['/news']">Tin tức</a>
-        </li>
+                        <li class="nav-item mx-3">
+                          <a class="nav-link" href="" [routerLink]="['/orderManage']">Quản lý đơn hàng</a>
+                        </li>
 
-        <li class="nav-item mx-3">
-          <a class="nav-link" href="" [routerLink]="['/contact']">Liên hệ</a>
-        </li>
+                        <li class="nav-item mx-3">
+                          <a class="nav-link" href="" [routerLink]="['/uploadProduct']">Thêm sản phẩm</a>
+                        </li>
 
-        <li class="nav-item mx-3">
-          <a class="nav-link" href="" [routerLink]="['/allProduct']">Tất cả sản phẩm</a>
-        </li>
+                        <li class="nav-item mx-3">
+                          <a class="nav-link" href="" [routerLink]="['/categoryManage']">Quản lý danh mục</a>
+                        </li>
+                        
+                        <li class="nav-item mx-3">
+                          <a class="nav-link" href="" [routerLink]="['/allProduct']">Tất cả sản phẩm</a>
+                        </li>
+                      } @else {}
       </ul>
     </div>
   </div>

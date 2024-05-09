@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment.development';
 import { CategoriesDto } from '../dtos/categories.dto';
@@ -10,16 +10,49 @@ import { AllProductDto } from '../dtos/AllProduct.dto';
 })
 export class CategoriesService {
   private readonly apiUrl : string = environment.apiUrl;
+  private token !: string | null;
 
   constructor(
     private httpClient : HttpClient
-  ) { }
+  ) {
+    if (typeof localStorage !== 'undefined') {
+      this.token = localStorage.getItem('token');
+    }
+   }
 
   getCategories(){
     return this.httpClient.get<CategoriesDto[]>(`${this.apiUrl}categories`);
   }
-
+  getCategoryById(id: number){
+    return this.httpClient.get<CategoriesDto>(`${this.apiUrl}categories/${id}`);
+  }
   getAllProductByCategory(id: number){
     return this.httpClient.get<AllProductDto>(`${this.apiUrl}products/category/${id}`);
+  }
+  postCategory(value: {name: string}){
+    return this.httpClient.post<{categories: CategoriesDto[],message: string}>(`${this.apiUrl}categories`, value , {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${this.token}`
+      })
+    });
+  }
+
+  updateCategory(value: {name: string}, id: number){
+    return this.httpClient.put<{categories: CategoriesDto[],message: string}>(`${this.apiUrl}categories/${id}`, value , {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${this.token}`
+      })
+    });
+  }
+
+  deleteCategory(id: number){
+    return this.httpClient.delete<{categories: CategoriesDto[],message: string}>(`${this.apiUrl}categories/${id}` , {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${this.token}`
+      })
+    });
   }
 }

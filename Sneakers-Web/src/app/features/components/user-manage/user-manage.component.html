@@ -1,0 +1,26 @@
+<div class="container user-manage-admin">
+    <p-confirmDialog></p-confirmDialog>
+    <p-toast></p-toast>
+    @for (user of users; track user) {
+        @if(userId != user.id){
+            <div class="row">
+                <div class="col-10 col-lg-10 offset-lg-1">
+                    <p-panel class="user-infor-wrapper" [toggleable]="true" [collapsed]="true">
+                        <ng-template pTemplate="header">
+                            <div class="flex align-items-center gap-2">
+                                <span class="font-bold">{{user.fullname}}</span>
+                            </div>
+                        </ng-template>
+                        <p>Số điện thoại: {{user.phone_number}}</p>
+                        <p>Địa chỉ: {{user.address}}</p>
+                        <p>Ngày sinh: {{user.date_of_birth | date: 'dd/MM/yyyy'}}</p>
+                        <p-dropdown [options]="userOptions" [placeholder]="roleMap[user.role.id-1]"
+                      (onChange)="onCategoryChange(user.id,$event)"></p-dropdown>
+                        <p-button class="delete--button" (click)="confirmDelete(user.id)" label="Xóa người dùng" severity="danger"></p-button>
+                    </p-panel>
+                </div>
+            </div>
+        }
+    }
+    
+</div>
