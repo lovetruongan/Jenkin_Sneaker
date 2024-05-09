@@ -52,7 +52,7 @@ services:
       context: .
       dockerfile: DockerfileAngular
     ports:
-      - "4200:80"
+      - "4200:443"
     networks:
       - Sneaker-network
     
