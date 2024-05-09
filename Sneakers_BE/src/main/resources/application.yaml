@@ -1,10 +1,9 @@
 server:
   port: 8089
   ssl:
-    key-store: example.jks
+    key-store: sneaker_p12.p12
     key-store-password: Truongan2k3
-    key-store-type: JKS
-    key-alias: tomcat
+    key-alias: sneaker.mydevopsproject2023.id.vn
 
 
 spring:
