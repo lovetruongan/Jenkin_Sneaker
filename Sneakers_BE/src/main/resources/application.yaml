@@ -1,7 +1,8 @@
 server:
   port: 8089
   ssl:
-    key-store: sneaker_p12.p12
+    key-store-type: PKCS12 
+    key-store: classpath:sneaker_p12.p12
     key-store-password: Truongan2k3
     key-alias: sneaker.mydevopsproject2023.id.vn
 
