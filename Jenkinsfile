@@ -4,7 +4,7 @@ pipeline{
         SONAR_HOME = tool "Sonar"
     }
     stages{
-        stage("Clone code from github"){
+        stage("Check out code from github"){
             steps{
                 git url : "https://github.com/lovetruongan/Jenkin_Sneaker", branch: "master"
             }
