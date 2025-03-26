@@ -14,6 +14,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "users")
+@Data
 @Getter
 @Setter
 @AllArgsConstructor
@@ -24,23 +25,23 @@ public class User extends BaseEntity implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "fullname",length = 100)
+    @Column(name = "fullname", length = 100)
     private String fullName;
 
-    @Column(name = "phone_number",length = 11,nullable = false)
+    @Column(name = "phone_number", length = 11, nullable = false)
     private String phoneNumber;
 
-    @Column(name = "address",length = 200)
+    @Column(name = "address", length = 200)
     private String address;
 
-    @Column(name = "password",length = 100,nullable = false)
+    @Column(name = "password", length = 100, nullable = false)
     private String password;
 
     @Column(name = "is_active")
     private boolean isActive;
 
     @Column(name = "date_of_birth")
-//    @JsonFormat(pattern="MM/dd/yyyy")
+    // @JsonFormat(pattern="MM/dd/yyyy")
     private Date dateOfBirth;
 
     @Column(name = "facebook_account_id")
@@ -57,7 +58,7 @@ public class User extends BaseEntity implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<SimpleGrantedAuthority> authorityList = new ArrayList<>();
         authorityList.add(new SimpleGrantedAuthority("ROLE_" + getRole().getName()));
-        //authorityList.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
+        // authorityList.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
         return authorityList;
     }
 
