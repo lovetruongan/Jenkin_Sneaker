@@ -14,10 +14,4 @@ COPY --from=build /app/Sneakers_BE/Image_upload Image_upload
 EXPOSE 8089
 CMD ["java","-jar","app.jar"]
 
-#docker build -t sneaker-spring:1.0.0 -f ./DockerfileJavaSpring .
-#docker login
-#create sunlight4d/shopapp-spring:1.0.4 repository on DockerHub
-#docker tag shopapp-spring:1.0.4 sunlight4d/shopapp-spring:1.0.4
-#docker push sunlight4d/shopapp-spring:1.0.4
-#docker run --name sneaker_container sneaker-spring:1.0.0
 
