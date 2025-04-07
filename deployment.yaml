@@ -1,9 +1,7 @@
-
-version: '3.7'
 services:
   mysql8-container:
     container_name: mysql8-container
-    image: mysql:8.2.0    
+    image: mysql:8.2.0
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: admin
@@ -11,59 +9,59 @@ services:
     ports:
       - 3306:3306
     networks:
-      - Sneaker-network  
+      - Sneaker-network
 
   phpmyadmin8-container:
     #intel host
-    image: phpmyadmin/phpmyadmin
+    #image: phpmyadmin/phpmyadmin
     #mac m1 host
-    #image: arm64v8/phpmyadmin     
+    image: arm64v8/phpmyadmin
     container_name: phpmyadmin8-container
     restart: always
     depends_on:
-      - mysql8-container      
+      - mysql8-container
     ports:
       - "8100:80" #port mapping
     environment:
       PMA_HOST: mysql8-container #phpMyAdmin Host, PMA = PHP My Amin
     networks:
       - Sneaker-network
-  
-  sneaker-spring-container:    
-    container_name: sneaker-spring-container    
+
+  sneaker-spring-container:
+    container_name: sneaker-spring-container
     build:
       context: .
-      dockerfile: DockerfileJavaSpring       
+      dockerfile: DockerfileJavaSpring
     ports:
       - 8089:8089
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql8-container:3306/shopsneaker?serverTimezone=UTC&allowPublicKeyRetrieval=true   
-      SPRING_DATASOURCE_USERNAME: root         
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql8-container:3306/shopsneaker3?serverTimezone=UTC&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: root
       MYSQL_ROOT_PASSWORD: admin
-      MYSQL_DATABASE: shopsneaker
+      MYSQL_DATABASE: shopsneaker3
     #depends_on only waits for the container to start, not for the service inside the container to be fully operational
-    depends_on:      
+    depends_on:
       - mysql8-container
     networks:
-      - Sneaker-network    
-  sneaker-angular-container:    
-    container_name: sneaker-angular-container    
+      - Sneaker-network
+  sneaker-angular-container:
+    container_name: sneaker-angular-container
     build:
       context: .
       dockerfile: DockerfileAngular
     ports:
-      - "4200:443"
+      - "4200:80"
     networks:
       - Sneaker-network
-    
-#docker-compose -f ./deployment.yaml down 
+
+#docker-compose -f ./deployment.yaml down
 #docker-compose -f ./deployment.yaml rm -s -f mysql8-container
 #docker-compose -f ./deployment.yaml up -d mysql8-container
 
 #docker-compose -f ./deployment.yaml rm -s -f phpmyadmin8-container
 #docker-compose -f ./deployment.yaml up -d phpmyadmin8-container
-#docker-compose -f ./deployment.yaml rm -s -f sneaker-spring-container 
-#docker-compose -f ./deployment.yaml up -d sneaker-spring-container 
+#docker-compose -f ./deployment.yaml rm -s -f sneaker-spring-container
+#docker-compose -f ./deployment.yaml up -d sneaker-spring-container
 #docker-compose -f ./deployment.yaml up -d sneaker-spring-container
 #test
 #docker-compose -f ./deployment.yaml rm -s -f sneaker-angular-container
@@ -73,6 +71,4 @@ networks:
   Sneaker-network:
     name: Sneaker-network
     driver: bridge
-
-
-
+    external: true
