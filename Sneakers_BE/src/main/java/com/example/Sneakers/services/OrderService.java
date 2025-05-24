@@ -8,6 +8,8 @@ import com.example.Sneakers.repositories.OrderDetailRepository;
 import com.example.Sneakers.repositories.OrderRepository;
 import com.example.Sneakers.repositories.ProductRepository;
 import com.example.Sneakers.repositories.UserRepository;
+import com.example.Sneakers.repositories.VoucherRepository;
+import com.example.Sneakers.repositories.VoucherUsageRepository;
 import com.example.Sneakers.responses.*;
 import com.example.Sneakers.utils.BuilderEmailContent;
 import com.example.Sneakers.utils.Email;
@@ -21,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -28,7 +31,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class OrderService implements IOrderService{
+public class OrderService implements IOrderService {
     private final OrderRepository orderRepository;
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
@@ -36,27 +39,81 @@ public class OrderService implements IOrderService{
     private final OrderDetailRepository orderDetailRepository;
     private final UserService userService;
     private final CartService cartService;
+    private final VoucherRepository voucherRepository;
+    private final VoucherUsageRepository voucherUsageRepository;
+
     @Override
     @Transactional
     public OrderIdResponse createOrder(OrderDTO orderDTO, String token) throws Exception {
-        //Tìm xem user id có tồn tại không
+        // Tìm xem user id có tồn tại không
         String extractedToken = token.substring(7); // Loại bỏ "Bearer " từ chuỗi token
         User user = userService.getUserDetailsFromToken(extractedToken);
         // Kiểm tra xem cartItems có trống không
         if (orderDTO.getCartItems() == null || orderDTO.getCartItems().isEmpty()) {
             throw new Exception("Cart items are null or empty");
         }
-        //Convert orderDTO => Order
-        //Dùng thư viện Model Mapper
-        //Tạo 1 luồng bằng ánh xạ riêng để kiểm soát việc ánh xạ
-//        modelMapper.typeMap(OrderDTO.class,Order.class)
-//                .addMappings(mapper -> mapper.skip(Order::setId));
+        // Convert orderDTO => Order
+        // Dùng thư viện Model Mapper
+        // Tạo 1 luồng bằng ánh xạ riêng để kiểm soát việc ánh xạ
+        // modelMapper.typeMap(OrderDTO.class,Order.class)
+        // .addMappings(mapper -> mapper.skip(Order::setId));
         Long shippingCost = switch (orderDTO.getShippingMethod()) {
             case "Tiêu chuẩn" -> 30000L;
             case "Nhanh" -> 40000L;
             case "Hỏa tốc" -> 60000L;
             default -> throw new Exception("Shipping method is unavailable");
         };
+
+        // Calculate base total
+        Long baseTotal = orderDTO.getTotalMoney();
+        Long finalTotal = baseTotal + shippingCost;
+        Voucher appliedVoucher = null;
+        Long discountAmount = 0L;
+
+        // Handle voucher if provided
+        if (orderDTO.getVoucherCode() != null && !orderDTO.getVoucherCode().trim().isEmpty()) {
+            // Find and validate voucher
+            Voucher voucher = voucherRepository.findByCode(orderDTO.getVoucherCode())
+                    .orElseThrow(() -> new Exception("Voucher không tồn tại"));
+
+            // Check if voucher is active
+            if (!voucher.getIsActive()) {
+                throw new Exception("Voucher không còn hoạt động");
+            }
+
+            // Check validity period
+            LocalDateTime now = LocalDateTime.now();
+            if (now.isBefore(voucher.getValidFrom()) || now.isAfter(voucher.getValidTo())) {
+                throw new Exception("Voucher không trong thời gian hiệu lực");
+            }
+
+            // Check minimum order value
+            if (baseTotal < voucher.getMinOrderValue()) {
+                throw new Exception("Giá trị đơn hàng không đủ điều kiện áp dụng voucher");
+            }
+
+            // Check remaining quantity
+            if (voucher.getRemainingQuantity() <= 0) {
+                throw new Exception("Voucher đã hết lượt sử dụng");
+            }
+
+            // Check user usage limit
+            Long userUsageCount = voucherUsageRepository.countByVoucherIdAndUserId(voucher.getId(), user.getId());
+            if (userUsageCount >= 1) {
+                throw new Exception("Bạn đã sử dụng voucher này rồi");
+            }
+
+            // Calculate discount
+            discountAmount = (baseTotal * voucher.getDiscountPercentage()) / 100;
+            if (voucher.getMaxDiscountAmount() != null && discountAmount > voucher.getMaxDiscountAmount()) {
+                discountAmount = voucher.getMaxDiscountAmount();
+            }
+
+            // Apply discount to final total
+            finalTotal = baseTotal - discountAmount + shippingCost;
+            appliedVoucher = voucher;
+        }
+
         Order order = Order.builder()
                 .user(user)
                 .orderDate(LocalDate.now())
@@ -68,23 +125,43 @@ public class OrderService implements IOrderService{
                 .note(orderDTO.getNote())
                 .shippingMethod(orderDTO.getShippingMethod())
                 .paymentMethod(orderDTO.getPaymentMethod())
-                .totalMoney(orderDTO.getTotalMoney()+shippingCost)
+                .totalMoney(finalTotal)
+                .voucher(appliedVoucher)
+                .discountAmount(discountAmount)
                 .active(true)
                 .shippingDate(LocalDate.now().plusDays(3))
                 .build();
-//        modelMapper.map(orderDTO,order);
-//        order.setUser(user);
-//        order.setOrderDate(LocalDate.now());
-//        order.setStatus(OrderStatus.PENDING);
-        //Kiểm tra shipping date phải >= hôm nay
-//        LocalDate shippingDate = orderDTO.getShippingDate() == null ? LocalDate.now() : orderDTO.getShippingDate();
-//        if(shippingDate.isBefore(LocalDate.now())){
-//            throw new DataNotFoundException("Date must be at least today !");
-//        }
-//        order.setActive(true);
-//        order.setShippingDate(shippingDate);
+        // modelMapper.map(orderDTO,order);
+        // order.setUser(user);
+        // order.setOrderDate(LocalDate.now());
+        // order.setStatus(OrderStatus.PENDING);
+        // Kiểm tra shipping date phải >= hôm nay
+        // LocalDate shippingDate = orderDTO.getShippingDate() == null ? LocalDate.now()
+        // : orderDTO.getShippingDate();
+        // if(shippingDate.isBefore(LocalDate.now())){
+        // throw new DataNotFoundException("Date must be at least today !");
+        // }
+        // order.setActive(true);
+        // order.setShippingDate(shippingDate);
 
         orderRepository.save(order);
+
+        // Track voucher usage and update remaining quantity
+        if (appliedVoucher != null) {
+            // Create voucher usage record
+            VoucherUsage voucherUsage = VoucherUsage.builder()
+                    .voucher(appliedVoucher)
+                    .order(order)
+                    .user(user)
+                    .discountAmount(discountAmount)
+                    .usedAt(LocalDateTime.now())
+                    .build();
+            voucherUsageRepository.save(voucherUsage);
+
+            // Update remaining quantity
+            appliedVoucher.setRemainingQuantity(appliedVoucher.getRemainingQuantity() - 1);
+            voucherRepository.save(appliedVoucher);
+        }
 
         // Tạo danh sách các đối tượng OrderDetail từ cartItems
         List<OrderDetail> orderDetails = new ArrayList<>();
@@ -109,7 +186,7 @@ public class OrderService implements IOrderService{
 
             // Các trường khác của OrderDetail nếu cần
             orderDetail.setPrice(product.getPrice());
-            orderDetail.setTotalMoney(product.getPrice()*quantity);
+            orderDetail.setTotalMoney(product.getPrice() * quantity);
             // Thêm OrderDetail vào danh sách
             orderDetails.add(orderDetail);
         }
@@ -122,9 +199,9 @@ public class OrderService implements IOrderService{
         String to = order.getEmail();
         String subject = "Đặt hàng thành công từ Sneaker Store - Đơn hàng #" + order.getId();
         String content = BuilderEmailContent.buildOrderEmailContent(order);
-        boolean sendMail = email.sendEmail(to,subject,content);
+        boolean sendMail = email.sendEmail(to, subject, content);
 
-        if(!sendMail){
+        if (!sendMail) {
             throw new Exception("Cannot send email");
         }
         return OrderIdResponse.fromOrder(order);
@@ -141,14 +218,14 @@ public class OrderService implements IOrderService{
         String extractedToken = token.substring(7);
         User user = userService.getUserDetailsFromToken(extractedToken);
 
-        if(user.getRole().getName().equals(Role.ADMIN)){
+        if (user.getRole().getName().equals(Role.ADMIN)) {
             return OrderResponse.fromOrder(orderRepository.findById(orderId)
                     .orElseThrow(() -> new Exception("Cannot find order with id = " + orderId)));
 
         }
 
         Order order = orderRepository.findById(orderId).orElse(null);
-        if(!user.getId().equals(order.getUser().getId())){
+        if (!user.getId().equals(order.getUser().getId())) {
             throw new Exception("Cannot get order of another user");
         }
         return OrderResponse.fromOrder(order);
@@ -160,12 +237,11 @@ public class OrderService implements IOrderService{
         Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new DataNotFoundException("Cannot find order with id = " + id));
         User existingUser = userRepository.findById(
-                orderDTO.getUserId()).orElseThrow(() ->
-                new DataNotFoundException("Cannot find user with id: " + id));
-        modelMapper.typeMap(OrderDTO.class,Order.class)
+                orderDTO.getUserId()).orElseThrow(() -> new DataNotFoundException("Cannot find user with id: " + id));
+        modelMapper.typeMap(OrderDTO.class, Order.class)
                 .addMappings(mapper -> mapper.skip(Order::setId))
-                        .addMappings(mapper -> mapper.skip(Order::setOrderDetails));
-        modelMapper.map(orderDTO,order);
+                .addMappings(mapper -> mapper.skip(Order::setOrderDetails));
+        modelMapper.map(orderDTO, order);
         order.setUser(existingUser);
         return orderRepository.save(order);
     }
@@ -174,7 +250,7 @@ public class OrderService implements IOrderService{
     @Transactional
     public void deleteOrder(Long id) {
         Order order = orderRepository.findById(id).orElse(null);
-        if(order != null){
+        if (order != null) {
             order.setActive(false);
             orderRepository.save(order);
         }

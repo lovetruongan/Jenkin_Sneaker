@@ -20,6 +20,7 @@ import { RoleGuard } from './features/auth/authInterceptor/role.guard';
 import { CategoryManageComponent } from './features/components/category-manage/category-manage.component';
 import { UserManageComponent } from './features/components/user-manage/user-manage.component';
 import { OrderManageComponent } from './features/components/order-manage/order-manage.component';
+import { VoucherManageComponent } from './features/components/voucher-manage/voucher-manage.component';
 
 export const routes: Routes = [
   {
@@ -103,6 +104,11 @@ export const routes: Routes = [
       {
         path: 'orderManage',
         component: OrderManageComponent,
+        canActivate: [RoleGuard]
+      },
+      {
+        path: 'voucherManage',
+        component: VoucherManageComponent,
         canActivate: [RoleGuard]
       }
     ]
