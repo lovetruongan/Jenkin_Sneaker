@@ -29,6 +29,9 @@ export class OrderDetailComponent extends BaseComponent implements OnInit {
   public notion!: string;
   public id!: string;
   public apiImage: string = environment.apiImage;
+  public discountAmount: number = 0;
+  public voucherInfo: { code: string, name: string, percentage: number } | null = null;
+  public finalTotal: number = 0;
 
   constructor(
     private commonService: CommonService,
@@ -64,11 +67,25 @@ export class OrderDetailComponent extends BaseComponent implements OnInit {
               default:
                 break;
             }
-          }),
-          tap(() => {
+            this.totalMoney = 0;
             this.productOrderd.forEach((item) => {
               this.totalMoney += item.totalMoney;
-            })
+            });
+            if (orderInfor.discount_amount) {
+              this.discountAmount = orderInfor.discount_amount;
+            }
+            if (orderInfor.voucher) {
+              this.voucherInfo = {
+                code: orderInfor.voucher.code,
+                name: orderInfor.voucher.name,
+                percentage: orderInfor.voucher.discount_percentage
+              };
+            }
+            if (orderInfor.total_money) {
+              this.finalTotal = orderInfor.total_money;
+            } else {
+              this.finalTotal = this.totalMoney - this.discountAmount + this.shipCost;
+            }
           }),
           catchError((err) => {
             return of(err)
@@ -79,8 +96,5 @@ export class OrderDetailComponent extends BaseComponent implements OnInit {
         return of(err)
       }),
     ).subscribe();
-
-    
   }
-
 }
