@@ -11,7 +11,6 @@ import java.util.Date;
 @NoArgsConstructor
 @Getter
 @Setter
-@ToString
 public class UpdateUserDTO {
     @JsonProperty("fullname")
     private String fullName;
