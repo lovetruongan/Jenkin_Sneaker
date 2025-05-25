@@ -12,6 +12,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@ToString
 public class UserResponse {
     @JsonProperty("id")
     private Long id;
@@ -24,6 +25,9 @@ public class UserResponse {
 
     @JsonProperty("address")
     private String address;
+
+    @JsonProperty("email")
+    private String email;
 
     @JsonProperty("is_active")
     private boolean active;
@@ -50,6 +54,7 @@ public class UserResponse {
                 .facebookAccountId(user.getFacebookAccountId())
                 .googleAccountId(user.getGoogleAccountId())
                 .role(user.getRole())
+                .email(user.getEmail())
                 .build();
     }
 }
