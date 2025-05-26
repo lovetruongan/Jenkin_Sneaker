@@ -39,7 +39,6 @@ public class UserController {
     ){
         RegisterResponse registerResponse = new RegisterResponse();
         try {
-
             if(result.hasErrors()){
                 List<String> errorMessages = result.getFieldErrors().stream()
                         .map(FieldError::getDefaultMessage).toList();
@@ -124,7 +123,7 @@ public class UserController {
             @RequestHeader("Authorization") String authorizationHeader
     ) {
         try {
-            System.out.println("updatedUserDTO: " + updatedUserDTO.toString());
+
             User updatedUser = userService.updateUser(userId, updatedUserDTO);
             return ResponseEntity.ok(UserResponse.fromUser(updatedUser));
         } catch (Exception e) {
