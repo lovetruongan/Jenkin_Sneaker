@@ -18,9 +18,7 @@ import { UserService } from '../../../core/services/user.service';
 import { catchError, filter, of, tap } from 'rxjs';
 import { UserDto } from '../../../core/dtos/user.dto';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { RegisteredMessage } from '@angular/cdk/a11y';
 import { registerReq } from '../../../core/types/registerReq';
-import { SourceTextModule } from 'vm';
 
 export interface UserOption {
   label: string;
@@ -99,21 +97,24 @@ export class UserManageComponent extends BaseComponent implements OnInit {
   ) {
     super();
     if (typeof localStorage !== 'undefined') {
-      this.userId = parseInt(JSON.parse(localStorage.getItem("userInfor") || '').id);
+      this.userId = parseInt(JSON.parse(localStorage.getItem("userInfor") || '{}').id);
     }
   }
 
   ngOnInit(): void {
     if (isPlatformBrowser(this.platformId)) {
-      this.userService.getAllUser().pipe(
-        filter((users: UserDto[]) => !!users),
-        tap((users: UserDto[]) => {
-          console.log('Danh sách users:', users);
-          this.users = users;
-          this.filterLsedUsers = this.users;
-        })
-      ).subscribe();
+      this.getUsers();
     }
+  }
+
+  private getUsers(): void {
+    this.userService.getAllUser().pipe(
+      filter((users: UserDto[]) => !!users),
+      tap((users: UserDto[]) => {
+        this.users = users;
+        this.filterLsedUsers = this.users;
+      })
+    ).subscribe();
   }
 
   // Edit user functionality
@@ -151,23 +152,23 @@ export class UserManageComponent extends BaseComponent implements OnInit {
       address: this.editingUser.address?.trim(),
       date_of_birth: this.editingUser.date_of_birth,
       role_id: this.editingUser.role?.id,
-      is_active: this.editingUser.is_active
+      is_active: this.editingUser.is_active,
+      email: this.editingUser.email
     };
+
 
     this.userService.updateUser(updateData).pipe(
       tap((res: { users: UserDto[], message: string } | UserDto) => {
         // Handle different response formats
         if ('users' in res) {
-          // If response contains users array
-          this.users = res.users;
-          this.showSuccessMessage(res.message || 'Cập nhật thông tin người dùng thành công!'); 
+          // Nếu response có users array
+          // Reload lại danh sách
+          this.getUsers();
+          this.showSuccessMessage(res.message || 'Cập nhật thông tin người dùng thành công!');
         } else {
-          // If response is single user
-          const updatedUser = res as UserDto;
-          const index = this.users.findIndex(u => u.id === updatedUser.id);
-          if (index !== -1) {
-            this.users[index] = updatedUser;
-          }
+          // Nếu response là user đơn lẻ
+          // Reload lại danh sách
+          this.getUsers();
           this.showSuccessMessage('Cập nhật thông tin người dùng thành công!');
         }
         this.closeEditDialog();
@@ -181,22 +182,21 @@ export class UserManageComponent extends BaseComponent implements OnInit {
   }
 
   addUserF(): void {
-    // Prepare data for API
-
+    this.addUser.retype_password = this.addUser.password;
     const errors = this.validateAddUser();
     if (errors.length > 0) {
-      alert(errors.join('\n')); // Hoặc hiển thị bằng UI component
+      alert(errors.join('\n'));
       return;
     }
-    this.addUser.retype_password = this.addUser.password;
 
     this.userService.register(this.addUser).subscribe({
       next: (res: any) => {
         this.showSuccessMessage('Thêm thành công!');
+        this.getUsers();
+        this.closeAddDialog();
       },
       error: (err) => {
         this.showErrorMessage(err.error?.message || 'Thêm không thành công!');
-        // TODO: Hiển thị lỗi cho người dùng
       }
     });
   }
@@ -257,7 +257,7 @@ export class UserManageComponent extends BaseComponent implements OnInit {
     if (confirmed) {
       this.userService.deleteUser(id).pipe(
         tap((res: { users: UserDto[], message: string }) => {
-          this.users = res.users;
+          this.getUsers();
           this.snackBar.open(res.message, 'Đóng', {
             duration: 3000,
             panelClass: ['success-snackbar']
@@ -282,7 +282,7 @@ export class UserManageComponent extends BaseComponent implements OnInit {
   onCategoryChange(userId: number, event: any) {
     this.userService.changeRoleUser(event.value, userId).pipe(
       tap((res: { users: UserDto[], message: string }) => {
-        this.users = res.users;
+        this.getUsers();
         this.snackBar.open(res.message, 'Đóng', {
           duration: 3000,
           panelClass: ['success-snackbar']
@@ -307,10 +307,7 @@ export class UserManageComponent extends BaseComponent implements OnInit {
     }
     this.userService.changeActive(user.id, newStatus).pipe(
       tap((res: UserDto) => {
-        const index = this.users.findIndex(u => u.id === res.id);
-        if (index !== -1) {
-          this.users[index] = res;
-        }
+        this.getUsers();
         this.snackBar.open(
           `Cập nhật trạng thái người dùng thành công`,
           'Đóng',
@@ -336,7 +333,7 @@ export class UserManageComponent extends BaseComponent implements OnInit {
       email: '',
       retype_password: '',
       address: '',
-      date_of_birth: new Date(), // hoặc null nếu bạn sửa DTO hỗ trợ null
+      date_of_birth: new Date(),
     };
     this.originalUser = {} as UserDto;
     this.showAddDialog = true;
@@ -382,5 +379,4 @@ export class UserManageComponent extends BaseComponent implements OnInit {
       );
     }
   }
-
 }

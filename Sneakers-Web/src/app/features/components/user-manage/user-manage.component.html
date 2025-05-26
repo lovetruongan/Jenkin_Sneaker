@@ -133,26 +133,17 @@
                 </mat-form-field>
 
                 <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Email</mat-label>
+                    <textarea matInput [(ngModel)]="editingUser.email" placeholder="Nhập email" rows="3"></textarea>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="full-width">
                     <mat-label>Ngày sinh</mat-label>
                     <input matInput [matDatepicker]="picker" [(ngModel)]="editingUser.date_of_birth">
                     <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
                     <mat-datepicker #picker></mat-datepicker>
                 </mat-form-field>
-
-                <mat-form-field appearance="outline" class="full-width">
-                    <mat-label>Vai trò</mat-label>
-                    <mat-select [(ngModel)]="editingUser.role.id" placeholder="Chọn vai trò">
-                        <mat-option *ngFor="let option of userOptions" [value]="option.value">
-                            {{ option.label }}
-                        </mat-option>
-                    </mat-select>
-                </mat-form-field>
-
-                <div class="status-field">
-                    <mat-checkbox [(ngModel)]="editingUser.is_active">
-                        Trạng thái hoạt động
-                    </mat-checkbox>
-                </div>
+\
             </div>
 
             <div class="dialog-actions">

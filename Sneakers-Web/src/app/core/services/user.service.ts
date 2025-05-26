@@ -101,6 +101,7 @@ export class UserService {
       phone_number: userData.phone_number,
       address: userData.address,
       date_of_birth: userData.date_of_birth,
+      email: userData.email,
       // Không gửi password nếu không thay đổi
       // password: userData.password,
       // retype_password: userData.retype_password,
