@@ -1,3 +1,5 @@
+@import '../../../../assets/abstracts/variable.scss';
+
 .navbar {
   padding: 0.5rem 1rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -6,24 +8,53 @@
   left: 0;
   right: 0;
   z-index: 999;
-  background: #fff;
+  background: $black-color;
 
   .navbar-nav {
     gap: 1rem;
 
     .nav-item {
       .nav-link {
-        color: #333;
-        padding: 0.5rem 1rem;
+        color: $white-color;
+        padding: 0.8rem 1.2rem;
         border-radius: 4px;
         transition: all 0.3s ease;
+        font-size: 14px;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-family: 'Roboto', sans-serif;
+        position: relative;
+
+        &::after {
+          content: '';
+          position: absolute;
+          bottom: 5px;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 0;
+          height: 2px;
+          background-color: $white-color;
+          transition: width 0.3s ease;
+        }
 
         &:hover {
-          background: rgba(0, 0, 0, 0.05);
+          background: rgba(255, 255, 255, 0.1);
+          color: $white-color;
+
+          &::after {
+            width: 80%;
+          }
         }
 
         &.active {
-          background: rgba(0, 0, 0, 0.1);
+          color: $white-color;
+          font-weight: 600;
+          background: rgba(255, 255, 255, 0.15);
+          
+          &::after {
+            width: 80%;
+          }
         }
       }
     }
@@ -37,9 +68,14 @@
       border: none;
       padding: 0.5rem;
       margin-right: 0;
+      color: $white-color;
 
       &:focus {
         box-shadow: none;
+      }
+
+      .navbar-toggler-icon {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255, 255, 255, 0.9)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
       }
     }
 
@@ -48,24 +84,44 @@
       top: 100%;
       left: 0;
       right: 0;
-      background: #fff;
-      padding: 1rem;
+      background: $black-color;
+      padding: 0;
       z-index: 998;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
 
       &.show {
-        border-top: 1px solid rgba(0, 0, 0, 0.1);
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
       }
 
       .navbar-nav {
         gap: 0;
 
         .nav-item {
+          border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+          &:last-child {
+            border-bottom: none;
+          }
+
           .nav-link {
-            padding: 0.75rem 1rem;
+            padding: 1rem 1.5rem;
             border-radius: 0;
+            font-size: 13px;
+            font-weight: 500;
+
+            &::after {
+              display: none;
+            }
 
             &:hover {
-              background: rgba(0, 0, 0, 0.05);
+              background: rgba(255, 255, 255, 0.1);
+              color: $white-color;
+            }
+
+            &.active {
+              background: rgba(255, 255, 255, 0.15);
+              color: $white-color;
+              font-weight: 600;
             }
           }
         }
