@@ -70,23 +70,13 @@
                                 <p style="flex: 1;">Tổng tiền hàng</p>
                                 <p class="font-bold">{{totalMoney | currency:'VND':'symbol':'1.0-0'}}</p>
                             </div>
-                            @if (voucherInfo) {
-                                <div class="d-flex">
-                                    <p style="flex: 1;">Mã giảm giá</p>
-                                    <p class="font-bold">{{voucherInfo.code}} (-{{voucherInfo.percentage}}%)</p>
-                                </div>
-                                <div class="d-flex">
-                                    <p style="flex: 1;">Giảm giá</p>
-                                    <p class="font-bold text-danger">-{{discountAmount | currency:'VND':'symbol':'1.0-0'}}</p>
-                                </div>
-                            }
                             <div class="d-flex">
                                 <p style="flex: 1;">Phí vận chuyển</p>
                                 <p class="font-bold">{{shipCost | currency:'VND':'symbol':'1.0-0'}}</p>
                             </div>
                             <div class="d-flex">
                                 <p style="flex: 1;">Tổng thanh toán</p>
-                                <p class="font-bold text-primary">{{finalTotal | currency:'VND':'symbol':'1.0-0'}}</p>
+                                <p class="font-bold">{{totalMoney + shipCost | currency:'VND':'symbol':'1.0-0'}}</p>
                             </div>
                         </div>
                     </div>

@@ -61,6 +61,7 @@ public class UserService implements IUserService{
                 .phoneNumber(userDTO.getPhoneNumber())
                 .password(userDTO.getPassword())
                 .address(userDTO.getAddress())
+                .email(userDTO.getEmail())
                 .dateOfBirth(userDTO.getDateOfBirth())
                 .facebookAccountId(userDTO.getFacebookAccountId())
                 .googleAccountId(userDTO.getGoogleAccountId())
@@ -84,6 +85,10 @@ public class UserService implements IUserService{
             throw new DataNotFoundException(localizationUtils.getLocalizedMessage(MessageKeys.WRONG_PHONE_PASSWORD));
         }
         User existingUser = optionalUser.get();
+
+        if (!Boolean.TRUE.equals(existingUser.isActive())) {
+            throw new BadCredentialsException(localizationUtils.getLocalizedMessage(MessageKeys.USER_IS_LOCKED));
+        }
         //check password
         if (existingUser.getFacebookAccountId() == 0
                 && existingUser.getGoogleAccountId() == 0) {
@@ -141,6 +146,9 @@ public class UserService implements IUserService{
         if (updatedUserDTO.getAddress() != null) {
             existingUser.setAddress(updatedUserDTO.getAddress());
         }
+        if (updatedUserDTO.getEmail() != null) {
+            existingUser.setEmail(updatedUserDTO.getEmail());
+        }
         if (updatedUserDTO.getDateOfBirth() != null) {
             existingUser.setDateOfBirth(updatedUserDTO.getDateOfBirth());
         }
@@ -164,12 +172,28 @@ public class UserService implements IUserService{
     }
 
     @Override
+    public Optional<User> updateActiveUserById(Long id, boolean activeUser) {
+        Optional<User> userOpt = userRepository.findById(id);
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            user.setActive(activeUser);
+            userRepository.save(user);
+            return Optional.of(user);
+        }
+        return Optional.empty();
+    }
+
+
+    @Override
     public List<UserResponse> getAllUser() {
+        List<User> ls = this.userRepository.findAll();
         return userRepository.findAll()
                 .stream()
                 .map(UserResponse::fromUser)
                 .collect(Collectors.toList());
     }
+
+
     @Override
     public User changeRoleUser(Long roleId, Long userId) throws Exception {
         Role role = roleRepository.findById(roleId)

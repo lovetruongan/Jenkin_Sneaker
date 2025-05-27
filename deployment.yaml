@@ -44,41 +44,6 @@ services:
       - mysql8-container
     networks:
       - Sneaker-network
-
-  jenkins-container:
-    container_name: jenkins-container
-    image: jenkins/jenkins:lts
-    restart: always
-    privileged: true
-    user: root
-    ports:
-      - "8080:8080"
-      - "50000:50000"
-    volumes:
-      - jenkins_home:/var/jenkins_home
-      - /var/run/docker.sock:/var/run/docker.sock
-    networks:
-      - Sneaker-network
-
-  sonarqube-container:
-    container_name: sonarqube-container
-    image: sonarqube:latest
-    restart: always
-    ports:
-      - "9000:9000"
-    environment:
-      - SONARQUBE_JDBC_URL=jdbc:mysql://mysql8-container:3306/sonarqube?useUnicode=true&characterEncoding=utf8&useSSL=false
-      - SONARQUBE_JDBC_USERNAME=root
-      - SONARQUBE_JDBC_PASSWORD=admin
-    volumes:
-      - sonarqube_data:/opt/sonarqube/data
-      - sonarqube_extensions:/opt/sonarqube/extensions
-      - sonarqube_logs:/opt/sonarqube/logs
-    depends_on:
-      - mysql8-container
-    networks:
-      - Sneaker-network
-
   sneaker-angular-container:
     container_name: sneaker-angular-container
     build:
@@ -107,13 +72,3 @@ networks:
     name: Sneaker-network
     driver: bridge
     external: true
-
-volumes:
-  jenkins_home:
-    driver: local
-  sonarqube_data:
-    driver: local
-  sonarqube_extensions:
-    driver: local
-  sonarqube_logs:
-    driver: local

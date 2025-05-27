@@ -53,28 +53,6 @@
                             <td class="col-right">{{totalCost | currency:'VND':'symbol':'1.0-0'}}</td>
                         </tr>
                         <tr>
-                            <td class="font-bold">Mã giảm giá</td>
-                            <td class="col-right">
-                                @if (!isVoucherApplied) {
-                                    <div class="voucher-input-group d-flex align-items-center">
-                                        <input type="text" [(ngModel)]="voucherCode" pInputText placeholder="Nhập mã" style="width: 120px; margin-right: 5px;">
-                                        <button pButton type="button" label="Áp dụng" (click)="applyVoucher()" class="p-button-sm"></button>
-                                    </div>
-                                } @else {
-                                    <div class="applied-voucher d-flex align-items-center">
-                                        <span class="voucher-info">{{appliedVoucherName}} (-{{discountAmount | currency:'VND':'symbol':'1.0-0'}})</span>
-                                        <button pButton type="button" icon="pi pi-times" (click)="removeVoucher()" class="p-button-text p-button-sm"></button>
-                                    </div>
-                                }
-                            </td>
-                        </tr>
-                        @if (isVoucherApplied) {
-                            <tr>
-                                <td class="font-bold">Giảm giá</td>
-                                <td class="col-right text-danger">-{{discountAmount | currency:'VND':'symbol':'1.0-0'}}</td>
-                            </tr>
-                        }
-                        <tr>
                             <td class="font-bold">Giao hàng</td>
                             <td class="col-right">{{methodShippingValue.price | currency:'VND':'symbol':'1.0-0'}}</td>
                         </tr>
@@ -86,7 +64,7 @@
                         </tr>
                         <tr>
                             <td class="font-bold">Tổng</td>
-                            <td class="col-right font-bold text-primary">{{finalCost + methodShippingValue.price | currency:'VND':'symbol':'1.0-0'}}</td>
+                            <td class="col-right">{{totalCost + methodShippingValue.price | currency:'VND':'symbol':'1.0-0'}}</td>
                         </tr>
                    </tbody>
                 </table>
