@@ -11,5 +11,12 @@ export interface InfoOrderDto {
     payment_method: string,
     order_date: Date,
     status: string,
-    order_details: OrderDetailDto[]
+    order_details: OrderDetailDto[],
+    total_money?: number,
+    voucher?: {
+        code: string,
+        name: string,
+        discount_percentage: number
+    },
+    discount_amount?: number
 }

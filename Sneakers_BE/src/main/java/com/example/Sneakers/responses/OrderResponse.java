@@ -3,6 +3,7 @@ package com.example.Sneakers.responses;
 import com.example.Sneakers.models.Order;
 import com.example.Sneakers.models.OrderDetail;
 import com.example.Sneakers.models.User;
+import com.example.Sneakers.models.Voucher;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Column;
 import jakarta.persistence.JoinColumn;
@@ -41,7 +42,7 @@ public class OrderResponse {
     private String note;
 
     @JsonProperty("order_date")
-    //@JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone = "UTC")
+    // @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone = "UTC")
     private LocalDate orderDate;
 
     @JsonProperty("status")
@@ -59,10 +60,36 @@ public class OrderResponse {
     @JsonProperty("payment_method")
     private String paymentMethod;
 
+    @JsonProperty("voucher")
+    private VoucherInfo voucher;
+
+    @JsonProperty("discount_amount")
+    private Long discountAmount;
+
     @JsonProperty("order_details")
     private List<OrderDetail> orderDetails;
 
+    @Data
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class VoucherInfo {
+        private String code;
+        private String name;
+        @JsonProperty("discount_percentage")
+        private Integer discountPercentage;
+    }
+
     public static OrderResponse fromOrder(Order order) {
+        OrderResponse.VoucherInfo voucherInfo = null;
+        if (order.getVoucher() != null) {
+            voucherInfo = VoucherInfo.builder()
+                    .code(order.getVoucher().getCode())
+                    .name(order.getVoucher().getName())
+                    .discountPercentage(order.getVoucher().getDiscountPercentage())
+                    .build();
+        }
+
         return OrderResponse
                 .builder()
                 .id(order.getId())
@@ -78,6 +105,8 @@ public class OrderResponse {
                 .shippingMethod(order.getShippingMethod())
                 .shippingDate(order.getShippingDate())
                 .paymentMethod(order.getPaymentMethod())
+                .voucher(voucherInfo)
+                .discountAmount(order.getDiscountAmount())
                 .orderDetails(order.getOrderDetails())
                 .build();
     }

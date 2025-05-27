@@ -18,7 +18,7 @@ import java.util.List;
 @NoArgsConstructor
 public class OrderDTO {
     @JsonProperty("user_id")
-    @Min(value = 1,message = "User's id must be > 0")
+    @Min(value = 1, message = "User's id must be > 0")
     private Long userId;
 
     @JsonProperty("fullname")
@@ -28,7 +28,7 @@ public class OrderDTO {
 
     @JsonProperty("phone_number")
     @NotBlank(message = "Phone number is required")
-    @Size(min = 5,message = "Phone number must be at least 5 characters")
+    @Size(min = 5, message = "Phone number must be at least 5 characters")
     private String phoneNumber;
 
     @JsonProperty("status")
@@ -39,7 +39,7 @@ public class OrderDTO {
     private String note;
 
     @JsonProperty("total_money")
-    @Min(value = 0,message = "Total money must be >= 0")
+    @Min(value = 0, message = "Total money must be >= 0")
     private Long totalMoney;
 
     @JsonProperty("shipping_method")
@@ -53,4 +53,7 @@ public class OrderDTO {
 
     @JsonProperty("cart_items")
     private List<CartItemDTO> cartItems;
+
+    @JsonProperty("voucher_code")
+    private String voucherCode;
 }
