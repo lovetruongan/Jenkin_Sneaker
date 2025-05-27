@@ -231,6 +231,8 @@ public class StatisticsService {
     }
 
     public Long getOrdersToday() {
-        return orderRepository.countOrdersToday(java.time.LocalDate.now());
+        // Đếm số đơn hàng trong ngày
+        Long todayOrders = orderRepository.countOrdersToday();
+        return todayOrders;
     }
 } 

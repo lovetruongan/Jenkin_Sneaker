@@ -10,6 +10,7 @@ import { TableModule } from 'primeng/table';
 import { StatisticsService, DailyRevenue, MonthlyRevenue, YearlyRevenue, ProductStatistics } from '../../../core/services/statistics.service';
 import { Chart } from 'chart.js';
 import { BestSellingStatisticsComponent } from '../../../best-selling-statistics/best-selling-statistics.component';
+import { OrderService } from '../../../core/services/order.service';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -34,43 +35,69 @@ import { BestSellingStatisticsComponent } from '../../../best-selling-statistics
       <div class="dashboard-content">
         <!-- Statistics Cards -->
         <div class="statistics-cards">
+          <div class="card total-revenue">
+            <p-card styleClass="stat-card stat-total-revenue">
+              <div class="card-content">
+                <i class="pi pi-money-bill"></i>
+                <div class="stat-info">
+                  <h2>{{ totalRevenue | number:'1.0-0' }}</h2>
+                  <div class="stat-label">Tổng doanh thu (VNĐ)</div>
+                </div>
+              </div>
+            </p-card>
+          </div>
           <div class="card orders-today">
-            <p-card header="Đơn hàng hôm nay" styleClass="stat-card stat-orders">
+            <p-card styleClass="stat-card stat-orders">
               <div class="card-content">
                 <i class="pi pi-shopping-bag"></i>
-                <h2>{{ ordersToday }}</h2>
+                <div class="stat-info">
+                  <h2>{{ ordersToday | number:'1.0-0' }}</h2>
+                  <div class="stat-label">Đơn hàng hôm nay</div>
+                </div>
               </div>
             </p-card>
           </div>
           <div class="card daily-revenue">
-            <p-card header="Doanh thu hôm nay" styleClass="stat-card stat-daily-revenue">
+            <p-card styleClass="stat-card stat-daily-revenue">
               <div class="card-content">
-                <i class="pi pi-money-bill"></i>
-                <h2>{{ dailyRevenue | currency:'VND' }}</h2>
+                <i class="pi pi-chart-line"></i>
+                <div class="stat-info">
+                  <h2>{{ dailyRevenue | number:'1.0-0' }}</h2>
+                  <div class="stat-label">Doanh thu hôm nay (VNĐ)</div>
+                </div>
               </div>
             </p-card>
           </div>
           <div class="card total-products">
-            <p-card header="Tổng sản phẩm" styleClass="stat-card stat-total-products">
+            <p-card styleClass="stat-card stat-total-products">
               <div class="card-content">
                 <i class="pi pi-box"></i>
-                <h2>{{ totalProducts }}</h2>
+                <div class="stat-info">
+                  <h2>{{ totalProducts | number:'1.0-0' }}</h2>
+                  <div class="stat-label">Tổng sản phẩm</div>
+                </div>
               </div>
             </p-card>
           </div>
           <div class="card sold-products">
-            <p-card header="Sản phẩm đã bán" styleClass="stat-card stat-sold-products">
+            <p-card styleClass="stat-card stat-sold-products">
               <div class="card-content">
                 <i class="pi pi-shopping-cart"></i>
-                <h2>{{ soldProducts }}</h2>
+                <div class="stat-info">
+                  <h2>{{ soldProducts | number:'1.0-0' }}</h2>
+                  <div class="stat-label">Sản phẩm đã bán</div>
+                </div>
               </div>
             </p-card>
           </div>
           <div class="card available-products">
-            <p-card header="Sản phẩm trong kho" styleClass="stat-card stat-available-products">
+            <p-card styleClass="stat-card stat-available-products">
               <div class="card-content">
                 <i class="pi pi-inbox"></i>
-                <h2>{{ availableProducts }}</h2>
+                <div class="stat-info">
+                  <h2>{{ availableProducts | number:'1.0-0' }}</h2>
+                  <div class="stat-label">Sản phẩm trong kho</div>
+                </div>
               </div>
             </p-card>
           </div>
@@ -172,47 +199,121 @@ import { BestSellingStatisticsComponent } from '../../../best-selling-statistics
 
     .statistics-cards {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
       gap: 1.5rem;
       margin-bottom: 2rem;
     }
 
     .stat-card {
-      height: 100%;
-      transition: transform 0.2s;
-
+      height: 140px;
+      border-radius: 12px;
+      border: 1px solid #e9ecef;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+      transition: all 0.3s ease;
+      overflow: hidden;
+      
       &:hover {
-        transform: translateY(-5px);
+        transform: translateY(-4px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
       }
 
       .card-content {
         display: flex;
         align-items: center;
-        gap: 1rem;
-        padding: 1rem;
+        justify-content: space-between;
+        padding: 1.5rem;
+        height: 100%;
+        background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
 
         i {
-          font-size: 2rem;
+          font-size: 2.5rem;
+          margin-right: 1rem;
+          opacity: 0.8;
         }
 
-        h2 {
-          margin: 0;
-          font-size: 1.5rem;
+        .stat-info {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          gap: 0.5rem;
+
+          h2 {
+            margin: 0;
+            font-size: 1.8rem;
+            font-weight: 700;
+            line-height: 1.2;
+          }
+
+          .stat-label {
+            font-size: 0.9rem;
+            color: #6c757d;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+          }
         }
       }
     }
 
-    .stat-orders .card-content i { color: #ff9800; }
-    .stat-daily-revenue .card-content i { color: #4caf50; }
-    .stat-total-products .card-content i { color: #2196f3; }
-    .stat-sold-products .card-content i { color: #e91e63; }
-    .stat-available-products .card-content i { color: #9c27b0; }
+    .stat-total-revenue {
+      .card-content {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        
+        i { color: rgba(255, 255, 255, 0.9); }
+        .stat-label { color: rgba(255, 255, 255, 0.8); }
+      }
+    }
 
-    .stat-orders .card-content h2 { color: #ff9800; }
-    .stat-daily-revenue .card-content h2 { color: #4caf50; }
-    .stat-total-products .card-content h2 { color: #2196f3; }
-    .stat-sold-products .card-content h2 { color: #e91e63; }
-    .stat-available-products .card-content h2 { color: #9c27b0; }
+    .stat-orders {
+      .card-content {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+        
+        i { color: rgba(255, 255, 255, 0.9); }
+        .stat-label { color: rgba(255, 255, 255, 0.8); }
+      }
+    }
+
+    .stat-daily-revenue {
+      .card-content {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        color: white;
+        
+        i { color: rgba(255, 255, 255, 0.9); }
+        .stat-label { color: rgba(255, 255, 255, 0.8); }
+      }
+    }
+
+    .stat-total-products {
+      .card-content {
+        background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        color: white;
+        
+        i { color: rgba(255, 255, 255, 0.9); }
+        .stat-label { color: rgba(255, 255, 255, 0.8); }
+      }
+    }
+
+    .stat-sold-products {
+      .card-content {
+        background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        color: white;
+        
+        i { color: rgba(255, 255, 255, 0.9); }
+        .stat-label { color: rgba(255, 255, 255, 0.8); }
+      }
+    }
+
+    .stat-available-products {
+      .card-content {
+        background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+        color: #333;
+        
+        i { color: rgba(0, 0, 0, 0.7); }
+        .stat-label { color: rgba(0, 0, 0, 0.6); }
+      }
+    }
 
     .revenue-statistics {
       margin-top: 2rem;
@@ -492,6 +593,7 @@ import { BestSellingStatisticsComponent } from '../../../best-selling-statistics
 
       .statistics-cards {
         grid-template-columns: 1fr;
+        gap: 1rem;
       }
 
       .best-selling-section {
@@ -556,45 +658,73 @@ export class AdminDashboardComponent implements OnInit {
   @ViewChild('monthlyRevenueChart') monthlyRevenueChartRef!: ElementRef;
   @ViewChild('yearlyRevenueChart') yearlyRevenueChartRef!: ElementRef;
 
+  // Dashboard statistics
+  totalRevenue: number = 0;
   dailyRevenue: number = 0;
+  ordersToday: number = 0;
   totalProducts: number = 0;
   soldProducts: number = 0;
   availableProducts: number = 0;
-  ordersToday: number = 0;
-  
+
+  // Chart date ranges
   dateRange: Date[] = [];
   monthRange: Date[] = [];
   yearRange: Date[] = [];
 
+  // Chart instances
   private dailyChart: Chart | null = null;
   private monthlyChart: Chart | null = null;
   private yearlyChart: Chart | null = null;
 
-  constructor(private statisticsService: StatisticsService) {}
+  constructor(
+    private statisticsService: StatisticsService,
+    private orderService: OrderService
+  ) {}
 
   ngOnInit() {
     this.loadDashboardData();
   }
 
   private loadDashboardData() {
-    // Load daily revenue
-    this.statisticsService.getDailyRevenue().subscribe(
-      revenue => this.dailyRevenue = revenue
-    );
+    // Load dashboard stats
+    this.orderService.getDashboardStats().subscribe({
+      next: (stats) => {
+        this.totalRevenue = stats.totalRevenue;
+        this.ordersToday = stats.todayOrders;
+        this.soldProducts = stats.totalProductsSold;
+      },
+      error: (error) => {
+        console.error('Error loading dashboard stats:', error);
+        this.totalRevenue = 0;
+        this.ordersToday = 0;
+        this.soldProducts = 0;
+      }
+    });
+
+    // Load daily revenue for today
+    const today = new Date();
+    this.statisticsService.getDailyRevenue().subscribe({
+      next: (revenue) => {
+        this.dailyRevenue = revenue;
+      },
+      error: (error) => {
+        console.error('Error loading daily revenue:', error);
+        this.dailyRevenue = 0;
+      }
+    });
 
     // Load product statistics
-    this.statisticsService.getProductStatistics().subscribe(
-      stats => {
+    this.statisticsService.getProductStatistics().subscribe({
+      next: (stats) => {
         this.totalProducts = stats.totalProducts;
-        this.soldProducts = stats.soldProducts;
         this.availableProducts = stats.availableProducts;
+      },
+      error: (error) => {
+        console.error('Error loading product statistics:', error);
+        this.totalProducts = 0;
+        this.availableProducts = 0;
       }
-    );
-
-    // Load today's orders
-    this.statisticsService.getOrdersToday().subscribe(
-      count => this.ordersToday = count
-    );
+    });
   }
 
   onDateRangeSelect() {

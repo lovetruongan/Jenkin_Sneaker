@@ -13,47 +13,67 @@ import java.util.List;
 public interface OrderRepository extends JpaRepository<Order, Long> {
     //Tìm các đơn hàng của 1 user nào đó
     List<Order> findByUserId(Long userId);
-    @Query("SELECT o FROM Order o WHERE o.active = true AND (:keyword IS NULL OR :keyword = '' OR " +
-            "o.fullName LIKE %:keyword% " +
+    
+    @Query(value = "SELECT * FROM orders o WHERE o.active = true AND (:keyword IS NULL OR :keyword = '' OR " +
+            "o.fullname LIKE %:keyword% " +
             "OR o.address LIKE %:keyword% " +
             "OR o.note LIKE %:keyword% " +
-            "OR o.email LIKE %:keyword%)")
+            "OR o.email LIKE %:keyword%)", 
+            nativeQuery = true)
     Page<Order> findByKeyword(@Param("keyword") String keyword, Pageable pageable);
     
-    // Statistics queries - removed status filter to include all orders with revenue
-    @Query("SELECT COALESCE(SUM(o.totalMoney), 0) FROM Order o WHERE o.orderDate = :date AND o.totalMoney > 0")
+    @Query(value = "SELECT COALESCE(SUM(o.total_money), 0) FROM orders o WHERE o.order_date = :date AND o.total_money > 0",
+            nativeQuery = true)
     Double getDailyRevenue(@Param("date") LocalDate date);
 
-    @Query("SELECT o.orderDate, COALESCE(SUM(o.totalMoney), 0) " +
-           "FROM Order o " +
-           "WHERE o.orderDate BETWEEN :startDate AND :endDate " +
-           "AND o.totalMoney > 0 " +
-           "GROUP BY o.orderDate " +
-           "ORDER BY o.orderDate")
+    @Query(value = "SELECT o.order_date, COALESCE(SUM(o.total_money), 0) " +
+           "FROM orders o " +
+           "WHERE o.order_date BETWEEN :startDate AND :endDate " +
+           "AND o.total_money > 0 " +
+           "GROUP BY o.order_date " +
+           "ORDER BY o.order_date",
+           nativeQuery = true)
     List<Object[]> getRevenueByDateRange(
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate);
 
-    @Query("SELECT YEAR(o.orderDate), MONTH(o.orderDate), COALESCE(SUM(o.totalMoney), 0) " +
-           "FROM Order o " +
-           "WHERE o.orderDate BETWEEN :startDate AND :endDate " +
-           "AND o.totalMoney > 0 " +
-           "GROUP BY YEAR(o.orderDate), MONTH(o.orderDate) " +
-           "ORDER BY YEAR(o.orderDate), MONTH(o.orderDate)")
+    @Query(value = "SELECT YEAR(o.order_date), MONTH(o.order_date), COALESCE(SUM(o.total_money), 0) " +
+           "FROM orders o " +
+           "WHERE o.order_date BETWEEN :startDate AND :endDate " +
+           "AND o.total_money > 0 " +
+           "GROUP BY YEAR(o.order_date), MONTH(o.order_date) " +
+           "ORDER BY YEAR(o.order_date), MONTH(o.order_date)",
+           nativeQuery = true)
     List<Object[]> getRevenueByMonthRange(
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate);
 
-    @Query("SELECT YEAR(o.orderDate), COALESCE(SUM(o.totalMoney), 0) " +
-           "FROM Order o " +
-           "WHERE YEAR(o.orderDate) BETWEEN :startYear AND :endYear " +
-           "AND o.totalMoney > 0 " +
-           "GROUP BY YEAR(o.orderDate) " +
-           "ORDER BY YEAR(o.orderDate)")
+    @Query(value = "SELECT YEAR(o.order_date), COALESCE(SUM(o.total_money), 0) " +
+           "FROM orders o " +
+           "WHERE YEAR(o.order_date) BETWEEN :startYear AND :endYear " +
+           "AND o.total_money > 0 " +
+           "GROUP BY YEAR(o.order_date) " +
+           "ORDER BY YEAR(o.order_date)",
+           nativeQuery = true)
     List<Object[]> getRevenueByYearRange(
             @Param("startYear") int startYear,
             @Param("endYear") int endYear);
 
-    @Query("SELECT COUNT(o) FROM Order o WHERE o.orderDate = :today")
-    Long countOrdersToday(@Param("today") java.time.LocalDate today);
+    // Đếm số đơn hàng trong ngày
+    @Query(value = "SELECT COUNT(*) FROM orders WHERE DATE(order_date) = CURRENT_DATE",
+           nativeQuery = true)
+    Long countOrdersToday();
+
+    // Tính tổng doanh thu từ các đơn hàng đã hoàn thành
+    @Query(value = "SELECT COALESCE(SUM(total_money), 0) FROM orders WHERE status IN ('COMPLETED', 'delivered')",
+           nativeQuery = true)
+    Long calculateTotalRevenue();
+
+    // Đếm tổng số sản phẩm đã bán (từ đơn hàng đã hoàn thành)
+    @Query(value = "SELECT COALESCE(SUM(od.number_of_products), 0) " +
+           "FROM orders o " +
+           "JOIN order_details od ON o.id = od.order_id " +
+           "WHERE o.status IN ('COMPLETED', 'delivered')",
+           nativeQuery = true)
+    Long countTotalProductsSold();
 }

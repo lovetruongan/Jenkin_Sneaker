@@ -2,6 +2,7 @@ package com.example.Sneakers.services;
 
 import com.example.Sneakers.dtos.CartItemDTO;
 import com.example.Sneakers.dtos.OrderDTO;
+import com.example.Sneakers.dtos.DashboardStatsDTO;
 import com.example.Sneakers.exceptions.DataNotFoundException;
 import com.example.Sneakers.models.*;
 import com.example.Sneakers.repositories.OrderDetailRepository;
@@ -21,6 +22,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -286,4 +288,16 @@ public class OrderService implements IOrderService {
         return orderRepository.save(order);
     }
 
+    @Override
+    public Long getTotalRevenue() {
+        return orderRepository.calculateTotalRevenue();
+    }
+
+    public DashboardStatsDTO getDashboardStats() {
+        Long totalRevenue = orderRepository.calculateTotalRevenue();
+        Long todayOrders = orderRepository.countOrdersToday();
+        Long totalProductsSold = orderRepository.countTotalProductsSold();
+        
+        return new DashboardStatsDTO(totalRevenue, todayOrders, totalProductsSold);
+    }
 }

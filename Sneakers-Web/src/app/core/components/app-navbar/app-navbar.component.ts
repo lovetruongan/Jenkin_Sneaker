@@ -26,7 +26,9 @@ import { UserDto } from '../../dtos/user.dto';
 export class AppNavbarComponent extends BaseComponent implements OnInit {
   public roleId: number = 100;
   public token: string | null = null;
+  public isMenuOpen: boolean = false;
   categories: MenuItem[] = [];
+
   constructor(
     private categoriesService: CategoriesService,
     private userService: UserService,
@@ -70,7 +72,12 @@ export class AppNavbarComponent extends BaseComponent implements OnInit {
     ).subscribe()
   }
 
+  toggleMenu() {
+    this.isMenuOpen = !this.isMenuOpen;
+  }
+
   navigateToCategory(categoryName: string) {
-    this.router.navigateByUrl(`/Category/${categoryName}`)
+    this.router.navigateByUrl(`/Category/${categoryName}`);
+    this.isMenuOpen = false; // Đóng menu khi chuyển trang
   }
 }

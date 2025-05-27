@@ -5,7 +5,7 @@ export interface ProductDto {
     thumbnail : string,
     description: string,
     discount: number,
-    category_id: number,
+    category_id: number | null,
     product_images: {
         id: number;
         imageUrl: string;
