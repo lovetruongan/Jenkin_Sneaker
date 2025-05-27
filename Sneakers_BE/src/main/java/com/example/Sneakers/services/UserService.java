@@ -1,6 +1,5 @@
 package com.example.Sneakers.services;
 
-
 import com.example.Sneakers.components.JwtTokenUtils;
 import com.example.Sneakers.components.LocalizationUtils;
 import com.example.Sneakers.dtos.UpdateUserDTO;
@@ -28,39 +27,42 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
-public class UserService implements IUserService{
+public class UserService implements IUserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenUtils jwtTokenUtil;
     private final AuthenticationManager authenticationManager;
     private final LocalizationUtils localizationUtils;
+
     @Override
     public User createUser(UserDTO userDTO) throws Exception {
-        //register user
+        // register user
         String phoneNumber = userDTO.getPhoneNumber();
         // Kiểm tra xem số điện thoại đã tồn tại hay chưa
-        if(userRepository.existsByPhoneNumber(phoneNumber)) {
+        if (userRepository.existsByPhoneNumber(phoneNumber)) {
             throw new DataIntegrityViolationException("Phone number already exists");
         }
 
-        if(userDTO.getRoleId() == null){
+        if (userDTO.getRoleId() == null) {
             userDTO.setRoleId(1L);
         }
 
-        Role role =roleRepository.findById(userDTO.getRoleId())
+        Role role = roleRepository.findById(userDTO.getRoleId())
                 .orElseThrow(() -> new DataNotFoundException(
-                        localizationUtils.getLocalizedMessage(MessageKeys.ROLE_DOES_NOT_EXISTS)));;
+                        localizationUtils.getLocalizedMessage(MessageKeys.ROLE_DOES_NOT_EXISTS)));
+        ;
 
-        if(role.getName().toUpperCase().equals(Role.ADMIN)) {
+        if (role.getName().toUpperCase().equals(Role.ADMIN)) {
             throw new PermissionDenyException("You cannot register an admin account");
         }
-        //convert from userDTO => user
+        // convert from userDTO => user
         User newUser = User.builder()
                 .fullName(userDTO.getFullName())
                 .phoneNumber(userDTO.getPhoneNumber())
                 .password(userDTO.getPassword())
                 .address(userDTO.getAddress())
+                .email(userDTO.getEmail())
                 .dateOfBirth(userDTO.getDateOfBirth())
                 .facebookAccountId(userDTO.getFacebookAccountId())
                 .googleAccountId(userDTO.getGoogleAccountId())
@@ -80,31 +82,35 @@ public class UserService implements IUserService{
     @Override
     public String login(String phoneNumber, String password) throws Exception {
         Optional<User> optionalUser = userRepository.findByPhoneNumber(phoneNumber);
-        if(optionalUser.isEmpty()) {
+        if (optionalUser.isEmpty()) {
             throw new DataNotFoundException(localizationUtils.getLocalizedMessage(MessageKeys.WRONG_PHONE_PASSWORD));
         }
         User existingUser = optionalUser.get();
-        //check password
+
+        if (!Boolean.TRUE.equals(existingUser.isActive())) {
+            throw new BadCredentialsException(localizationUtils.getLocalizedMessage(MessageKeys.USER_IS_LOCKED));
+        }
+        // check password
         if (existingUser.getFacebookAccountId() == 0
                 && existingUser.getGoogleAccountId() == 0) {
-            if(!passwordEncoder.matches(password, existingUser.getPassword())) {
-                throw new BadCredentialsException(localizationUtils.getLocalizedMessage(MessageKeys.WRONG_PHONE_PASSWORD));
+            if (!passwordEncoder.matches(password, existingUser.getPassword())) {
+                throw new BadCredentialsException(
+                        localizationUtils.getLocalizedMessage(MessageKeys.WRONG_PHONE_PASSWORD));
             }
         }
-        //Thông tin xác thực
+        // Thông tin xác thực
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                 phoneNumber, password,
-                existingUser.getAuthorities()
-        );
+                existingUser.getAuthorities());
 
-        //authenticate with Java Spring security
+        // authenticate with Java Spring security
         authenticationManager.authenticate(authenticationToken);
         return jwtTokenUtil.generateToken(existingUser);
     }
 
     @Override
     public User getUserDetailsFromToken(String token) throws Exception {
-        if(jwtTokenUtil.isTokenExpired(token)) {
+        if (jwtTokenUtil.isTokenExpired(token)) {
             throw new Exception("Token is expired");
         }
         String phoneNumber = jwtTokenUtil.extractPhoneNumber(token);
@@ -124,7 +130,8 @@ public class UserService implements IUserService{
         User existingUser = userRepository.findById(userId)
                 .orElseThrow(() -> new DataNotFoundException("User not found"));
 
-        // Check if the phone number is being changed and if it already exists for another user
+        // Check if the phone number is being changed and if it already exists for
+        // another user
         String newPhoneNumber = updatedUserDTO.getPhoneNumber();
         if (!existingUser.getPhoneNumber().equals(newPhoneNumber) &&
                 userRepository.existsByPhoneNumber(newPhoneNumber)) {
@@ -140,6 +147,9 @@ public class UserService implements IUserService{
         }
         if (updatedUserDTO.getAddress() != null) {
             existingUser.setAddress(updatedUserDTO.getAddress());
+        }
+        if (updatedUserDTO.getEmail() != null) {
+            existingUser.setEmail(updatedUserDTO.getEmail());
         }
         if (updatedUserDTO.getDateOfBirth() != null) {
             existingUser.setDateOfBirth(updatedUserDTO.getDateOfBirth());
@@ -158,18 +168,32 @@ public class UserService implements IUserService{
             String encodedPassword = passwordEncoder.encode(newPassword);
             existingUser.setPassword(encodedPassword);
         }
-        //existingUser.setRole(updatedRole);
+        // existingUser.setRole(updatedRole);
         // Save the updated user
         return userRepository.save(existingUser);
     }
 
     @Override
+    public Optional<User> updateActiveUserById(Long id, boolean activeUser) {
+        Optional<User> userOpt = userRepository.findById(id);
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            user.setActive(activeUser);
+            userRepository.save(user);
+            return Optional.of(user);
+        }
+        return Optional.empty();
+    }
+
+    @Override
     public List<UserResponse> getAllUser() {
+        List<User> ls = this.userRepository.findAll();
         return userRepository.findAll()
                 .stream()
                 .map(UserResponse::fromUser)
                 .collect(Collectors.toList());
     }
+
     @Override
     public User changeRoleUser(Long roleId, Long userId) throws Exception {
         Role role = roleRepository.findById(roleId)

@@ -14,6 +14,7 @@ import java.sql.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@ToString
 public class UserDTO {
     @JsonProperty("fullname")
     private String fullName;
@@ -23,6 +24,7 @@ public class UserDTO {
     private String phoneNumber;
 
     private String address;
+    private String email;
 
     @NotBlank(message = "Password cannot be blank")
     private String password;
@@ -31,7 +33,7 @@ public class UserDTO {
     private String retypePassword;
 
     @JsonProperty("date_of_birth")
-//    @JsonFormat(pattern="MM/dd/yyyy")
+    // @JsonFormat(pattern="MM/dd/yyyy")
     private Date dateOfBirth;
 
     @JsonProperty("facebook_account_id")
@@ -40,7 +42,7 @@ public class UserDTO {
     @JsonProperty("google_account_id")
     private int googleAccountId;
 
-//    @NotNull(message = "Role ID  is required")
+    // @NotNull(message = "Role ID is required")
     @JsonProperty("role_id")
     private Long roleId;
 }
