@@ -1,5 +1,18 @@
-import { Component, OnInit } from '@angular/core';
-import { PanelModule } from 'primeng/panel';
+import { Component, Inject, OnInit, PLATFORM_ID } from '@angular/core';
+import { MatTableModule } from '@angular/material/table';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatSelectModule } from '@angular/material/select';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatDialogModule, MatDialog } from '@angular/material/dialog';
+import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { FormsModule } from '@angular/forms';
+import { CommonModule, DatePipe, isPlatformBrowser } from '@angular/common';
 import { BaseComponent } from '../../../core/commonComponent/base.component';
 import { UserService } from '../../../core/services/user.service';
 import { catchError, filter, of, tap } from 'rxjs';
@@ -16,38 +29,71 @@ export interface UserOption {
   selector: 'app-user-manage',
   standalone: true,
   imports: [
-    PanelModule,
-    DropdownModule,
+    CommonModule,
+    MatTableModule,
+    MatButtonModule,
+    MatIconModule,
+    MatSelectModule,
+    MatChipsModule,
+    MatDialogModule,
+    MatSnackBarModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatCheckboxModule,
+    FormsModule,
     DatePipe,
-    ButtonModule,
-    ConfirmDialogModule,
-    ToastModule
-  ],
-  providers: [
-    MessageService,
-    ToastService,
-    ConfirmationService
+    MatTooltipModule
   ],
   templateUrl: './user-manage.component.html',
-  styleUrl: './user-manage.component.scss'
+  styleUrls: ['./user-manage.component.scss']
 })
-export class UserManageComponent extends BaseComponent implements OnInit{
-  public userOptions: MenuItem[] = [
+export class UserManageComponent extends BaseComponent implements OnInit {
+  public userOptions: UserOption[] = [
     { label: 'Người dùng', value: 1 },
     { label: 'Quản trị viên', value: 2 },
   ];
+
+  searchTerm: string = '';
+  filterLsedUsers: any[] = [];
+
   public roleMap = [
     'Người dùng',
     'Quản trị viên',
   ];
-  public userId!: number;
 
+  public userId!: number;
   public users: UserDto[] = [];
+
+  // Properties for edit functionality
+  public showEditDialog = false;
+  public showAddDialog = false;
+  public editingUser: UserDto = {} as UserDto;
+  public originalUser: UserDto = {} as UserDto;
+  public addUser: registerReq = {} as registerReq;
+
+  displayedColumns: string[] = [
+    'fullname',
+    'phone',
+    'email',
+    'address',
+    'dateOfBirth',
+    'status',
+    'role',
+    'actions'
+  ];
+
+  get filteredUsers(): UserDto[] {
+    if (!this.users || !this.userId) return [];
+    return this.users.filter(user => user?.id != null && this.userId !== user.id);
+  }
 
   constructor(
     private userService: UserService,
-    private toastService: ToastService,
-    private confirmationService: ConfirmationService
+    private dialog: MatDialog,
+    private snackBar: MatSnackBar,
+    @Inject(PLATFORM_ID) private platformId: Object
   ) {
     super();
     if (typeof localStorage !== 'undefined') {
@@ -228,7 +274,12 @@ export class UserManageComponent extends BaseComponent implements OnInit{
     }
   }
 
-  onCategoryChange(userId: number, event: any){
+  getRoleName(user: any): string {
+    const roleId = user?.role?.id;
+    return roleId != null ? this.roleMap[roleId - 1] : 'Không xác định';
+  }
+
+  onCategoryChange(userId: number, event: any) {
     this.userService.changeRoleUser(event.value, userId).pipe(
       tap((res: { users: UserDto[], message: string }) => {
         this.getUsers();
@@ -238,7 +289,10 @@ export class UserManageComponent extends BaseComponent implements OnInit{
         });
       }),
       catchError((err) => {
-        this.toastService.fail(err.error.message);
+        this.snackBar.open(err.error.message, 'Đóng', {
+          duration: 3000,
+          panelClass: ['error-snackbar']
+        });
         return of(err);
       })
     ).subscribe();
