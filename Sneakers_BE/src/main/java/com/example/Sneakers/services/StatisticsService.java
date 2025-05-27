@@ -71,9 +71,9 @@ public class StatisticsService {
     }
 
     public ProductStatisticsDTO getProductStatistics() {
+        Long totalProducts = productRepository.count();
         Long soldProducts = orderDetailRepository.countSoldProducts();
-        Long totalProducts = 1000L; // Tổng số sản phẩm cố định
-        Long availableProducts = 800L; // Số sản phẩm trong kho cố định
+        Long availableProducts = totalProducts - soldProducts;
 
         return new ProductStatisticsDTO(
                 totalProducts,

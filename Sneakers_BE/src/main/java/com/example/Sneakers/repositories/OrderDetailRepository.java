@@ -11,8 +11,8 @@ import org.springframework.data.domain.Pageable;
 public interface OrderDetailRepository extends JpaRepository<OrderDetail,Long> {
     List<OrderDetail> findByOrderId(Long orderId);
     
-    @Query(value = "SELECT COALESCE(SUM(od.number_of_products), 0) FROM order_details od " +
-           "JOIN orders o ON od.order_id = o.id WHERE o.status = 'delivered'", nativeQuery = true)
+    @Query("SELECT COUNT(DISTINCT od.product.id) FROM OrderDetail od " +
+           "JOIN od.order o WHERE o.status = 'COMPLETED'")
     Long countSoldProducts();
 
     // Best selling products statistics (native SQL)
