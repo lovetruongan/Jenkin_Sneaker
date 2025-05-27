@@ -8,9 +8,13 @@ import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
 import { StatisticsService, DailyRevenue, MonthlyRevenue, YearlyRevenue, ProductStatistics } from '../../../core/services/statistics.service';
-import { Chart } from 'chart.js';
+import { Chart, registerables } from 'chart.js';
 import { BestSellingStatisticsComponent } from '../../../best-selling-statistics/best-selling-statistics.component';
 import { OrderService } from '../../../core/services/order.service';
+import { PrimeNGConfig } from 'primeng/api';
+
+// Register Chart.js components
+Chart.register(...registerables);
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -118,7 +122,16 @@ import { OrderService } from '../../../core/services/order.service';
                               styleClass="statistics-calendar"
                               appendTo="body"
                               [numberOfMonths]="1"
-                              [touchUI]="true">
+                              [touchUI]="true"
+                              [showIcon]="true"
+                              [readonlyInput]="true"
+                              [firstDayOfWeek]="1"
+                              dateFormat="dd/mm/yy"
+                              placeholder="Chọn ngày"
+                              [showOtherMonths]="false"
+                              [yearNavigator]="true"
+                              [monthNavigator]="true"
+                              yearRange="2000:2030">
                     </p-calendar>
                   </div>
                   <div class="chart-wrapper">
@@ -138,7 +151,14 @@ import { OrderService } from '../../../core/services/order.service';
                               styleClass="statistics-calendar"
                               appendTo="body"
                               [numberOfMonths]="1"
-                              [touchUI]="true">
+                              [touchUI]="true"
+                              [showIcon]="true"
+                              [readonlyInput]="true"
+                              dateFormat="mm/yy"
+                              placeholder="Chọn tháng"
+                              [yearNavigator]="true"
+                              [monthNavigator]="true"
+                              yearRange="2000:2030">
                     </p-calendar>
                   </div>
                   <div class="chart-wrapper">
@@ -158,7 +178,13 @@ import { OrderService } from '../../../core/services/order.service';
                               styleClass="statistics-calendar"
                               appendTo="body"
                               [numberOfMonths]="1"
-                              [touchUI]="true">
+                              [touchUI]="true"
+                              [showIcon]="true"
+                              [readonlyInput]="true"
+                              dateFormat="yy"
+                              placeholder="Chọn năm"
+                              [yearNavigator]="true"
+                              yearRange="2000:2030">
                     </p-calendar>
                   </div>
                   <div class="chart-wrapper">
@@ -433,11 +459,8 @@ import { OrderService } from '../../../core/services/order.service';
 
       :host ::ng-deep {
         .p-calendar {
-          width: 320px;
-          display: inline-block;
-
           .p-inputtext {
-            width: 100%;
+            width: 250px;
             padding: 0.5rem;
             border-radius: 6px;
             border: 1px solid #ddd;
@@ -451,92 +474,154 @@ import { OrderService } from '../../../core/services/order.service';
             }
           }
 
-          .p-datepicker {
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            background: white;
+          .p-button {
+            background: #1976d2;
+            border: none;
+            color: white;
+            
+            &:hover {
+              background: #1565c0;
+            }
+            
+            &:focus {
+              box-shadow: none;
+            }
+          }
+        }
+
+        .p-datepicker {
+          padding: 0.5rem;
+          background: white;
+          border: 1px solid #ddd;
+          border-radius: 8px;
+          box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+
+          .p-datepicker-header {
             padding: 0.5rem;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 0.5rem;
 
-            .p-datepicker-header {
-              padding: 0.5rem;
-              border-bottom: 1px solid #eee;
+            .p-datepicker-title {
+              .p-datepicker-month,
+              .p-datepicker-year {
+                padding: 0.25rem 0.5rem;
+                font-weight: 600;
+                margin: 0 0.25rem;
+                border-radius: 4px;
+                transition: background-color 0.2s;
 
-              .p-datepicker-title {
-                .p-datepicker-month,
-                .p-datepicker-year {
-                  font-weight: 500;
-                  color: #333;
+                &:hover {
+                  background-color: #f0f0f0;
+                  cursor: pointer;
+                }
+
+                &:focus {
+                  outline: none;
+                  box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.1);
                 }
               }
+            }
 
-              .p-datepicker-prev,
-              .p-datepicker-next {
+            .p-datepicker-prev,
+            .p-datepicker-next {
+              width: 2rem;
+              height: 2rem;
+              border-radius: 50%;
+              transition: background-color 0.2s;
+
+              &:hover {
+                background-color: #f0f0f0;
+              }
+
+              &:focus {
+                outline: none;
+                box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.1);
+              }
+            }
+          }
+
+          table {
+            font-size: 14px;
+            border-collapse: collapse;
+            width: 100%;
+
+            th {
+              padding: 0.5rem;
+              text-align: center;
+              font-weight: 600;
+              color: #666;
+            }
+
+            td {
+              padding: 0.25rem;
+
+              > span {
                 width: 2rem;
                 height: 2rem;
-                border-radius: 4px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
                 transition: all 0.2s;
 
                 &:hover {
-                  background: #f0f0f0;
+                  background-color: #f0f0f0;
+                }
+
+                &.p-highlight {
+                  background-color: #1976d2;
+                  color: white;
+                }
+
+                &.p-disabled {
+                  opacity: 0.5;
+                  pointer-events: none;
                 }
               }
             }
+          }
 
-            .p-datepicker-calendar {
-              th {
-                padding: 0.5rem;
-                font-weight: 500;
+          .p-datepicker-buttonbar {
+            padding: 0.5rem;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+
+            button {
+              padding: 0.5rem 1rem;
+              border: none;
+              border-radius: 4px;
+              font-weight: 500;
+              transition: all 0.2s;
+
+              &.p-button-text {
                 color: #666;
+
+                &:hover {
+                  background-color: #f0f0f0;
+                }
               }
 
-              td {
-                padding: 0.25rem;
+              &.p-button {
+                background-color: #1976d2;
+                color: white;
 
-                > span {
-                  width: 2rem;
-                  height: 2rem;
-                  border-radius: 4px;
-                  transition: all 0.2s;
-
-                  &:hover {
-                    background: #f0f0f0;
-                  }
-
-                  &.p-highlight {
-                    background: #1976d2;
-                    color: white;
-                  }
-
-                  &.p-datepicker-today {
-                    background: #e3f2fd;
-                    color: #1976d2;
-                    font-weight: 500;
-                  }
+                &:hover {
+                  background-color: #1565c0;
                 }
               }
             }
           }
+        }
 
-          .p-button {
-            padding: 0.5rem 1rem;
-            background-color: #1976d2;
-            border: none;
-            border-radius: 6px;
-            color: white;
-            font-weight: 500;
-            transition: all 0.2s ease;
-
-            &:hover {
-              background-color: #1565c0;
-              transform: translateY(-1px);
-              box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            }
-
-            &:active {
-              transform: translateY(0);
-            }
-          }
+        .p-datepicker-touch-ui {
+          min-width: 300px;
+          max-width: 90vw;
+          position: fixed !important;
+          top: 50% !important;
+          left: 50% !important;
+          transform: translate(-50%, -50%) !important;
+          z-index: 1100 !important;
         }
       }
     }
@@ -605,51 +690,14 @@ import { OrderService } from '../../../core/services/order.service';
       }
     }
 
-    :host ::ng-deep .p-datepicker {
-      min-width: 220px !important;
-      max-width: 340px !important;
-      width: 100% !important;
-      box-sizing: border-box;
-      position: fixed !important;
-      z-index: 9999 !important;
-    }
-
-    :host ::ng-deep .p-datepicker .p-datepicker-group {
-      width: 100% !important;
-      max-width: 320px !important;
-    }
-
-    :host ::ng-deep .p-datepicker .p-datepicker-multiple-month {
-      display: block !important;
-    }
-
-    :host ::ng-deep .p-datepicker .p-datepicker-multiple-month .p-datepicker-group {
-      width: 100% !important;
-      margin: 0 !important;
-    }
-
-    @media (max-width: 768px) {
-      :host ::ng-deep .p-datepicker {
-        min-width: 280px !important;
-        max-width: 300px !important;
-        left: 50% !important;
-        transform: translateX(-50%) !important;
-      }
-    }
-
     .calendar-container {
-      overflow: visible !important;
-      position: relative !important;
+      position: relative;
+      z-index: 1000;
     }
 
     .chart-container {
-      overflow: visible !important;
-      position: relative !important;
-    }
-
-    .revenue-statistics {
-      overflow: visible !important;
-      position: relative !important;
+      position: relative;
+      z-index: 1;
     }
   `]
 })
@@ -666,10 +714,24 @@ export class AdminDashboardComponent implements OnInit {
   soldProducts: number = 0;
   availableProducts: number = 0;
 
-  // Chart date ranges
-  dateRange: Date[] = [];
-  monthRange: Date[] = [];
-  yearRange: Date[] = [];
+  // Chart date ranges with default values
+  dateRange: Date[] = [new Date(), new Date()];
+  monthRange: Date[] = [new Date(), new Date()];
+  yearRange: Date[] = [new Date(), new Date()];
+
+  // Calendar configuration
+  calendarConfig = {
+    firstDayOfWeek: 1,
+    dayNames: ['Chủ nhật', 'Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7'],
+    dayNamesShort: ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'],
+    dayNamesMin: ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'],
+    monthNames: ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'],
+    monthNamesShort: ['Th1', 'Th2', 'Th3', 'Th4', 'Th5', 'Th6', 'Th7', 'Th8', 'Th9', 'Th10', 'Th11', 'Th12'],
+    today: 'Hôm nay',
+    clear: 'Xóa',
+    dateFormat: 'dd/mm/yy',
+    weekHeader: 'Tuần'
+  };
 
   // Chart instances
   private dailyChart: Chart | null = null;
@@ -678,11 +740,28 @@ export class AdminDashboardComponent implements OnInit {
 
   constructor(
     private statisticsService: StatisticsService,
-    private orderService: OrderService
+    private orderService: OrderService,
+    private primeNGConfig: PrimeNGConfig
   ) {}
 
   ngOnInit() {
+    // Set PrimeNG calendar locale
+    this.primeNGConfig.setTranslation(this.calendarConfig);
+    
+    // Initialize date ranges
+    const today = new Date();
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(today.getDate() - 30);
+    
+    this.dateRange = [thirtyDaysAgo, today];
+    this.monthRange = [new Date(today.getFullYear(), 0, 1), today];
+    this.yearRange = [new Date(today.getFullYear() - 5, 0, 1), today];
+
+    // Load initial data
     this.loadDashboardData();
+    this.onDateRangeSelect();
+    this.onMonthRangeSelect();
+    this.onYearRangeSelect();
   }
 
   private loadDashboardData() {
@@ -761,6 +840,8 @@ export class AdminDashboardComponent implements OnInit {
   }
 
   private updateDailyChart(data: DailyRevenue[]) {
+    if (typeof window === 'undefined') return; // Skip on server-side
+
     const ctx = this.dailyRevenueChartRef.nativeElement.getContext('2d');
     if (this.dailyChart) {
       this.dailyChart.destroy();
@@ -806,6 +887,8 @@ export class AdminDashboardComponent implements OnInit {
   }
 
   private updateMonthlyChart(data: MonthlyRevenue[]) {
+    if (typeof window === 'undefined') return; // Skip on server-side
+
     const ctx = this.monthlyRevenueChartRef.nativeElement.getContext('2d');
     if (this.monthlyChart) {
       this.monthlyChart.destroy();
@@ -850,6 +933,8 @@ export class AdminDashboardComponent implements OnInit {
   }
 
   private updateYearlyChart(data: YearlyRevenue[]) {
+    if (typeof window === 'undefined') return; // Skip on server-side
+
     const ctx = this.yearlyRevenueChartRef.nativeElement.getContext('2d');
     if (this.yearlyChart) {
       this.yearlyChart.destroy();
