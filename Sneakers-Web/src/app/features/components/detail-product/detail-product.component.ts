@@ -141,24 +141,18 @@ export class DetailProductComponent extends BaseComponent implements OnInit,Afte
             price: product.price,
             discount: product.discount
           })
-          this.categoryId = product.category_id ? product.category_id.toString() : '0';
+          this.categoryId = product.category_id.toString();
           this.images = product.product_images;
         }),
         switchMap(() => {
-          if (this.categoryId && this.categoryId !== '0') {
-            return this.categoriesService.getCategoryById(parseInt(this.categoryId)).pipe(
-              tap((category: CategoriesDto) => {
-                this.categoryNameOfProduct = category.name;
-              }),
-              catchError((err) => {
-                this.categoryNameOfProduct = 'Chưa phân loại';
-                return of(err);
-              })
-            );
-          } else {
-            this.categoryNameOfProduct = 'Chưa phân loại';
-            return of(null);
-          }
+          return this.categoriesService.getCategoryById(parseInt(this.categoryId)).pipe(
+            tap((category: CategoriesDto) => {
+              this.categoryNameOfProduct = category.name;
+            }),
+            catchError((err) => {
+              return of(err);
+            })
+          );
         }),
         catchError((err) => {
           return of(err);
