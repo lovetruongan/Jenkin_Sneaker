@@ -34,35 +34,40 @@ import { BestSellingStatisticsComponent } from '../../../best-selling-statistics
       <div class="dashboard-content">
         <!-- Statistics Cards -->
         <div class="statistics-cards">
+          <div class="card orders-today">
+            <p-card header="Đơn hàng hôm nay" styleClass="stat-card stat-orders">
+              <div class="card-content">
+                <i class="pi pi-shopping-bag"></i>
+                <h2>{{ ordersToday }}</h2>
+              </div>
+            </p-card>
+          </div>
           <div class="card daily-revenue">
-            <p-card header="Doanh thu hôm nay" styleClass="stat-card">
+            <p-card header="Doanh thu hôm nay" styleClass="stat-card stat-daily-revenue">
               <div class="card-content">
                 <i class="pi pi-money-bill"></i>
                 <h2>{{ dailyRevenue | currency:'VND' }}</h2>
               </div>
             </p-card>
           </div>
-
           <div class="card total-products">
-            <p-card header="Tổng sản phẩm" styleClass="stat-card">
+            <p-card header="Tổng sản phẩm" styleClass="stat-card stat-total-products">
               <div class="card-content">
                 <i class="pi pi-box"></i>
                 <h2>{{ totalProducts }}</h2>
               </div>
             </p-card>
           </div>
-
           <div class="card sold-products">
-            <p-card header="Sản phẩm đã bán" styleClass="stat-card">
+            <p-card header="Sản phẩm đã bán" styleClass="stat-card stat-sold-products">
               <div class="card-content">
                 <i class="pi pi-shopping-cart"></i>
                 <h2>{{ soldProducts }}</h2>
               </div>
             </p-card>
           </div>
-
           <div class="card available-products">
-            <p-card header="Sản phẩm trong kho" styleClass="stat-card">
+            <p-card header="Sản phẩm trong kho" styleClass="stat-card stat-available-products">
               <div class="card-content">
                 <i class="pi pi-inbox"></i>
                 <h2>{{ availableProducts }}</h2>
@@ -78,11 +83,15 @@ import { BestSellingStatisticsComponent } from '../../../best-selling-statistics
               <p-tabPanel header="Theo ngày">
                 <div class="chart-container">
                   <div class="calendar-container">
+                    <label class="date-range-label">Chọn khoảng thời gian:</label>
                     <p-calendar [(ngModel)]="dateRange" 
                               selectionMode="range" 
                               [showButtonBar]="true" 
                               (onSelect)="onDateRangeSelect()"
-                              styleClass="statistics-calendar">
+                              styleClass="statistics-calendar"
+                              appendTo="body"
+                              [numberOfMonths]="1"
+                              [touchUI]="true">
                     </p-calendar>
                   </div>
                   <div class="chart-wrapper">
@@ -93,12 +102,16 @@ import { BestSellingStatisticsComponent } from '../../../best-selling-statistics
               <p-tabPanel header="Theo tháng">
                 <div class="chart-container">
                   <div class="calendar-container">
+                    <label class="date-range-label">Chọn khoảng thời gian:</label>
                     <p-calendar [(ngModel)]="monthRange" 
                               selectionMode="range" 
                               view="month" 
                               [showButtonBar]="true" 
                               (onSelect)="onMonthRangeSelect()"
-                              styleClass="statistics-calendar">
+                              styleClass="statistics-calendar"
+                              appendTo="body"
+                              [numberOfMonths]="1"
+                              [touchUI]="true">
                     </p-calendar>
                   </div>
                   <div class="chart-wrapper">
@@ -109,12 +122,16 @@ import { BestSellingStatisticsComponent } from '../../../best-selling-statistics
               <p-tabPanel header="Theo năm">
                 <div class="chart-container">
                   <div class="calendar-container">
+                    <label class="date-range-label">Chọn khoảng thời gian:</label>
                     <p-calendar [(ngModel)]="yearRange" 
                               selectionMode="range" 
                               view="year" 
                               [showButtonBar]="true" 
                               (onSelect)="onYearRangeSelect()"
-                              styleClass="statistics-calendar">
+                              styleClass="statistics-calendar"
+                              appendTo="body"
+                              [numberOfMonths]="1"
+                              [touchUI]="true">
                     </p-calendar>
                   </div>
                   <div class="chart-wrapper">
@@ -176,16 +193,26 @@ import { BestSellingStatisticsComponent } from '../../../best-selling-statistics
 
         i {
           font-size: 2rem;
-          color: #2196F3;
         }
 
         h2 {
           margin: 0;
           font-size: 1.5rem;
-          color: #333;
         }
       }
     }
+
+    .stat-orders .card-content i { color: #ff9800; }
+    .stat-daily-revenue .card-content i { color: #4caf50; }
+    .stat-total-products .card-content i { color: #2196f3; }
+    .stat-sold-products .card-content i { color: #e91e63; }
+    .stat-available-products .card-content i { color: #9c27b0; }
+
+    .stat-orders .card-content h2 { color: #ff9800; }
+    .stat-daily-revenue .card-content h2 { color: #4caf50; }
+    .stat-total-products .card-content h2 { color: #2196f3; }
+    .stat-sold-products .card-content h2 { color: #e91e63; }
+    .stat-available-products .card-content h2 { color: #9c27b0; }
 
     .revenue-statistics {
       margin-top: 2rem;
@@ -280,14 +307,136 @@ import { BestSellingStatisticsComponent } from '../../../best-selling-statistics
 
     .chart-container {
       display: grid;
-      grid-template-columns: 300px 1fr;
-      gap: 2rem;
+      grid-template-columns: 1fr;
+      gap: 1rem;
       padding: 1rem;
     }
 
     .calendar-container {
-      .statistics-calendar {
-        width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+      background: #f8f9fa;
+      padding: 0.75rem;
+      border-radius: 8px;
+      border: 1px solid #e9ecef;
+
+      .date-range-label {
+        font-weight: 500;
+        color: #333;
+        white-space: nowrap;
+        margin-right: 0.25rem;
+      }
+
+      :host ::ng-deep {
+        .p-calendar {
+          width: 320px;
+          display: inline-block;
+
+          .p-inputtext {
+            width: 100%;
+            padding: 0.5rem;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            font-size: 14px;
+            background: white;
+
+            &:focus {
+              outline: none;
+              border-color: #1976d2;
+              box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.1);
+            }
+          }
+
+          .p-datepicker {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            background: white;
+            padding: 0.5rem;
+
+            .p-datepicker-header {
+              padding: 0.5rem;
+              border-bottom: 1px solid #eee;
+
+              .p-datepicker-title {
+                .p-datepicker-month,
+                .p-datepicker-year {
+                  font-weight: 500;
+                  color: #333;
+                }
+              }
+
+              .p-datepicker-prev,
+              .p-datepicker-next {
+                width: 2rem;
+                height: 2rem;
+                border-radius: 4px;
+                transition: all 0.2s;
+
+                &:hover {
+                  background: #f0f0f0;
+                }
+              }
+            }
+
+            .p-datepicker-calendar {
+              th {
+                padding: 0.5rem;
+                font-weight: 500;
+                color: #666;
+              }
+
+              td {
+                padding: 0.25rem;
+
+                > span {
+                  width: 2rem;
+                  height: 2rem;
+                  border-radius: 4px;
+                  transition: all 0.2s;
+
+                  &:hover {
+                    background: #f0f0f0;
+                  }
+
+                  &.p-highlight {
+                    background: #1976d2;
+                    color: white;
+                  }
+
+                  &.p-datepicker-today {
+                    background: #e3f2fd;
+                    color: #1976d2;
+                    font-weight: 500;
+                  }
+                }
+              }
+            }
+          }
+
+          .p-button {
+            padding: 0.5rem 1rem;
+            background-color: #1976d2;
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-weight: 500;
+            transition: all 0.2s ease;
+
+            &:hover {
+              background-color: #1565c0;
+              transform: translateY(-1px);
+              box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+
+            &:active {
+              transform: translateY(0);
+            }
+          }
+        }
       }
     }
 
@@ -353,6 +502,53 @@ import { BestSellingStatisticsComponent } from '../../../best-selling-statistics
         }
       }
     }
+
+    :host ::ng-deep .p-datepicker {
+      min-width: 220px !important;
+      max-width: 340px !important;
+      width: 100% !important;
+      box-sizing: border-box;
+      position: fixed !important;
+      z-index: 9999 !important;
+    }
+
+    :host ::ng-deep .p-datepicker .p-datepicker-group {
+      width: 100% !important;
+      max-width: 320px !important;
+    }
+
+    :host ::ng-deep .p-datepicker .p-datepicker-multiple-month {
+      display: block !important;
+    }
+
+    :host ::ng-deep .p-datepicker .p-datepicker-multiple-month .p-datepicker-group {
+      width: 100% !important;
+      margin: 0 !important;
+    }
+
+    @media (max-width: 768px) {
+      :host ::ng-deep .p-datepicker {
+        min-width: 280px !important;
+        max-width: 300px !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+      }
+    }
+
+    .calendar-container {
+      overflow: visible !important;
+      position: relative !important;
+    }
+
+    .chart-container {
+      overflow: visible !important;
+      position: relative !important;
+    }
+
+    .revenue-statistics {
+      overflow: visible !important;
+      position: relative !important;
+    }
   `]
 })
 export class AdminDashboardComponent implements OnInit {
@@ -364,6 +560,7 @@ export class AdminDashboardComponent implements OnInit {
   totalProducts: number = 0;
   soldProducts: number = 0;
   availableProducts: number = 0;
+  ordersToday: number = 0;
   
   dateRange: Date[] = [];
   monthRange: Date[] = [];
@@ -392,6 +589,11 @@ export class AdminDashboardComponent implements OnInit {
         this.soldProducts = stats.soldProducts;
         this.availableProducts = stats.availableProducts;
       }
+    );
+
+    // Load today's orders
+    this.statisticsService.getOrdersToday().subscribe(
+      count => this.ordersToday = count
     );
   }
 

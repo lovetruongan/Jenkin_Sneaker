@@ -53,4 +53,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     List<Object[]> getRevenueByYearRange(
             @Param("startYear") int startYear,
             @Param("endYear") int endYear);
+
+    @Query("SELECT COUNT(o) FROM Order o WHERE o.orderDate = :today")
+    Long countOrdersToday(@Param("today") java.time.LocalDate today);
 }

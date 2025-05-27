@@ -73,15 +73,34 @@ public class StatisticsController {
         return ResponseEntity.ok(statisticsService.getProductSoldByYear(year));
     }
 
-        @GetMapping("/top-product-sold")
+    @GetMapping("/top-product-sold")
     public ResponseEntity<List<ProductSoldStatisticsDTO>> getTopProductSold(
-      @RequestParam(defaultValue = "10") int topN) {
-      return ResponseEntity.ok(statisticsService.getTopProductSold(topN));
+            @RequestParam(defaultValue = "10") int topN,
+            @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate) {
+        
+        if (startDate != null && endDate != null) {
+            return ResponseEntity.ok(statisticsService.getTopProductSoldByDateRange(topN, startDate, endDate));
+        } else {
+            return ResponseEntity.ok(statisticsService.getTopProductSold(topN));
+        }
     }
 
     @GetMapping("/top-brands-sold")
     public ResponseEntity<List<BrandSoldStatisticsDTO>> getTopBrandsSold(
-      @RequestParam(defaultValue = "10") int topN) {
-      return ResponseEntity.ok(statisticsService.getTopBrandsSold(topN));
+            @RequestParam(defaultValue = "10") int topN,
+            @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate) {
+        
+        if (startDate != null && endDate != null) {
+            return ResponseEntity.ok(statisticsService.getTopBrandsSoldByDateRange(topN, startDate, endDate));
+        } else {
+            return ResponseEntity.ok(statisticsService.getTopBrandsSold(topN));
+        }
+    }
+
+    @GetMapping("/orders-today")
+    public ResponseEntity<Long> getOrdersToday() {
+        return ResponseEntity.ok(statisticsService.getOrdersToday());
     }
 } 

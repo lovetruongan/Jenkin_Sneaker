@@ -1,83 +1,272 @@
 .best-selling-container {
   margin-top: 2rem;
   padding: 1rem;
+  overflow: visible !important;
+  position: relative !important;
 }
 
 .controls {
   margin-bottom: 1.5rem;
   display: flex;
-  gap: 1rem;
+  gap: 1.5rem;
   align-items: center;
+  flex-wrap: wrap;
+  background: #f8f9fa;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+  overflow: visible !important;
+  position: relative !important;
+}
+
+.control-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 
   label {
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    font-weight: 500;
+    color: #333;
+    white-space: nowrap;
   }
 
   input {
-    padding: 0.25rem 0.5rem;
+    padding: 0.5rem;
     border: 1px solid #ddd;
-    border-radius: 4px;
+    border-radius: 6px;
+    font-size: 14px;
+    width: 80px;
+
+    &:focus {
+      outline: none;
+      border-color: #1976d2;
+      box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.1);
+    }
+  }
+}
+
+.date-range-picker {
+  :host ::ng-deep {
+    .p-calendar {
+      width: 300px;
+    }
+
+    .p-inputtext {
+      padding: 0.5rem;
+      border-radius: 6px;
+      border: 1px solid #ddd;
+      font-size: 14px;
+
+      &:focus {
+        outline: none;
+        border-color: #1976d2;
+        box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.1);
+      }
+    }
+
+    .p-button {
+      padding: 0.5rem 1rem;
+      background-color: #1976d2;
+      border: none;
+      border-radius: 6px;
+      color: white;
+      font-weight: 500;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background-color: #1565c0;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      }
+
+      &:active {
+        transform: translateY(0);
+      }
+    }
+  }
+}
+
+button {
+  padding: 0.5rem 1rem;
+  background-color: #1976d2;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: #1565c0;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   }
 
-  button {
-    padding: 0.5rem 1rem;
-    background-color: #1976d2;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-
-    &:hover {
-      background-color: #1565c0;
-    }
+  &:active {
+    transform: translateY(0);
   }
 }
 
 .statistics-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+  gap: 2rem;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
 }
 
 .statistics-card {
   background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  padding: 1rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+  padding: 1.5rem;
+  border: 1px solid #f0f0f0;
+  transition: all 0.2s ease;
+
+  &:hover {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+  }
 
   h3 {
-    margin: 0 0 1rem;
+    margin: 0 0 1.5rem;
     color: #333;
-    font-size: 1.1rem;
+    font-size: 1.2rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    &::before {
+      content: '';
+      width: 4px;
+      height: 20px;
+      background: linear-gradient(45deg, #1976d2, #42a5f5);
+      border-radius: 2px;
+    }
   }
 
   table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 1rem;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 
     th, td {
       padding: 0.75rem;
       text-align: left;
-      border-bottom: 1px solid #eee;
+      border-bottom: 1px solid #f5f5f5;
     }
 
     th {
-      background-color: #f5f5f5;
+      background: linear-gradient(135deg, #f8f9fa, #e9ecef);
       font-weight: 600;
+      color: #495057;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
-    tbody tr:hover {
-      background-color: #f8f9fa;
+    tbody tr {
+      transition: all 0.2s ease;
+
+      &:hover {
+        background-color: #f8f9fa;
+        transform: scale(1.01);
+      }
+
+      &:last-child td {
+        border-bottom: none;
+      }
+    }
+
+    td {
+      color: #6c757d;
+      font-size: 0.95rem;
+
+      &:first-child {
+        font-weight: 600;
+        color: #1976d2;
+      }
+
+      &:last-child {
+        font-weight: 600;
+        color: #28a745;
+      }
     }
   }
 }
 
-.loading, .no-data {
+.loading {
   text-align: center;
-  padding: 1rem;
-  color: #666;
+  padding: 2rem;
+  color: #6c757d;
+  font-style: italic;
+
+  &::after {
+    content: '';
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #1976d2;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-left: 10px;
+  }
+}
+
+.no-data {
+  text-align: center;
+  padding: 2rem;
+  color: #6c757d;
+  font-style: italic;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border: 2px dashed #dee2e6;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+:host ::ng-deep .p-datepicker {
+  min-width: 220px !important;
+  max-width: 340px !important;
+  width: 100% !important;
+  box-sizing: border-box;
+  position: fixed !important;
+  z-index: 9999 !important;
+}
+
+:host ::ng-deep .p-datepicker .p-datepicker-group {
+  width: 100% !important;
+  max-width: 320px !important;
+}
+
+:host ::ng-deep .p-datepicker .p-datepicker-multiple-month {
+  display: block !important;
+}
+
+:host ::ng-deep .p-datepicker .p-datepicker-multiple-month .p-datepicker-group {
+  width: 100% !important;
+  margin: 0 !important;
+}
+
+@media (max-width: 768px) {
+  :host ::ng-deep .p-datepicker {
+    min-width: 280px !important;
+    max-width: 300px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+  }
 } 

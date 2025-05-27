@@ -24,6 +24,19 @@ export interface ProductStatistics {
   availableProducts: number;
 }
 
+export interface BrandSoldStatistics {
+  brandId: number;
+  brandName: string;
+  totalSold: number;
+  totalRevenue: number;
+}
+
+export interface ProductSoldStatistics {
+  productId: number;
+  productName: string;
+  totalSold: number;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -80,5 +93,25 @@ export class StatisticsService {
         availableProducts: response.availableProducts
       }))
     );
+  }
+
+  getTopBrandsSold(topN: number = 10, startDate?: string, endDate?: string): Observable<BrandSoldStatistics[]> {
+    let params: any = { topN };
+    if (startDate && endDate) {
+      params = { ...params, startDate, endDate };
+    }
+    return this.http.get<BrandSoldStatistics[]>(`${this.apiUrl}/statistics/top-brands-sold`, { params });
+  }
+
+  getOrdersToday(): Observable<number> {
+    return this.http.get<number>(`${this.apiUrl}/statistics/orders-today`);
+  }
+
+  getTopProductsSold(topN: number = 10, startDate?: string, endDate?: string): Observable<ProductSoldStatistics[]> {
+    let params: any = { topN };
+    if (startDate && endDate) {
+      params = { ...params, startDate, endDate };
+    }
+    return this.http.get<ProductSoldStatistics[]>(`${this.apiUrl}/statistics/top-product-sold`, { params });
   }
 } 

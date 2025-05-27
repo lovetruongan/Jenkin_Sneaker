@@ -15,26 +15,57 @@ public interface OrderDetailRepository extends JpaRepository<OrderDetail,Long> {
            "JOIN od.order o WHERE o.status = 'COMPLETED'")
     Long countSoldProducts();
 
-    // Best selling products statistics
-    @Query("SELECT od.product.id, p.name, SUM(od.numberOfProducts), SUM(od.totalMoney) " +
-           "FROM OrderDetail od " +
-           "JOIN od.order o " +
-           "JOIN od.product p " +
-           "WHERE o.totalMoney > 0 " +
-           "GROUP BY od.product.id, p.name " +
-           "ORDER BY SUM(od.numberOfProducts) DESC")
-    List<Object[]> getBestSellingProducts(Pageable pageable);
+    // Best selling products statistics (native SQL)
+    @Query(value = "SELECT p.id, p.name, SUM(od.number_of_products) AS total_sold, SUM(od.total_money) AS total_revenue " +
+           "FROM order_details od " +
+           "JOIN products p ON od.product_id = p.id " +
+           "JOIN orders o ON od.order_id = o.id " +
+           "WHERE o.status = 'delivered' " +
+           "GROUP BY p.id, p.name " +
+           "ORDER BY total_sold DESC " +
+           "LIMIT :limit", nativeQuery = true)
+    List<Object[]> getBestSellingProductsNative(@Param("limit") int limit);
 
-    // Best selling brands statistics
-    @Query("SELECT c.id, c.name, SUM(od.numberOfProducts), SUM(od.totalMoney) " +
-           "FROM OrderDetail od " +
-           "JOIN od.order o " +
-           "JOIN od.product p " +
-           "JOIN p.category c " +
-           "WHERE o.totalMoney > 0 " +
+    // Best selling products with date range
+    @Query(value = "SELECT p.id, p.name, SUM(od.number_of_products) AS total_sold, SUM(od.total_money) AS total_revenue " +
+           "FROM order_details od " +
+           "JOIN products p ON od.product_id = p.id " +
+           "JOIN orders o ON od.order_id = o.id " +
+           "WHERE o.status = 'delivered' " +
+           "AND DATE(o.order_date) BETWEEN :startDate AND :endDate " +
+           "GROUP BY p.id, p.name " +
+           "ORDER BY total_sold DESC " +
+           "LIMIT :limit", nativeQuery = true)
+    List<Object[]> getBestSellingProductsByDateRange(@Param("startDate") String startDate, 
+                                                     @Param("endDate") String endDate, 
+                                                     @Param("limit") int limit);
+
+    // Best selling brands statistics (native SQL, join with categories, status = 'delivered')
+    @Query(value = "SELECT c.id, c.name, SUM(od.number_of_products) AS total_sold, SUM(od.total_money) AS total_revenue " +
+           "FROM order_details od " +
+           "JOIN products p ON od.product_id = p.id " +
+           "JOIN categories c ON p.category_id = c.id " +
+           "JOIN orders o ON od.order_id = o.id " +
+           "WHERE o.status = 'delivered' " +
            "GROUP BY c.id, c.name " +
-           "ORDER BY SUM(od.numberOfProducts) DESC")
-    List<Object[]> getBestSellingBrands(Pageable pageable);
+           "ORDER BY total_sold DESC " +
+           "LIMIT :limit", nativeQuery = true)
+    List<Object[]> getBestSellingBrandsNative(@Param("limit") int limit);
+
+    // Best selling brands with date range
+    @Query(value = "SELECT c.id, c.name, SUM(od.number_of_products) AS total_sold, SUM(od.total_money) AS total_revenue " +
+           "FROM order_details od " +
+           "JOIN products p ON od.product_id = p.id " +
+           "JOIN categories c ON p.category_id = c.id " +
+           "JOIN orders o ON od.order_id = o.id " +
+           "WHERE o.status = 'delivered' " +
+           "AND DATE(o.order_date) BETWEEN :startDate AND :endDate " +
+           "GROUP BY c.id, c.name " +
+           "ORDER BY total_sold DESC " +
+           "LIMIT :limit", nativeQuery = true)
+    List<Object[]> getBestSellingBrandsByDateRange(@Param("startDate") String startDate, 
+                                                   @Param("endDate") String endDate, 
+                                                   @Param("limit") int limit);
 
     @Query("SELECT od.product.id, p.name, SUM(od.numberOfProducts) " +
            "FROM OrderDetail od " +
