@@ -43,7 +43,7 @@ public class ProductResponse extends BaseResponse{
                 .price(product.getPrice())
                 .thumbnail(product.getThumbnail())
                 .description(product.getDescription())
-                .categoryId(product.getCategory().getId())
+                .categoryId(product.getCategory() != null ? product.getCategory().getId() : null)
                 .discount(product.getDiscount())
                 .productImages(product.getProductImages())
                 .build();

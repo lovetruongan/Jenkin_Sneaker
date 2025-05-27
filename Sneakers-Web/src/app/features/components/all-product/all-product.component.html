@@ -2,11 +2,48 @@
   <!-- header -->
   <div class="allProduct-header">
     <div class="container">
-      <div style="margin-bottom: 60px;" class="row justify-content-between align-items-center">
-        <div class="col-lg-3 col-md-4">
-          <h3> <span style="color: #c4c2c2">TRANG CHỦ / </span>TẤT CẢ SẢN PHẨM</h3>
+      <div class="row justify-content-between align-items-center">
+        <div class="col-12 col-lg-3 col-md-4 mb-3">
+          <h3 class="mobile-title"> <span style="color: #c4c2c2">TRANG CHỦ / </span>TẤT CẢ SẢN PHẨM</h3>
         </div>
-        <div class="allProduct-header_right col-lg-3 col-md-4 d-none d-md-flex d-flex align-items-center">
+        <!-- Mobile filters -->
+        <div class="d-md-none col-12 mb-4">
+          <div class="accordion mobile-filters" id="filterAccordion">
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#filterCollapse" aria-expanded="false" aria-controls="filterCollapse">
+                  Bộ lọc
+                </button>
+              </h2>
+              <div id="filterCollapse" class="accordion-collapse collapse" data-bs-parent="#filterAccordion">
+                <div class="accordion-body">
+                  <div class="mb-4">
+                    <h5 class="filter-title">Danh mục</h5>
+                    <p-dropdown [options]="categoriesOptions" placeholder="Chọn danh mục"
+                      (onChange)="onCategoryChange($event)" [style]="{'width': '100%'}" styleClass="w-100"></p-dropdown>
+                  </div>
+                  <div class="mb-4">
+                    <h5 class="filter-title">Sắp xếp</h5>
+                    <p-dropdown [options]="sortOptions" placeholder="Sắp xếp theo giá"
+                      (onChange)="onSortChange($event)" [style]="{'width': '100%'}" styleClass="w-100"></p-dropdown>
+                  </div>
+                  <div class="mb-4">
+                    <h5 class="filter-title">Lọc theo giá</h5>
+                    <div class="range mb-3">
+                      <p-slider [min]="1" [(ngModel)]="priceFilterValue" [range]="true" [style]="{'width': '100%'}"></p-slider>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                      <span class="price-range">{{priceFilterValue[0]*500000 | currency:'VND':'symbol':'1.0-0'}} - {{priceFilterValue[1]*500000 | currency:'VND':'symbol':'1.0-0'}}</span>
+                      <button class="btn btn-danger btn-sm" (click)="filterPrice()">Lọc</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Desktop filters -->
+        <div class="allProduct-header_right col-lg-3 col-md-4 d-none d-md-flex align-items-center">
           <div class="d-flex justify-content-between align-items-center px-4 mt-3">
             <p-dropdown [options]="categoriesOptions" placeholder="Danh mục"
               (onChange)="onCategoryChange($event)"></p-dropdown> 
@@ -21,197 +58,98 @@
   </div>
 
   <!-- content -->
-  <div class="allProduct-content d-flex justify-content-center">
-    <div class="container" style="margin: 0; width: 100%; margin-top: 100px;">
-      <div class="row justify-content-between d-flex flex-wrap">
-        <!-- left -->
-        <div class=" col-md-3 col-lg-3 d-none d-md-block d-flex allProduct-content-left">
+  <div class="allProduct-content">
+    <div class="container">
+      <div class="row">
+        <!-- Desktop left sidebar -->
+        <div class="col-md-3 d-none d-md-block">
           <!-- price filter -->
           <div class="allProduct-content-filter">
-            <h4 style="margin-bottom: -5px;">LỌC THEO GIÁ</h4>
-            <div class="range">
+            <h4>LỌC THEO GIÁ</h4>
+            <div class="range mb-3">
               <p-slider [min]="1" [(ngModel)]="priceFilterValue" [range]="true" id="range1"></p-slider>
             </div>
-            <div class="d-flex justify-content-between">
-              <button (click)="filterPrice()" style="position: relative;">
-                <span style="position: absolute; top: 5%;
-                left: 26%;">Lọc</span>
-              </button>
-              <p-slider [hidden]="true" [(ngModel)]="priceFilterValue" [range]="true" id="range1"></p-slider>
-
-              <h6 style="margin-top: 8px; text-align: end; font-size: 12px;" class="text-muted">Giá
-                <span class="fw-700 text-dark">{{priceFilterValue[0]*500000 | currency:'VND':'symbol':'1.0-0'}} -
-                  {{priceFilterValue[1]*500000 | currency:'VND':'symbol':'1.0-0'}}
-                </span>
+            <div class="d-flex justify-content-between align-items-center">
+              <button (click)="filterPrice()" class="btn btn-danger btn-sm">Lọc</button>
+              <h6 class="price-range mb-0">
+                {{priceFilterValue[0]*500000 | currency:'VND':'symbol':'1.0-0'}} -
+                {{priceFilterValue[1]*500000 | currency:'VND':'symbol':'1.0-0'}}
               </h6>
             </div>
           </div>
 
           <!-- product suggestion -->
-          <div class="allProduct-content-product my-5">
-            <h4 class="text-dark">SẢN PHẨM</h4>
-            <div class="allProduct-content-product_table my-4">
-              <div class="container">
-                <p-dataView #dv [value]="productsHighlight">
-                  <ng-template pTemplate="list" let-products>
-                    @for(item of productsHighlight;track item){
-                    <div (click)="navigateToDetail(item.id)"
-                      class="row align-items-center justify-content-center allProduct-content-product_table-item">
-                      <div class="col-4">
-                        <img [src]="apiImage + item.thumbnail" alt="giaycv"
-                          class="img-fluid" style="margin-left: 10px;">
-                      </div>
-
-                      <div class="col-8">
-                        <p class="lead card-title text-secondary">{{item.name}}</p>
-                        <p class="my-2 text-dark fw-bold">{{item.price | currency:'VND':'symbol':'1.0-0'}}</p>
-                      </div>
+          <div class="featured-products mt-4">
+            <h4 class="text-dark mb-3">SẢN PHẨM NỔI BẬT</h4>
+            <div class="product-list">
+              @for(item of productsHighlight;track item){
+                <div (click)="navigateToDetail(item.id)" class="product-item">
+                  <div class="row g-0 align-items-center">
+                    <div class="col-4">
+                      <img [src]="apiImage + item.thumbnail" alt="{{item.name}}" class="img-fluid">
                     </div>
-                    }
-                  </ng-template>
-                </p-dataView>
-              </div>
-            </div>
-          </div>
-
-          <!-- post recommendation -->
-          <div class="allProduct-content-post my-5">
-            <h4 class="text-dark">BÀI VIẾT MỚI NHẤT</h4>
-            <div class="allProduct-content-post_table my-4">
-              <div class="container">
-                <div class="row g-5 align-items-center justify-content-center allProduct-content-post_table-item">
-                  <div class="col-4">
-                    <img src="../../../../assets/images/post1.jpg" alt="giaycv" class="img-fluid rounded-circle"
-                      style="margin-left: 10px; width: 60px; height:60px">
-                  </div>
-
-                  <div class="col-8">
-                    <p class="lead card-title text-secondary allProduct-content-post-item">Cảm xúc từ những tia nắng
-                      cuối cùng
-                      cho phép ý tưởng lộ
-                      nét...</p>
+                    <div class="col-8 ps-3">
+                      <h6 class="product-name">{{item.name}}</h6>
+                      <p class="product-price">{{item.price | currency:'VND':'symbol':'1.0-0'}}</p>
+                    </div>
                   </div>
                 </div>
-
-                <div class="row my-2 g-5 align-items-center justify-content-center allProduct-content-post_table-item">
-                  <div class="col-4">
-                    <img src="../../../../assets/images/post2.jpg" alt="giaycv" class="img-fluid rounded-circle"
-                      style="margin-left: 10px; width: 60px; height:60px">
-                  </div>
-
-                  <div class="col-8">
-                    <p class="lead card-title text-secondary allProduct-content-post-item">Đặc biệt, tên gọi khác của
-                      loại vải
-                      Corduroy sợi to (3-8
-                      sợi/inch)- ...</p>
-                  </div>
-                </div>
-
-                <div class="row my-2 g-5 align-items-center justify-content-center allProduct-content-post_table-item">
-                  <div class="col-4">
-                    <img src="../../../../assets/images/post3.jpg" alt="giaycv" class="img-fluid rounded-circle"
-                      style="margin-left: 10px; width: 60px; height:60px">
-                  </div>
-
-                  <div class="col-8">
-                    <p class="lead card-title text-secondary allProduct-content-post-item">Hẳn mọi người đã không mấy xa
-                      lạ với
-                      chất liệu Corduroy -
-                      Nhung...</p>
-                  </div>
-                </div>
-
-                <div class="row my-2 g-5 align-items-center justify-content-center allProduct-content-post_table-item">
-                  <div class="col-4">
-                    <img src="../../../../assets/images/post4.jpg" alt="giaycv" class="img-fluid rounded-circle"
-                      style="margin-left: 10px; width: 60px; height:60px">
-                  </div>
-
-                  <div class="col-8">
-                    <p class="lead card-title text-secondary allProduct-content-post-item">Hai yếu tố trên phối trộn
-                      cùng với
-                      những gam màu tươi tắn
-                      để...</p>
-                  </div>
-                </div>
-
-                <div class="row my-2 g-5 align-items-center justify-content-center allProduct-content-post_table-item">
-                  <div class="col-4">
-                    <img src="../../../../assets/images/post5.jpg" alt="giaycv" class="img-fluid rounded-circle"
-                      style="margin-left: 10px; width: 60px; height:60px">
-                  </div>
-
-                  <div class="col-8">
-                    <p class="lead card-title text-secondary allProduct-content-post-item">Chất liệu Corduroy lần đầu
-                      tiên được
-                      ứng dụng trên dáng
-                      giày...</p>
-                  </div>
-                </div>
-              </div>
+              }
             </div>
           </div>
         </div>
 
-        <!-- right -->
-        <div class="col-md-8 col-lg-8 allProduct-content-shoes">
-          <p-dataView [value]="products" [paginator]="true" [rows]="12" [sortField]="sortField" [sortOrder]="sortOrder">
-            <ng-template let-products pTemplate="list">
-              <div class="row my-5 d-flex align-items-start justify-content-start g-5">
-                @if(roleId == 1 || !roleId){
-                  @for (item of products; track item) {
-                    <div (click)="navigateToDetail(item.id)" class="col-lg-3 col-6 col-sm-4">
-                      <div>
-                        <div class="card">
-                          <div class="card-body py-3">
-                            @if(item.discount > 0){
-                              <p-badge [value]="-item.discount + '%'" severity="danger"></p-badge>
-                            }
-                            <img [src]="apiImage + item.thumbnail" alt="giaycv"
-                              class="img-fluid">
-                          </div>
-                          <div class="card-footer text-center tw-bold border-0">
-                            <p class="lead card-title text-secondary">{{item.name}}</p>
-                            <p class="my-2 text-danger fw-semibold" style="font-size: 15px;">{{item.price | currency:'VND':'symbol':'1.0-0'}}</p>
-                            @if (item.discount > 0){
-                              <p class="my-2 fw-semibold old-price" style="font-size: 15px;">{{item.price / (1-item.discount/100) | currency:'VND':'symbol':'1.0-0'}}</p>
-                            }
-                          </div>
-                          <button class="btn btn-danger" id="btn-addCart">XEM CHI TIẾT</button>
-                        </div>
-                      </div>
-                    </div>
-                    }
-                } @else {
-                  @for (item of products; track item) {
-                
-                    <div (click)="navigateToDetail(item.id)" class="col-lg-3 col-6 col-sm-4">
-                      <div>
-                        <div class="card">
-                          <div class="card-body py-3">
-                            @if(item.discount > 0){
-                              <p-badge [value]="-item.discount + '%'" severity="danger"></p-badge>
-                            }
-                            <img [src]="apiImage + item.thumbnail" alt="giaycv"
-                              class="img-fluid">
-                          </div>
-                          <div class="card-footer text-center tw-bold border-0">
-                            <p class="lead card-title text-secondary">{{item.name}}</p>
-                            <p class="my-2 text-danger fw-semibold" style="font-size: 15px;">{{item.price | currency:'VND':'symbol':'1.0-0'}}</p>
-                            @if (item.discount > 0){
-                              <p class="my-2 fw-semibold old-price" style="font-size: 15px;">{{item.price / (1-item.discount/100) | currency:'VND':'symbol':'1.0-0'}}</p>
-                            }
-                          </div>
-                          <button class="btn btn-danger" id="btn-addCart">SỬA THÔNG TIN</button>
-                        </div>
-                      </div>
-                    </div>
-                    }
-                }
-
+        <!-- Product grid -->
+        <div class="col-12 col-md-9">
+          @if(isLoading) {
+            <div class="d-flex justify-content-center py-5">
+              <div class="spinner-border text-danger" role="status">
+                <span class="visually-hidden">Loading...</span>
               </div>
-            </ng-template>
-          </p-dataView>
+            </div>
+          } @else if(error) {
+            <div class="alert alert-danger" role="alert">
+              {{error}}
+            </div>
+          } @else if(products.length === 0) {
+            <div class="alert alert-info" role="alert">
+              Không tìm thấy sản phẩm nào
+            </div>
+          } @else {
+            <div class="product-grid">
+              <div class="row g-3">
+                @for (item of products; track item) {
+                  <div class="col-6 col-sm-4 col-lg-3">
+                    <div class="product-card">
+                      <div class="product-image" (click)="navigateToDetail(item.id)">
+                        @if(item.discount > 0){
+                          <p-badge [value]="-item.discount + '%'" severity="danger"></p-badge>
+                        }
+                        <img [src]="apiImage + item.thumbnail" [alt]="item.name" class="img-fluid">
+                      </div>
+                      <div class="product-info">
+                        <h3 class="product-name" (click)="navigateToDetail(item.id)">{{item.name}}</h3>
+                        <div class="product-price">
+                          <span class="current-price">{{item.price | currency:'VND':'symbol':'1.0-0'}}</span>
+                          @if (item.discount > 0){
+                            <span class="original-price">{{item.price / (1-item.discount/100) | currency:'VND':'symbol':'1.0-0'}}</span>
+                          }
+                        </div>
+                        @if(roleId == 1 || !roleId) {
+                          <button class="btn btn-danger" (click)="navigateToDetail(item.id)">XEM CHI TIẾT</button>
+                        } @else {
+                          <button class="btn btn-danger" (click)="navigateToDetail(item.id)">SỬA THÔNG TIN</button>
+                        }
+                      </div>
+                    </div>
+                  </div>
+                }
+              </div>
+              <div class="pagination-container mt-4">
+                <p-paginator [rows]="12" [totalRecords]="products.length"></p-paginator>
+              </div>
+            </div>
+          }
         </div>
       </div>
     </div>

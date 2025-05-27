@@ -32,13 +32,22 @@ public class OrderHistoryResponse {
 
     @JsonProperty("total_products")
     private int totalProducts;
+
+    @JsonProperty("buyer_name")
+    private String buyerName;
+
+    @JsonProperty("phone_number")
+    private String phoneNumber;
+
     public static OrderHistoryResponse fromOrder(Order order){
         OrderHistoryResponseBuilder builder = OrderHistoryResponse.builder()
                 .id(order.getId())
                 .userId(order.getUser().getId())
                 .status(order.getStatus())
                 .totalMoney(order.getTotalMoney())
-                .orderDate(order.getOrderDate());
+                .orderDate(order.getOrderDate())
+                .buyerName(order.getFullName())
+                .phoneNumber(order.getPhoneNumber());
 
         // Kiểm tra xem danh sách orderDetails có rỗng không trước khi truy cập
         if (!order.getOrderDetails().isEmpty()) {
@@ -47,7 +56,6 @@ public class OrderHistoryResponse {
                     .totalProducts(order.getOrderDetails().size());
         } else {
             // Xử lý trường hợp danh sách orderDetails rỗng
-            // Bạn có thể gán giá trị mặc định cho thumbnail và totalProducts ở đây
             builder.thumbnail("notfound.jpg")
                     .productName("Not found")
                     .totalProducts(0);
@@ -55,5 +63,4 @@ public class OrderHistoryResponse {
 
         return builder.build();
     }
-
 }

@@ -1,5 +1,7 @@
 package com.example.Sneakers.services;
 
+import com.example.Sneakers.dtos.CartItemDTO;
+import com.example.Sneakers.dtos.DashboardStatsDTO;
 import com.example.Sneakers.dtos.OrderDTO;
 import com.example.Sneakers.exceptions.DataNotFoundException;
 import com.example.Sneakers.models.Order;
@@ -24,4 +26,6 @@ public interface IOrderService {
     List<OrderHistoryResponse> getAllOrders();
     Page<Order> getOrdersByKeyword(String keyword, Pageable pageable);
     Order updateOrderStatus(Long orderId, String status) throws Exception;
+    Long getTotalRevenue();
+    DashboardStatsDTO getDashboardStats();
 }

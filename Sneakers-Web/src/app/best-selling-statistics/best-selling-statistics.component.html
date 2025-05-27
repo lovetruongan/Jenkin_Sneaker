@@ -1,0 +1,85 @@
+<div class="best-selling-container">
+  <div class="controls">
+    <div class="control-group">
+      <label>
+        Hiển thị Top:
+        <input type="number" [(ngModel)]="topN" min="1" max="100" style="width: 60px;">
+      </label>
+    </div>
+
+    <div class="control-group">
+      <label>
+        Chọn khoảng thời gian:
+        <p-calendar [(ngModel)]="dateRange" 
+                   selectionMode="range" 
+                   [showButtonBar]="true"
+                   (onSelect)="onDateRangeSelect()"
+                   styleClass="date-range-picker"
+                   appendTo="body"
+                   [numberOfMonths]="1"
+                   [touchUI]="true">
+        </p-calendar>
+      </label>
+    </div>
+
+    <button (click)="updateStatistics()">Cập nhật</button>
+  </div>
+
+  <div class="statistics-grid">
+    <!-- Top Selling Products -->
+    <div class="statistics-card">
+      <h3>Top Sản phẩm bán chạy</h3>
+      <div *ngIf="loading" class="loading">Đang tải...</div>
+      <table *ngIf="!loading && topProducts.length > 0">
+        <thead>
+          <tr>
+            <th>STT</th>
+            <th>Mã sản phẩm</th>
+            <th>Tên sản phẩm</th>
+            <th>Số lượng bán</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let product of topProducts; let i = index">
+            <td>{{i + 1}}</td>
+            <td>{{product.productId}}</td>
+            <td>{{product.productName}}</td>
+            <td>{{product.totalSold}}</td>
+          </tr>
+        </tbody>
+      </table>
+      <div *ngIf="!loading && topProducts.length === 0" class="no-data">
+        Không có dữ liệu sản phẩm
+      </div>
+    </div>
+
+    <!-- Top Selling Brands -->
+    <div class="statistics-card">
+      <h3>Top Thương hiệu bán chạy</h3>
+      <div *ngIf="loading" class="loading">Đang tải...</div>
+      <table *ngIf="!loading && topBrands.length > 0">
+        <thead>
+          <tr>
+            <th>STT</th>
+            <th>Mã thương hiệu</th>
+            <th>Tên thương hiệu</th>
+            <th>Số lượng bán</th>
+            <th>Doanh thu</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let brand of topBrands; let i = index">
+            <td>{{i + 1}}</td>
+            <td>{{brand.brandId}}</td>
+            <td>{{brand.brandName}}</td>
+            <td>{{brand.totalSold}}</td>
+            <td>{{brand.totalRevenue | number:'1.0-0'}} ₫</td>
+          </tr>
+        </tbody>
+      </table>
+      <div *ngIf="!loading && topBrands.length === 0" class="no-data">
+        Không có dữ liệu thương hiệu
+      </div>
+    </div>
+  </div>
+</div> 

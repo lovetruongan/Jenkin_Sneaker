@@ -1,6 +1,8 @@
 package com.example.Sneakers.controllers;
 
 import com.example.Sneakers.components.LocalizationUtils;
+import com.example.Sneakers.dtos.CartItemDTO;
+import com.example.Sneakers.dtos.DashboardStatsDTO;
 import com.example.Sneakers.dtos.OrderDTO;
 import com.example.Sneakers.dtos.StatusDTO;
 import com.example.Sneakers.models.Order;
@@ -154,5 +156,22 @@ public class OrderController {
                 .orders(orderResponses)
                 .totalPages(totalPages)
                 .build());
+    }
+
+    @GetMapping("/revenue")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<?> getTotalRevenue() {
+        try {
+            Long totalRevenue = orderService.getTotalRevenue();
+            return ResponseEntity.ok(totalRevenue);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/dashboard-stats")
+    public ResponseEntity<DashboardStatsDTO> getDashboardStats() {
+        DashboardStatsDTO stats = orderService.getDashboardStats();
+        return ResponseEntity.ok(stats);
     }
 }

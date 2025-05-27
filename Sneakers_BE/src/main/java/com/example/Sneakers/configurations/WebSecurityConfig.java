@@ -48,6 +48,11 @@ public class WebSecurityConfig {
                             )
                             .permitAll()
 
+                            // Allow all statistics endpoints
+                            .requestMatchers(GET, String.format("%s/statistics/**", apiPrefix)).permitAll()
+                            .requestMatchers(POST, String.format("%s/statistics/**", apiPrefix)).permitAll()
+                            .requestMatchers(PUT, String.format("%s/statistics/**", apiPrefix)).permitAll()
+
                             .requestMatchers(GET,
                                     String.format("%s/roles**", apiPrefix)).permitAll()
 
@@ -123,6 +128,10 @@ public class WebSecurityConfig {
 
                             .requestMatchers(DELETE,
                                     String.format("%s/carts/**", apiPrefix)).hasRole(Role.USER)
+
+                            .requestMatchers(GET, String.format("%s/statistics/top-brands-sold", apiPrefix)).permitAll()
+                            .requestMatchers(GET, String.format("%s/statistics/top-brands-sold/**", apiPrefix)).permitAll()
+                            .requestMatchers(GET, String.format("%s/top-product-sold**", apiPrefix)).permitAll()
 
                             .anyRequest().authenticated();
                     //.anyRequest().permitAll();

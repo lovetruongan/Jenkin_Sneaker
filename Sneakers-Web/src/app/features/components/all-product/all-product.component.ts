@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, OnInit } from '@angular/core';
 import { BaseComponent } from '../../../core/commonComponent/base.component';
 import { ProductService } from '../../../core/services/product.service';
-import { catchError, filter, of, switchMap, takeUntil, tap } from 'rxjs';
+import { catchError, filter, finalize, of, switchMap, takeUntil, tap } from 'rxjs';
 import { ProductDto } from '../../../core/dtos/product.dto';
 import { DataViewModule } from 'primeng/dataview';
 import { DropdownModule } from 'primeng/dropdown';
@@ -18,7 +18,6 @@ import { BadgeModule } from 'primeng/badge';
 import { CategoriesService } from '../../../core/services/categories.service';
 import { CategoriesDto } from '../../../core/dtos/categories.dto';
 import { UserService } from '../../../core/services/user.service';
-import { userInfo } from 'os';
 import { UserDto } from '../../../core/dtos/user.dto';
 
 @Component({
@@ -50,6 +49,19 @@ export class AllProductComponent extends BaseComponent implements OnInit, AfterV
   public sortField!: string;
   public priceFilterValue: number[] = [1, 100];
   public apiImage: string = environment.apiImage;
+  public isLoading: boolean = false;
+  public error: string | null = null;
+
+  // Thêm các biến cho bộ lọc thương hiệu
+  public brandOptions = [
+    { label: 'Nike', value: 'nike' },
+    { label: 'Adidas', value: 'adidas' },
+    { label: 'Puma', value: 'puma' },
+    { label: 'Converse', value: 'converse' },
+    { label: 'Vans', value: 'vans' }
+  ];
+  public selectedBrands: string[] = [];
+  private allProducts: ProductDto[] = []; // Lưu trữ tất cả sản phẩm trước khi lọc
 
   constructor(
     private productService: ProductService,
@@ -63,6 +75,7 @@ export class AllProductComponent extends BaseComponent implements OnInit, AfterV
       this.token = localStorage.getItem('token');
     }
   }
+
   ngAfterViewInit(): void {
     this.detailProductService.content.pipe(
       filter((searchContent) => !!searchContent),
@@ -71,6 +84,7 @@ export class AllProductComponent extends BaseComponent implements OnInit, AfterV
           filter((product : AllProductDto) => !!product),
           tap((product: AllProductDto) => {
             this.products = product.products;
+            this.productsHighlight = product.products.slice(0, 5);
           }),
         )
       }),
@@ -78,7 +92,12 @@ export class AllProductComponent extends BaseComponent implements OnInit, AfterV
   }
 
   ngOnInit(): void {
-    if (this.token != null){
+    this.loadInitialData();
+  }
+
+  private loadInitialData(): void {
+    // Kiểm tra role user
+    if (this.token != null) {
       this.userService.getInforUser(this.token).pipe(
         filter((userInfor: UserDto) => !!userInfor),
         tap((userInfor: UserDto) => {
@@ -86,6 +105,8 @@ export class AllProductComponent extends BaseComponent implements OnInit, AfterV
         })
       ).subscribe();
     }
+
+    // Tải danh mục sản phẩm
     this.categoriesService.getCategories().pipe(
       tap((categories) => {
         this.categoriesOptions = categories.map((item: CategoriesDto) => {
@@ -95,15 +116,41 @@ export class AllProductComponent extends BaseComponent implements OnInit, AfterV
           }
         })
       })
-    ).subscribe()
+    ).subscribe();
 
-    this.productService.getAllProduct().pipe(
-      filter((product: AllProductDto) => !!product),
-      tap((product: AllProductDto) => {
-        this.products = product.products;
-        this.productsHighlight = product.products.slice(0, 5);
-      }),
-    ).subscribe()
+    // Tải sản phẩm theo khoảng giá mặc định
+    this.filterPrice();
+  }
+
+  onBrandChange(event: any, brandValue: string) {
+    if (event.target.checked) {
+      this.selectedBrands.push(brandValue);
+    } else {
+      this.selectedBrands = this.selectedBrands.filter(b => b !== brandValue);
+    }
+    this.filterProducts();
+  }
+
+  filterProducts() {
+    let filteredProducts = [...this.allProducts];
+
+    // Lọc theo thương hiệu nếu có chọn
+    if (this.selectedBrands.length > 0) {
+      filteredProducts = filteredProducts.filter(product => 
+        this.selectedBrands.some(brand => 
+          product.name.toLowerCase().includes(brand.toLowerCase())
+        )
+      );
+    }
+
+    // Lọc theo giá
+    filteredProducts = filteredProducts.filter(product => 
+      product.price >= this.priceFilterValue[0] * 500000 &&
+      product.price <= this.priceFilterValue[1] * 500000
+    );
+
+    this.products = filteredProducts;
+    this.productsHighlight = filteredProducts.slice(0, 5);
   }
 
   onSortChange(event: any) {
@@ -118,10 +165,25 @@ export class AllProductComponent extends BaseComponent implements OnInit, AfterV
   }
 
   onCategoryChange(event: any){
+    this.isLoading = true;
     this.categoriesService.getAllProductByCategory(event.value).pipe(
-      filter((productByCategory: AllProductDto) => !!productByCategory),
+      takeUntil(this.destroyed$),
       tap((productByCategory: AllProductDto) => {
-        this.products = productByCategory.products;
+        if (productByCategory && productByCategory.products) {
+          this.products = productByCategory.products;
+          this.productsHighlight = productByCategory.products.slice(0, 5);
+          this.error = null;
+        } else {
+          this.error = 'Không có sản phẩm nào trong danh mục này';
+        }
+      }),
+      catchError((error) => {
+        console.error('Error loading category products:', error);
+        this.error = 'Có lỗi xảy ra khi tải sản phẩm theo danh mục';
+        return of(null);
+      }),
+      finalize(() => {
+        this.isLoading = false;
       })
     ).subscribe();
   }
@@ -132,15 +194,26 @@ export class AllProductComponent extends BaseComponent implements OnInit, AfterV
   }
 
   filterPrice() {
+    this.isLoading = true;
     this.productService.getProductViaPrice(this.priceFilterValue[0] * 500000, this.priceFilterValue[1] * 500000).pipe(
-      filter((product: AllProductDto) => !!product),
+      takeUntil(this.destroyed$),
       tap((product: AllProductDto) => {
-        this.products = product.products;
+        if (product && product.products) {
+          this.products = product.products;
+          this.productsHighlight = product.products.slice(0, 5);
+          this.error = null;
+        } else {
+          this.error = 'Không tìm thấy sản phẩm trong khoảng giá này';
+        }
       }),
       catchError((error) => {
-        return of(error);
+        console.error('Error filtering products by price:', error);
+        this.error = 'Có lỗi xảy ra khi lọc sản phẩm theo giá';
+        return of(null);
       }),
-      takeUntil(this.destroyed$)
+      finalize(() => {
+        this.isLoading = false;
+      })
     ).subscribe();
   }
 }

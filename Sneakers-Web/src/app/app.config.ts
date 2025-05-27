@@ -6,14 +6,28 @@ import { routes } from './app.routes';
 import { provideClientHydration } from '@angular/platform-browser';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { HttpClientModule } from '@angular/common/http';
+import { ChartModule } from 'primeng/chart';
+import { CardModule } from 'primeng/card';
+import { TabViewModule } from 'primeng/tabview';
+import { CalendarModule } from 'primeng/calendar';
+import { FormsModule } from '@angular/forms';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     importProvidersFrom(HttpClientModule),
     provideRouter(routes), 
     provideClientHydration(), 
-    provideAnimationsAsync(),provideAnimations(), 
     provideAnimationsAsync(),
-    importProvidersFrom(BrowserAnimationsModule,BrowserModule),
+    provideAnimations(), 
+    provideAnimationsAsync(),
+    importProvidersFrom(
+      BrowserAnimationsModule,
+      BrowserModule,
+      ChartModule,
+      CardModule,
+      TabViewModule,
+      CalendarModule,
+      FormsModule
+    ),
   ]
 };

@@ -1,45 +1,97 @@
-<div class="order-manage">
+<div class="order-manage-container">
     <p-toast></p-toast>
-    <div class="container">
-        <div class="row history-order-header">
-            <div class="col-2 font-bold">Mã đơn hàng</div>
-            <div class="col-3 font-bold">Đơn hàng</div>
-            <div class="col-2 font-bold">Trạng thái</div>
-            <div class="col-2 font-bold">Ngày đặt</div>
-            <div class="col-2 font-bold">Tổng tiền</div>
-            <div class="col-1 font-bold"></div>
-        </div>
-        @for(order of allOrders; track order){
-            <div class="row">
-                <div class="col-2 d-flex align-items-center">{{order.id}}</div>
-                <div class="col-3 d-flex align-items-center history-order-main-info">
-                    <img class="history-order-image" [src]="apiImage + order.thumbnail" alt="Giày">
-                    <div>
-                        <p class="font-bold">{{order.product_name}}</p>
-                        @if(order.total_products > 1){
-                            <p>Còn {{order.total_products - 1}} sản phẩm <a [routerLink]="['/order-detail/', order.id]">Xem chi tiết</a></p>
-                        } @else {
-                            <a [routerLink]="['/order-detail/', order.id]">Xem chi tiết</a>
-                        }
-                    </div>
-                </div>
-                <div class="col-2 d-flex align-items-center">
-                    <div [ngSwitch]="order.status">  
-                        <p *ngSwitchCase="'pending'">Đang chờ</p>
-                        <p *ngSwitchCase="'success'">Đã giao hàng</p>
-                        <p *ngSwitchCase="'cancelled'">Đã hủy</p>
-                        <p *ngSwitchCase="'processing'">Đang xử lý</p>
-                        <p *ngSwitchCase="'delivered'">Đã được giao</p>
-                        <p *ngSwitchCase="'shipped'">Đang được giao</p>
-                    </div>
-                </div>
-                <div class="col-2 d-flex align-items-center">{{order.order_date | date: 'dd/MM/yyyy'}}</div>
-                <div class="col-2 d-flex align-items-center">{{order.total_money | currency:'VND':'symbol':'1.0-0'}}</div>
-                <div class="col-1 d-flex align-items-center">
-                    <p-dropdown [options]="orderStateOptions" [placeholder]="getPlaceholderByOrderStatus(order.status)"
-                    (onChange)="onOrderStateChange($event, order.id)"></p-dropdown> 
-                </div>
-            </div>
-        }
+    <p-confirmDialog></p-confirmDialog>
+
+    <div class="order-header">
+        <h2>Quản lý đơn hàng</h2>
+    </div>
+
+    <div class="order-table">
+        <p-table [value]="allOrders" 
+                 [loading]="loading" 
+                 [paginator]="true" 
+                 [rows]="15"
+                 [rowsPerPageOptions]="[15, 30, 50]" 
+                 [showCurrentPageReport]="true" 
+                 currentPageReportTemplate="Hiển thị {first} đến {last} của {totalRecords} đơn hàng"
+                 styleClass="p-datatable-striped"
+                 [scrollable]="true"
+                 scrollHeight="calc(100vh - 250px)"
+                 [sortField]="'order_date'"
+                 [sortOrder]="-1">
+            <ng-template pTemplate="header">
+                <tr>
+                    <th pSortableColumn="id">
+                        Mã đơn hàng
+                        <p-sortIcon field="id"></p-sortIcon>
+                    </th>
+                    <th pSortableColumn="buyer_name">
+                        Tên người mua
+                        <p-sortIcon field="buyer_name"></p-sortIcon>
+                    </th>
+                    <th pSortableColumn="phone_number">
+                        Số điện thoại
+                        <p-sortIcon field="phone_number"></p-sortIcon>
+                    </th>
+                    <th pSortableColumn="product_name">
+                        Tên sản phẩm
+                        <p-sortIcon field="product_name"></p-sortIcon>
+                    </th>
+                    <th pSortableColumn="total_products">
+                        Số lượng
+                        <p-sortIcon field="total_products"></p-sortIcon>
+                    </th>
+                    <th pSortableColumn="order_date">
+                        Ngày đặt
+                        <p-sortIcon field="order_date"></p-sortIcon>
+                    </th>
+                    <th pSortableColumn="total_money">
+                        Tổng tiền
+                        <p-sortIcon field="total_money"></p-sortIcon>
+                    </th>
+                    <th pSortableColumn="status">
+                        Trạng thái
+                        <p-sortIcon field="status"></p-sortIcon>
+                    </th>
+                    <th>Thao tác</th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-order>
+                <tr>
+                    <td data-label="Mã đơn hàng">{{ order.id }}</td>
+                    <td data-label="Tên người mua">{{ order.buyer_name }}</td>
+                    <td data-label="Số điện thoại">{{ order.phone_number }}</td>
+                    <td data-label="Tên sản phẩm">{{ order.product_name }}</td>
+                    <td data-label="Số lượng">{{ order.total_products }}</td>
+                    <td data-label="Ngày đặt">{{ order.order_date | date:'dd/MM/yyyy HH:mm' }}</td>
+                    <td data-label="Tổng tiền">{{ order.total_money | currency:'VND':'symbol-narrow':'1.0-0' }}</td>
+                    <td data-label="Trạng thái">
+                        <p-dropdown [options]="orderStateOptions" 
+                                  [(ngModel)]="order.status"
+                                  optionLabel="label" 
+                                  optionValue="value"
+                                  (onChange)="onOrderStateChange($event, order.id)"
+                                  [placeholder]="getPlaceholderByOrderStatus(order.status)"
+                                  appendTo="body">
+                        </p-dropdown>
+                    </td>
+                    <td data-label="Thao tác">
+                        <button pButton 
+                                pRipple 
+                                type="button" 
+                                icon="pi pi-eye"
+                                class="p-button-rounded p-button-info p-button-text"
+                                pTooltip="Xem chi tiết" 
+                                [routerLink]="['/admin/orders', order.id]">
+                        </button>
+                    </td>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+                <tr>
+                    <td colspan="9" class="text-center">Không có đơn hàng nào</td>
+                </tr>
+            </ng-template>
+        </p-table>
     </div>
 </div>

@@ -177,8 +177,18 @@ public class ProductService implements IProductService{
         if(optionalProduct.isEmpty()){
             throw new Exception("Cannot find product with id = " + productId);
         }
+        
+        Product targetProduct = optionalProduct.get();
+        if(targetProduct.getCategory() == null) {
+            // If product has no category, return empty list
+            return ListProductResponse.builder()
+                    .products(productResponses)
+                    .totalProducts(0)
+                    .build();
+        }
+        
         List<Product> products = productRepository.getProductsByCategory(
-                                    optionalProduct.get().getCategory().getId());
+                                    targetProduct.getCategory().getId());
         int cnt = 0;
         for(Product p : products){
             if(!Objects.equals(p.getId(), productId)){
