@@ -5,5 +5,4 @@ export interface registerReq {
     password: string,
     retype_password: string,
     date_of_birth: Date,
-    email: string
 }
