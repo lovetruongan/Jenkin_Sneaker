@@ -25,6 +25,14 @@
                         Mã đơn hàng
                         <p-sortIcon field="id"></p-sortIcon>
                     </th>
+                    <th pSortableColumn="buyer_name">
+                        Tên người mua
+                        <p-sortIcon field="buyer_name"></p-sortIcon>
+                    </th>
+                    <th pSortableColumn="phone_number">
+                        Số điện thoại
+                        <p-sortIcon field="phone_number"></p-sortIcon>
+                    </th>
                     <th pSortableColumn="product_name">
                         Tên sản phẩm
                         <p-sortIcon field="product_name"></p-sortIcon>
@@ -51,6 +59,8 @@
             <ng-template pTemplate="body" let-order>
                 <tr>
                     <td data-label="Mã đơn hàng">{{ order.id }}</td>
+                    <td data-label="Tên người mua">{{ order.buyer_name }}</td>
+                    <td data-label="Số điện thoại">{{ order.phone_number }}</td>
                     <td data-label="Tên sản phẩm">{{ order.product_name }}</td>
                     <td data-label="Số lượng">{{ order.total_products }}</td>
                     <td data-label="Ngày đặt">{{ order.order_date | date:'dd/MM/yyyy HH:mm' }}</td>
@@ -79,7 +89,7 @@
             </ng-template>
             <ng-template pTemplate="emptymessage">
                 <tr>
-                    <td colspan="7" class="text-center">Không có đơn hàng nào</td>
+                    <td colspan="9" class="text-center">Không có đơn hàng nào</td>
                 </tr>
             </ng-template>
         </p-table>

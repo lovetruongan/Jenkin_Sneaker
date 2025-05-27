@@ -141,7 +141,7 @@ export class DetailProductComponent extends BaseComponent implements OnInit,Afte
             price: product.price,
             discount: product.discount
           })
-          this.categoryId = product.category_id.toString();
+          this.categoryId = product.category_id?.toString() ?? '';
           this.images = product.product_images;
         }),
         switchMap(() => {
