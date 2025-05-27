@@ -11,6 +11,7 @@ import java.util.Date;
 @NoArgsConstructor
 @Getter
 @Setter
+@ToString
 public class UpdateUserDTO {
     @JsonProperty("fullname")
     private String fullName;
@@ -18,7 +19,12 @@ public class UpdateUserDTO {
     @JsonProperty("phone_number")
     private String phoneNumber;
 
+    @JsonProperty("address")
     private String address;
+
+    @JsonProperty("email")
+    private String email;
+
 
     @JsonProperty("password")
     private String password;

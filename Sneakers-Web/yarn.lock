@@ -3071,6 +3071,11 @@ chardet@^0.7.0:
   resolved "https://registry.npmjs.org/chardet/-/chardet-0.7.0.tgz"
   integrity sha512-mT8iDcrh03qDGRRmoA2hmBJnxpllMR+0/0qlzjqZES6NdiWDcZkCNAk4rPFZ9Q85r27unkiNNg8ZOiwZXBHwcA==
 
+chart.css@^0.1.1:
+  version "0.1.1"
+  resolved "https://registry.npmjs.org/chart.css/-/chart.css-0.1.1.tgz"
+  integrity sha512-/YZcm5FrkVsE8EOlVnn8Va9/GiSBPbD3fAFFbb0fJfplEsA92F52XUqQc8+uesfmGjsoxxw3JMc7bKuPsPx7Qw==
+
 chart.js@^4.4.9:
   version "4.4.9"
   resolved "https://registry.npmjs.org/chart.js/-/chart.js-4.4.9.tgz"
