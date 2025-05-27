@@ -1,8 +1,12 @@
 .app-header {
   background-color: $black-color;
   color: $white-color;
-  // height: calc($header-height + 20px);
   height: $header-height;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
 
   .header-nav-login {
     text-decoration: none;
@@ -16,7 +20,6 @@
   }
 
   .header-avtar-container {
-
     height: 100%;
     display: flex;
     align-items: center;
@@ -252,7 +255,6 @@
     }
   }
   }
-
 }
 
 @media only screen and (max-width: 489px) {
@@ -431,3 +433,14 @@
 @media only screen and (min-width: 1200px) and (max-width: 1400px) {}
 
 @media only screen and (min-width: 1401px) and (max-width: 1899px) {}
+
+@media (max-width: 768px) {
+  .app-header {
+    height: auto;
+    min-height: $header-height;
+    
+    .container-fluid .row {
+      padding: 0.5rem 0;
+    }
+  }
+}

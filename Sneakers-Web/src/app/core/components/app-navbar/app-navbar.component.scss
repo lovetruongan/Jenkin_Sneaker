@@ -1,25 +1,29 @@
 .navbar {
   padding: 0.5rem 1rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  position: relative;
-  z-index: 1000;
+  position: fixed;
+  top: $header-height;
+  left: 0;
+  right: 0;
+  z-index: 999;
+  background: #fff;
 
   .navbar-nav {
     gap: 1rem;
 
     .nav-item {
       .nav-link {
-        color: #fff;
+        color: #333;
         padding: 0.5rem 1rem;
         border-radius: 4px;
         transition: all 0.3s ease;
 
         &:hover {
-          background: rgba(255, 255, 255, 0.1);
+          background: rgba(0, 0, 0, 0.05);
         }
 
         &.active {
-          background: rgba(255, 255, 255, 0.2);
+          background: rgba(0, 0, 0, 0.1);
         }
       }
     }
@@ -44,12 +48,12 @@
       top: 100%;
       left: 0;
       right: 0;
-      background: #343a40;
+      background: #fff;
       padding: 1rem;
-      z-index: 1000;
+      z-index: 998;
 
       &.show {
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        border-top: 1px solid rgba(0, 0, 0, 0.1);
       }
 
       .navbar-nav {
@@ -61,7 +65,7 @@
             border-radius: 0;
 
             &:hover {
-              background: rgba(255, 255, 255, 0.05);
+              background: rgba(0, 0, 0, 0.05);
             }
           }
         }

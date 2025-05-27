@@ -1,10 +1,24 @@
 .app-layout {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  min-height: 100vh;
+
+  .app-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+  }
 
   .app-main {
-    // min-height: 82vh;
+    margin-top: calc(#{$header-height} + #{$nav-bar-height}); // Add margin to account for fixed header
     flex: 1;
+    width: 100%;
+    position: relative;
+  }
+
+  .app-footer {
+    width: 100%;
   }
 }
