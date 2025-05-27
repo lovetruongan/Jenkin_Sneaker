@@ -45,19 +45,19 @@
       </ng-template>
       <ng-template pTemplate="body" let-voucher>
         <tr>
-          <td>{{ voucher.code }}</td>
-          <td>{{ voucher.name }}</td>
-          <td>{{ voucher.discount_percentage }}%</td>
-          <td>{{ formatCurrency(voucher.min_order_value || 0) }}</td>
-          <td>{{ voucher.max_discount_amount ? formatCurrency(voucher.max_discount_amount) : 'Không giới hạn' }}</td>
-          <td>{{ voucher.quantity }}</td>
-          <td>{{ voucher.remaining_quantity }}</td>
-          <td>{{ formatDate(voucher.valid_from) }}</td>
-          <td>{{ formatDate(voucher.valid_to) }}</td>
-          <td>
+          <td data-label="Mã voucher">{{ voucher.code }}</td>
+          <td data-label="Tên voucher">{{ voucher.name }}</td>
+          <td data-label="Giảm giá">{{ voucher.discount_percentage }}%</td>
+          <td data-label="Đơn tối thiểu">{{ formatCurrency(voucher.min_order_value || 0) }}</td>
+          <td data-label="Giảm tối đa">{{ voucher.max_discount_amount ? formatCurrency(voucher.max_discount_amount) : 'Không giới hạn' }}</td>
+          <td data-label="Số lượng">{{ voucher.quantity }}</td>
+          <td data-label="Còn lại">{{ voucher.remaining_quantity }}</td>
+          <td data-label="Hiệu lực từ">{{ formatDate(voucher.valid_from) }}</td>
+          <td data-label="Đến">{{ formatDate(voucher.valid_to) }}</td>
+          <td data-label="Trạng thái">
             <p-tag [value]="getStatusLabel(voucher)" [severity]="getStatusSeverity(voucher)"></p-tag>
           </td>
-          <td>
+          <td data-label="Thao tác">
             <button pButton pRipple type="button" icon="pi pi-pencil" 
                     class="p-button-rounded p-button-success p-button-text" 
                     pTooltip="Sửa" (click)="showEditDialog(voucher)"></button>

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener, ElementRef } from '@angular/core';
 import { OverlayPanelModule } from 'primeng/overlaypanel';
 import { ButtonModule } from 'primeng/button';
 import { Router, RouterLink } from '@angular/router';
@@ -27,15 +27,25 @@ export class AppNavbarComponent extends BaseComponent implements OnInit {
   public roleId: number = 100;
   public token: string | null = null;
   categories: MenuItem[] = [];
+  isMenuOpen = false;
+
   constructor(
     private categoriesService: CategoriesService,
     private userService: UserService,
-    private readonly router: Router
+    private readonly router: Router,
+    private elementRef: ElementRef
   ) {
     super();
     if (typeof localStorage != 'undefined'){
       this.token = localStorage.getItem("token");
       this.roleId = parseInt(JSON.parse(localStorage.getItem("userInfor") || '{"role_id": "0"}').role_id || '0');
+    }
+  }
+
+  @HostListener('document:click', ['$event'])
+  clickOutside(event: Event) {
+    if (!this.elementRef.nativeElement.contains(event.target)) {
+      this.isMenuOpen = false;
     }
   }
 
@@ -72,5 +82,9 @@ export class AppNavbarComponent extends BaseComponent implements OnInit {
 
   navigateToCategory(categoryName: string) {
     this.router.navigateByUrl(`/Category/${categoryName}`)
+  }
+
+  toggleMenu() {
+    this.isMenuOpen = !this.isMenuOpen;
   }
 }
