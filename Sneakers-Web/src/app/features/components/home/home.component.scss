@@ -1,11 +1,16 @@
 .home {
+  width: 100%;
+  
   // Hero Banner Section
   .hero-banner {
+    margin-top: -20px; // Offset the margin-top from app-main
     position: relative;
 
     .carousel-item {
-      height: 70vh;
-      min-height: 500px;
+      height: 80vh;
+      min-height: 600px;
+      background-size: cover;
+      background-position: center;
 
       img {
         height: 100%;
@@ -110,6 +115,8 @@
 
   // Categories Section
   .categories-section {
+    padding: 4rem 0;
+    background: #fff;
     .category-card {
       background: #fff;
       border-radius: 15px;
@@ -176,6 +183,8 @@
 
   // Featured Products Section
   .featured-products {
+    padding: 4rem 0;
+    background: #f8f9fa;
     .product-card-featured {
       background: #fff;
       border-radius: 15px;
@@ -272,6 +281,8 @@
 
   // New Arrivals Section
   .new-arrivals {
+    padding: 4rem 0;
+    background: #fff;
     .product-card-new {
       background: #fff;
       border-radius: 12px;
@@ -354,6 +365,7 @@
 
   // Sale Section
   .sale-section {
+    padding: 4rem 0;
     background: linear-gradient(135deg, #2c3e50, #34495e);
     position: relative;
     overflow: hidden;
@@ -455,6 +467,7 @@
 
   // Newsletter Section
   .newsletter-section {
+    padding: 4rem 0;
     background: linear-gradient(135deg, #007bff, #0056b3);
 
     .input-group {
@@ -488,85 +501,77 @@
 
   // Responsive Design
   @media (max-width: 768px) {
-    .hero-banner {
-      .carousel-item {
-        height: 50vh;
-        min-height: 400px;
-      }
-
-      .carousel-caption {
-        bottom: 20%;
-        left: 5%;
-        right: 5%;
-        padding: 1rem;
-
-        h1 {
-          font-size: 2rem;
-        }
-
-        p {
-          font-size: 1rem;
-        }
-
-        .btn {
-          padding: 8px 20px;
-          font-size: 0.9rem;
+    .home {
+      .hero-banner {
+        margin-top: 0;
+        
+        .carousel-item {
+          height: 50vh;
+          min-height: 400px;
         }
       }
-    }
 
-    .section-title {
-      font-size: 2rem;
-    }
-
-    .categories-section {
-      .category-card {
-        margin-bottom: 2rem;
+      .categories-section,
+      .featured-products,
+      .new-arrivals,
+      .sale-section,
+      .newsletter-section {
+        padding: 2rem 0;
       }
-    }
 
-    .sale-section {
-      text-align: center;
+      .section-title {
+        font-size: 2rem;
+      }
 
-      .countdown-timer {
-        margin-bottom: 2rem;
-
-        .d-flex {
-          justify-content: center;
+      .categories-section {
+        .category-card {
+          margin-bottom: 2rem;
         }
+      }
 
-        .time-unit {
-          .time-number {
-            font-size: 1.5rem;
+      .sale-section {
+        text-align: center;
+
+        .countdown-timer {
+          margin-bottom: 2rem;
+
+          .d-flex {
+            justify-content: center;
+          }
+
+          .time-unit {
+            .time-number {
+              font-size: 1.5rem;
+            }
           }
         }
       }
     }
-  }
 
-  @media (max-width: 576px) {
-    .hero-banner {
-      .carousel-caption {
-        h1 {
-          font-size: 1.5rem;
-        }
+    @media (max-width: 576px) {
+      .hero-banner {
+        .carousel-caption {
+          h1 {
+            font-size: 1.5rem;
+          }
 
-        p {
-          font-size: 0.9rem;
+          p {
+            font-size: 0.9rem;
+          }
         }
       }
-    }
 
-    .section-title {
-      font-size: 1.8rem;
-    }
+      .section-title {
+        font-size: 1.8rem;
+      }
 
-    .featured-products,
-    .new-arrivals {
-      .col-md-6,
-      .col-lg-3,
-      .col-lg-4 {
-        margin-bottom: 1.5rem;
+      .featured-products,
+      .new-arrivals {
+        .col-md-6,
+        .col-lg-3,
+        .col-lg-4 {
+          margin-bottom: 1.5rem;
+        }
       }
     }
   }
