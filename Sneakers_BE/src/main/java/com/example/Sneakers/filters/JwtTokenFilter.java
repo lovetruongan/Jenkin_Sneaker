@@ -77,6 +77,11 @@ public class JwtTokenFilter extends OncePerRequestFilter{
         String requestPath = request.getServletPath();
         String requestMethod = request.getMethod();
 
+        // Bypass cho tất cả GET /api/v1/statistics/**
+        if (requestMethod.equals("GET") && requestPath.startsWith(String.format("/%s/statistics", apiPrefix))) {
+            return true;
+        }
+
         if (requestPath.equals(String.format("%s/orders", apiPrefix))
                 && requestMethod.equals("GET")) {
             // Allow access to %s/orders

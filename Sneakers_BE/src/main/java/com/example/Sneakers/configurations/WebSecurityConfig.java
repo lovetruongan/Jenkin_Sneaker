@@ -124,6 +124,8 @@ public class WebSecurityConfig {
                             .requestMatchers(DELETE,
                                     String.format("%s/carts/**", apiPrefix)).hasRole(Role.USER)
 
+                            .requestMatchers(GET, String.format("/%s/statistics/**", apiPrefix)).permitAll()
+
                             .anyRequest().authenticated();
                     //.anyRequest().permitAll();
 

@@ -1,0 +1,57 @@
+<div class="statistics-product-container">
+  <h2>Thống kê sản phẩm bán ra</h2>
+  <div class="tab-buttons">
+    <button [class.active]="mode === 'date'" (click)="mode = 'date'">Theo ngày</button>
+    <button [class.active]="mode === 'month'" (click)="mode = 'month'">Theo tháng</button>
+    <button [class.active]="mode === 'year'" (click)="mode = 'year'">Theo năm</button>
+    <button [class.active]="mode === 'top'" (click)="mode = 'top'">Top bán chạy</button>
+  </div>
+
+  <div class="filter-form">
+    <ng-container [ngSwitch]="mode">
+      <div *ngSwitchCase="'date'">
+        <label>Chọn ngày:</label>
+        <input type="date" [(ngModel)]="selectedDate">
+        <button (click)="fetchByDate()">Xem</button>
+      </div>
+      <div *ngSwitchCase="'month'">
+        <label>Năm:</label>
+        <input type="number" [(ngModel)]="selectedYear" min="2000" max="2100" style="width:80px;">
+        <label>Tháng:</label>
+        <input type="number" [(ngModel)]="selectedMonth" min="1" max="12" style="width:50px;">
+        <button (click)="fetchByMonth()">Xem</button>
+      </div>
+      <div *ngSwitchCase="'year'">
+        <label>Năm:</label>
+        <input type="number" [(ngModel)]="selectedYear" min="2000" max="2100" style="width:80px;">
+        <button (click)="fetchByYear()">Xem</button>
+      </div>
+      <div *ngSwitchCase="'top'">
+        <label>Top:</label>
+        <input type="number" [(ngModel)]="topN" min="1" max="100" style="width:60px;">
+        <button (click)="fetchTop()">Xem</button>
+      </div>
+    </ng-container>
+  </div>
+
+  <div *ngIf="loading" class="loading">Đang tải dữ liệu...</div>
+  <table *ngIf="!loading && statistics.length > 0" class="statistics-table">
+    <thead>
+      <tr>
+        <th>STT</th>
+        <th>Mã sản phẩm</th>
+        <th>Tên sản phẩm</th>
+        <th>Số lượng bán</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let stat of statistics; let i = index">
+        <td>{{ i + 1 }}</td>
+        <td>{{ stat.productId }}</td>
+        <td>{{ stat.productName }}</td>
+        <td>{{ stat.totalSold }}</td>
+      </tr>
+    </tbody>
+  </table>
+  <div *ngIf="!loading && statistics.length === 0" class="no-data">Không có dữ liệu</div>
+</div> 

@@ -20,6 +20,7 @@ import { RoleGuard } from './features/auth/authInterceptor/role.guard';
 import { CategoryManageComponent } from './features/components/category-manage/category-manage.component';
 import { UserManageComponent } from './features/components/user-manage/user-manage.component';
 import { OrderManageComponent } from './features/components/order-manage/order-manage.component';
+import { ADMIN_ROUTES } from './features/admin/admin.routes';
 
 export const routes: Routes = [
   {
@@ -103,6 +104,11 @@ export const routes: Routes = [
       {
         path: 'orderManage',
         component: OrderManageComponent,
+        canActivate: [RoleGuard]
+      },
+      {
+        path: 'admin',
+        children: ADMIN_ROUTES,
         canActivate: [RoleGuard]
       }
     ]
