@@ -72,17 +72,6 @@ Chart.register(...registerables);
               </div>
             </p-card>
           </div>
-          <div class="card total-products">
-            <p-card styleClass="stat-card stat-total-products">
-              <div class="card-content">
-                <i class="pi pi-box"></i>
-                <div class="stat-info">
-                  <h2>{{ totalProducts | number:'1.0-0' }}</h2>
-                  <div class="stat-label">Tổng sản phẩm</div>
-                </div>
-              </div>
-            </p-card>
-          </div>
           <div class="card sold-products">
             <p-card styleClass="stat-card stat-sold-products">
               <div class="card-content">
@@ -225,9 +214,20 @@ Chart.register(...registerables);
 
     .statistics-cards {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      grid-template-columns: repeat(5, 1fr);
       gap: 1.5rem;
       margin-bottom: 2rem;
+      
+      @media screen and (min-width: 1200px) {
+        grid-template-columns: repeat(5, 1fr);
+        .stat-card {
+          min-width: 200px;
+        }
+      }
+
+      @media screen and (max-width: 1199px) {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      }
     }
 
     .stat-card {
@@ -268,6 +268,9 @@ Chart.register(...registerables);
             font-size: 1.8rem;
             font-weight: 700;
             line-height: 1.2;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
           }
 
           .stat-label {
@@ -276,6 +279,9 @@ Chart.register(...registerables);
             font-weight: 500;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
           }
         }
       }
@@ -304,16 +310,6 @@ Chart.register(...registerables);
     .stat-daily-revenue {
       .card-content {
         background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-        color: white;
-        
-        i { color: rgba(255, 255, 255, 0.9); }
-        .stat-label { color: rgba(255, 255, 255, 0.8); }
-      }
-    }
-
-    .stat-total-products {
-      .card-content {
-        background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
         color: white;
         
         i { color: rgba(255, 255, 255, 0.9); }
