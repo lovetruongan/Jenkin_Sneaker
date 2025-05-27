@@ -10,4 +10,5 @@ export interface OrderDto {
     payment_method: string,
     total_money: number,
     cart_items: ProductToCartDto[];
+    voucher_code?: string;
 }
