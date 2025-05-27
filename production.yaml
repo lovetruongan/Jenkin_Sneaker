@@ -1,0 +1,116 @@
+services:
+  nginx-proxy:
+    container_name: nginx-proxy
+    image: nginxproxy/nginx-proxy
+    restart: unless-stopped
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - /var/docker/nginx/html:/usr/share/nginx/html
+      - /var/docker/nginx/certs:/etc/nginx/certs
+      - /var/docker/nginx/vhost:/etc/nginx/vhost.d
+    networks:
+      - Sneaker-network
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  letsencrypt-companion:
+    container_name: letsencrypt-companion
+    image: jrcs/letsencrypt-nginx-proxy-companion
+    restart: unless-stopped
+    volumes_from:
+      - nginx-proxy
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/docker/nginx/acme:/etc/acme.sh
+    networks:
+      - Sneaker-network
+    environment:
+      DEFAULT_EMAIL: test@mail.com
+
+  mysql8-container:
+    container_name: mysql8-container
+    image: mysql:8.2.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_DATABASE: shopsneaker
+    ports:
+      - 3306:3306
+    networks:
+      - Sneaker-network
+
+  phpmyadmin8-container:
+    #intel host
+    #image: phpmyadmin/phpmyadmin
+    #mac m1 host
+    image: arm64v8/phpmyadmin
+    container_name: phpmyadmin8-container
+    restart: always
+    depends_on:
+      - mysql8-container
+    ports:
+      - "8100:80" #port mapping
+    environment:
+      PMA_HOST: mysql8-container #phpMyAdmin Host, PMA = PHP My Amin
+    networks:
+      - Sneaker-network
+
+  sneaker-spring-container:
+    container_name: sneaker-spring-container
+    build:
+      context: .
+      dockerfile: DockerfileJavaSpring
+    expose:
+      - 8089
+    environment:
+      - VIRTUAL_HOST=api.yourwebsite.com
+      - VIRTUAL_PORT=8089
+      - LETSENCRYPT_HOST=api.yourwebsite.com
+      - LETSENCRYPT_EMAIL=test@mail.com
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql8-container:3306/shopsneaker3?serverTimezone=UTC&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: root
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_DATABASE: shopsneaker3
+    #depends_on only waits for the container to start, not for the service inside the container to be fully operational
+    depends_on:
+      - mysql8-container
+    networks:
+      - Sneaker-network
+  sneaker-angular-container:
+    container_name: sneaker-angular-container
+    build:
+      context: .
+      dockerfile: DockerfileAngular
+    expose:
+      - 80
+    environment:
+      - VIRTUAL_HOST=yourwebsite.com
+      - VIRTUAL_PORT=80
+      - LETSENCRYPT_HOST=yourwebsite.com
+      - LETSENCRYPT_EMAIL=test@mail.com
+    networks:
+      - Sneaker-network
+
+#docker-compose -f ./deployment.yaml down
+#docker-compose -f ./deployment.yaml rm -s -f mysql8-container
+#docker-compose -f ./deployment.yaml up -d mysql8-container
+
+#docker-compose -f ./deployment.yaml rm -s -f phpmyadmin8-container
+#docker-compose -f ./deployment.yaml up -d phpmyadmin8-container
+#docker-compose -f ./deployment.yaml rm -s -f sneaker-spring-container
+#docker-compose -f ./deployment.yaml up -d sneaker-spring-container
+#docker-compose -f ./deployment.yaml up -d sneaker-spring-container
+#test
+#docker-compose -f ./deployment.yaml rm -s -f sneaker-angular-container
+#docker-compose -f ./deployment.yaml up -d sneaker-angular-container
+#docker run -d -p 9000:9000 SonarQubeimage
+networks:
+  Sneaker-network:
+    name: Sneaker-network
+    driver: bridge
+    external: true

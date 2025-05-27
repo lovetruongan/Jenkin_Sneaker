@@ -1,5 +1,5 @@
 # Base image, even version for production
-FROM node:20-alpine3.17 AS builder
+FROM node:18-alpine AS builder
 # Set the working directory
 WORKDIR /app
 
@@ -17,14 +17,12 @@ COPY ./Sneakers-Web/ .
 RUN yarn build
 
 # Production-ready image
-FROM nginx:alpine
-COPY default.conf /etc/nginx/conf.d
-COPY cert.pem /etc/nginx/ssl/cert.pem
-COPY prv.pem /etc/nginx/ssl/prv.pem
+FROM nginx:1.25-alpine
+
 # Copy the built app from the builder stage
 COPY --from=builder /app/dist/sneakers-ui/browser /usr/share/nginx/html
 
-EXPOSE 443
+EXPOSE 80
 
 # Start Nginx
 CMD ["nginx", "-g", "daemon off;"]
