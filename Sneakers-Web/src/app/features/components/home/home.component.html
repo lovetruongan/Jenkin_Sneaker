@@ -111,8 +111,8 @@
           @for(product of productsHighlight; track product){
             <div class="col-lg-4 col-md-6">
               <div class="product-card-featured" (click)="navigateToDetail(product.id)">
-                                 <div class="product-image-wrapper">
-                   <img [src]="product.thumbnail.startsWith('assets/') ? product.thumbnail : apiImage + product.thumbnail" [alt]="product.name" class="img-fluid">
+                <div class="product-image-wrapper">
+                   <img [src]="(product.thumbnail && product.thumbnail.startsWith('assets/')) ? product.thumbnail : (apiImage + (product.thumbnail || 'notfound.jpg'))" [alt]="product.name" class="img-fluid">
                   @if(product.discount > 0) {
                     <span class="discount-badge">-{{product.discount}}%</span>
                   }
@@ -150,8 +150,8 @@
           @for(product of productNewest; track product){
             <div class="col-lg-3 col-md-6">
               <div class="product-card-new" (click)="navigateToDetail(product.id)">
-                                 <div class="product-image">
-                   <img [src]="product.thumbnail.startsWith('assets/') ? product.thumbnail : apiImage + product.thumbnail" [alt]="product.name" class="img-fluid">
+                <div class="product-image">
+                   <img [src]="(product.thumbnail && product.thumbnail.startsWith('assets/')) ? product.thumbnail : (apiImage + (product.thumbnail || 'notfound.jpg'))" [alt]="product.name" class="img-fluid">
                   <div class="product-overlay">
                     <button class="btn btn-white btn-sm">Xem Nhanh</button>
                   </div>
@@ -198,8 +198,8 @@
                 @for(product of productsDiscount; track product.id; let i = $index){
                   @if(i < 4) {
                     <div class="col-6">
-                                             <div class="sale-product-card" (click)="navigateToDetail(product.id)">
-                         <img [src]="product.thumbnail.startsWith('assets/') ? product.thumbnail : apiImage + product.thumbnail" [alt]="product.name" class="img-fluid">
+                      <div class="sale-product-card" (click)="navigateToDetail(product.id)">
+                        <img [src]="(product.thumbnail && product.thumbnail.startsWith('assets/')) ? product.thumbnail : (apiImage + (product.thumbnail || 'notfound.jpg'))" [alt]="product.name" class="img-fluid">
                         <div class="sale-overlay">
                           <span class="sale-discount">-{{product.discount}}%</span>
                         </div>
@@ -227,7 +227,7 @@
             </div>
             <small>Chúng tôi cam kết bảo mật thông tin của bạn</small>
           </div>
-              </div>
-    </div>
-  </section>
+        </div>
+      </div>
+    </section>
 </div>
