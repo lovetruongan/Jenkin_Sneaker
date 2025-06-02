@@ -324,7 +324,6 @@ CREATE TABLE IF NOT EXISTS `users` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `fullname` varchar(100) DEFAULT '',
   `phone_number` varchar(10) NOT NULL,
-   `email` varchar(100) NULL unique,
   `address` varchar(200) DEFAULT '',
   `password` varchar(100) NOT NULL DEFAULT '',
   `created_at` datetime DEFAULT NULL,
@@ -340,26 +339,24 @@ CREATE TABLE IF NOT EXISTS `users` (
 ) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4;
 
 -- Dumping data for table shopsneaker.users: ~17 rows (approximately)
-INSERT INTO `users` (`id`, `fullname`, `phone_number`, `address`, `password`, `created_at`, `updated_at`, `is_active`, `date_of_birth`, `facebook_account_id`, `google_account_id`, `role_id`, `email`) VALUES
-(1, 'Trần Đức Anh', '0865247233', 'Hanoi', '21112003', NULL, NULL, 1, '2003-11-21', 0, 0, NULL, 'tran.duc.anh@gmail.com'),
-(2, 'Lưu Thuỳ Linh', '0123456789', 'Hanoi', '$2a$10$rOkHZxxyhIbFNofDaorwruUjO2vCHLpnfz7j0RmoVaDz6lKHl5P6O', '2024-02-20 09:12:32', '2024-02-20 09:12:32', 1, '2003-07-06', 0, 0, 1, 'lu.thuy.linh@gmail.com'),
-(3, 'ADMIN 1', '0111222333', 'Hanoi', '$2a$10$zgJgPl51rJQGl8xlznCKgOGipZjbaPMXiF/Zv/03ri1mA1iN1Z.su', '2024-02-21 09:00:03', '2024-02-21 09:00:03', 1, '2003-11-12', 0, 0, 2, 'admin.1@gmail.com'),
-(4, 'Nguyễn Văn A', '0197252343', 'Thái Nguyên', '$2a$10$EaQ4vkmvqt.cTdgfq7WLN.wyhDnD3iEm4CNKWK75pQLImwFod1Flm', '2024-02-23 10:45:57', '2024-02-23 10:45:57', 1, '2006-02-23', 0, 0, 1, 'nguyen.van.a@gmail.com'),
-(5, 'Đỗ Tùng Lâm', '0456123789', 'Thái Nguyên', '$2a$10$Q2vfr2lGKvN2u8VzfaZeJurW0AiKdhm3xTzKeNu7XoYEqzqQUk8l2', '2024-02-23 15:02:28', '2024-02-23 15:02:28', 1, '2006-02-23', 0, 0, 1, 'do.tung.lam@gmail.com'),
-(6, 'Hà Quang Dương', '0967854321', 'Thái Nguyên', '$2a$10$yah7HFxQ652PAOaxXOXHfulu4ML1PidYvYAa8.m..pLIO/SiK4nti', '2024-02-23 15:59:41', '2024-02-23 15:59:41', 1, '2005-02-23', 0, 0, 1, 'ha.quang.duong@gmail.com'),
-(7, 'Hà Quang Dương', '0967854321', 'Thái Nguyên', '$2a$10$cHyGqlu9q5VHC0zNTsDXmu/jFiT.ZmK3Rz1jwKL785mja7/irc2fS', '2024-02-23 16:35:24', '2024-02-23 16:35:24', 1, '2005-02-23', 0, 0, 1, 'ha.quang.duong@gmail.com'),
-(8, 'Long ăn cứt', '0678123459', 'Hà Nội', '$2a$10$aWgT6VW6M/hU4Lnreu6f7.v8UyvuRWU0Z7t/DU2Is541rGzFwSIpG', '2024-02-24 07:46:00', '2024-02-24 07:46:00', 1, '2005-02-24', 0, 0, 1, 'long.an.cut@gmail.com'),
-(9, 'Long ăn cứt', '0678123459', 'Hà Nội', '$2a$10$xCyTUzu/7myRDS/Aa67s/uA6nYF3UdfMD/vrwASyPMzvBscBOcRP6', '2024-02-24 07:46:00', '2024-02-24 07:46:00', 1, '2005-02-24', 0, 0, 1, 'long.an.cut@gmail.com'),
-(10, 'Long ăn cứt', '0678123459', 'Hà Nội', '$2a$10$GI9/NYptwgzaSzkZH5LaaueSZLbga0WbbST8smzca/ufe.n0yqv7C', '2024-02-24 07:46:00', '2024-02-24 07:46:00', 1, '2005-02-24', 0, 0, 1, 'long.an.cut@gmail.com'),
-(11, 'Long ăn cứt', '0678123459', 'Hà Nội', '$2a$10$DJesTEN3ThvfZjl4tvmBbeIE8vAHIj0Hus5/L8A163CiNeXkDHR0m', '2024-02-24 07:46:00', '2024-02-24 07:46:00', 1, '2005-02-24', 0, 0, 1, 'long.an.cut@gmail.com'),
-(12, 'Nguyễn Phương Mai', '0865211203', 'Hà Nội', '$2a$10$ihJRuUH5BsZ0PJ1LPqUMCuXFI0u4QFMkN5byGadeKOguCyjgdzNOW', '2024-02-25 15:36:49', '2024-02-25 15:36:49', 1, '2005-02-25', 0, 0, 1, 'nguyen.phuong.mai@gmail.com'),
-(13, 'Nguyễn Vũ Bảo Long', '0113355779', 'Hà Nội', '$2a$10$0p4m7/W1QVDZG2ui5aPytujxppt4xK2C8S.OMJKlurjovveRvnzqm', '2024-03-19 10:09:29', '2024-03-23 08:41:48', 1, '2003-09-13', 0, 0, 1, 'nguyen.vu.bao.long@gmail.com'),
-(14, 'Trần Đức Anh', '0865247234', 'Hà Nội', '$2a$10$yjh/pZGtFpeyfaPSCb0IceZfG8sIS3H.7OmmV.dQq7GQ3WefLFADO', '2024-03-21 06:43:07', '2024-03-21 06:43:07', 1, '2003-11-21', 0, 0, 1, 'tran.duc.anh@gmail.com'),
-(15, 'Hà Quang Dương', '0911725756', 'Thái Nguyên', '$2a$10$PPWS5r60c0pvkeWlVSeGlucfqBnJwtHQ7/FBgeRKx05ixVmg6fhlC', '2024-03-28 15:55:14', '2024-03-28 15:55:14', 1, '2003-03-20', 0, 0, 1, 'ha.quang.duong@gmail.com'),
-(16, 'Hoàng Ngọc Hà', '0911123456', 'Hà Nội', '$2a$10$wzTu2DbgN6MLTrcDdDkQE.jqiIl4ySdr/RZzEEKDlyxkqI6DihlLi', '2024-03-28 15:56:02', '2024-03-28 15:56:02', 1, '2003-10-15', 0, 0, 1, 'hoang.ngoc.ha@gmail.com'),
-(17, 'Trần Đức Anh', '0123786457', 'Hà Nội', '$2a$10$J4/bvTOHxOT2DiAg.ga81.vvoFdrSKbNuQ20lFaoOQI4zLHAfl7IO', '2024-03-28 16:09:07', '2024-03-28 16:09:07', 1, '2003-11-21', 0, 0, 1, 'tran.duc.anh@gmail.com');
-
-
+INSERT INTO `users` (`id`, `fullname`, `phone_number`, `address`, `password`, `created_at`, `updated_at`, `is_active`, `date_of_birth`, `facebook_account_id`, `google_account_id`, `role_id`) VALUES
+	(1, 'Trần Đức Anh', '0865247233', 'Hanoi', '21112003', NULL, NULL, 1, '2003-11-21', 0, 0, NULL),
+	(2, 'Lưu Thuỳ Linh  ', '0123456789', 'Hanoi', '$2a$10$rOkHZxxyhIbFNofDaorwruUjO2vCHLpnfz7j0RmoVaDz6lKHl5P6O', '2024-02-20 09:12:32', '2024-02-20 09:12:32', 1, '2003-07-06', 0, 0, 1),
+	(3, 'ADMIN 1', '0111222333', 'Hanoi', '$2a$10$zgJgPl51rJQGl8xlznCKgOGipZjbaPMXiF/Zv/03ri1mA1iN1Z.su', '2024-02-21 09:00:03', '2024-02-21 09:00:03', 1, '2003-11-12', 0, 0, 2),
+	(4, 'Nguyễn Văn A', '0197252343', 'Thái Nguyên', '$2a$10$EaQ4vkmvqt.cTdgfq7WLN.wyhDnD3iEm4CNKWK75pQLImwFod1Flm', '2024-02-23 10:45:57', '2024-02-23 10:45:57', 1, '2006-02-23', 0, 0, 1),
+	(5, 'Đỗ Tùng Lâm', '0456123789', 'Thái Nguyên', '$2a$10$Q2vfr2lGKvN2u8VzfaZeJurW0AiKdhm3xTzKeNu7XoYEqzqQUk8l2', '2024-02-23 15:02:28', '2024-02-23 15:02:28', 1, '2006-02-23', 0, 0, 1),
+	(6, 'Hà Quang Dương', '0967854321', 'Thái Nguyên', '$2a$10$yah7HFxQ652PAOaxXOXHfulu4ML1PidYvYAa8.m..pLIO/SiK4nti', '2024-02-23 15:59:41', '2024-02-23 15:59:41', 1, '2005-02-23', 0, 0, 1),
+	(7, 'Hà Quang Dương', '0967854321', 'Thái Nguyên', '$2a$10$cHyGqlu9q5VHC0zNTsDXmu/jFiT.ZmK3Rz1jwKL785mja7/irc2fS', '2024-02-23 16:35:24', '2024-02-23 16:35:24', 1, '2005-02-23', 0, 0, 1),
+	(8, 'Long ăn cứt', '0678123459', 'Hà Nội', '$2a$10$aWgT6VW6M/hU4Lnreu6f7.v8UyvuRWU0Z7t/DU2Is541rGzFwSIpG', '2024-02-24 07:46:00', '2024-02-24 07:46:00', 1, '2005-02-24', 0, 0, 1),
+	(9, 'Long ăn cứt', '0678123459', 'Hà Nội', '$2a$10$xCyTUzu/7myRDS/Aa67s/uA6nYF3UdfMD/vrwASyPMzvBscBOcRP6', '2024-02-24 07:46:00', '2024-02-24 07:46:00', 1, '2005-02-24', 0, 0, 1),
+	(10, 'Long ăn cứt', '0678123459', 'Hà Nội', '$2a$10$GI9/NYptwgzaSzkZH5LaaueSZLbga0WbbST8smzca/ufe.n0yqv7C', '2024-02-24 07:46:00', '2024-02-24 07:46:00', 1, '2005-02-24', 0, 0, 1),
+	(11, 'Long ăn cứt', '0678123459', 'Hà Nội', '$2a$10$DJesTEN3ThvfZjl4tvmBbeIE8vAHIj0Hus5/L8A163CiNeXkDHR0m', '2024-02-24 07:46:00', '2024-02-24 07:46:00', 1, '2005-02-24', 0, 0, 1),
+	(12, 'Nguyễn Phương Mai', '0865211203', 'Hà Nội', '$2a$10$ihJRuUH5BsZ0PJ1LPqUMCuXFI0u4QFMkN5byGadeKOguCyjgdzNOW', '2024-02-25 15:36:49', '2024-02-25 15:36:49', 1, '2005-02-25', 0, 0, 1),
+	(13, 'Nguyễn Vũ Bảo Long', '0113355779', 'Hà Nội', '$2a$10$0p4m7/W1QVDZG2ui5aPytujxppt4xK2C8S.OMJKlurjovveRvnzqm', '2024-03-19 10:09:29', '2024-03-23 08:41:48', 1, '2003-09-13', 0, 0, 1),
+	(14, 'Trần Đức Anh', '0865247234', 'Hà Nội', '$2a$10$yjh/pZGtFpeyfaPSCb0IceZfG8sIS3H.7OmmV.dQq7GQ3WefLFADO', '2024-03-21 06:43:07', '2024-03-21 06:43:07', 1, '2003-11-21', 0, 0, 1),
+	(15, 'Hà Quang Dương', '0911725756', 'Thái Nguyên', '$2a$10$PPWS5r60c0pvkeWlVSeGlucfqBnJwtHQ7/FBgeRKx05ixVmg6fhlC', '2024-03-28 15:55:14', '2024-03-28 15:55:14', 1, '2003-03-20', 0, 0, 1),
+	(16, 'Hoàng Ngọc Hà', '0911123456', 'Hà Nội', '$2a$10$wzTu2DbgN6MLTrcDdDkQE.jqiIl4ySdr/RZzEEKDlyxkqI6DihlLi', '2024-03-28 15:56:02', '2024-03-28 15:56:02', 1, '2003-10-15', 0, 0, 1),
+	(17, 'Trần Đức Anh', '0123786457', 'Hà Nội', '$2a$10$J4/bvTOHxOT2DiAg.ga81.vvoFdrSKbNuQ20lFaoOQI4zLHAfl7IO', '2024-03-28 16:09:07', '2024-03-28 16:09:07', 1, '2003-11-21', 0, 0, 1);
 
 
 -- Dumping structure for table shopsneaker.orders
@@ -546,3 +543,62 @@ INSERT INTO `carts` (`id`, `user_id`, `product_id`, `quantity`, `size`) VALUES
 /*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40111 SET SQL_NOTES=IFNULL(@OLD_SQL_NOTES, 1) */;
+
+
+
+-- Voucher table
+CREATE TABLE IF NOT EXISTS `vouchers` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `code` varchar(50) NOT NULL UNIQUE COMMENT 'Mã voucher duy nhất',
+  `name` varchar(100) NOT NULL COMMENT 'Tên voucher',
+  `description` text DEFAULT NULL COMMENT 'Mô tả voucher',
+  `discount_percentage` int(11) NOT NULL CHECK (`discount_percentage` > 0 AND `discount_percentage` <= 100) COMMENT 'Phần trăm giảm giá',
+  `min_order_value` bigint(20) DEFAULT 0 COMMENT 'Giá trị đơn hàng tối thiểu để áp dụng',
+  `max_discount_amount` bigint(20) DEFAULT NULL COMMENT 'Số tiền giảm tối đa',
+  `quantity` int(11) NOT NULL DEFAULT 1 COMMENT 'Tổng số lượng voucher',
+  `remaining_quantity` int(11) NOT NULL DEFAULT 1 COMMENT 'Số lượng voucher còn lại',
+  `valid_from` datetime NOT NULL COMMENT 'Thời gian bắt đầu hiệu lực',
+  `valid_to` datetime NOT NULL COMMENT 'Thời gian hết hiệu lực',
+  `is_active` tinyint(1) DEFAULT 1 COMMENT 'Trạng thái hoạt động',
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `idx_code` (`code`),
+  KEY `idx_valid_dates` (`valid_from`, `valid_to`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Voucher usage table to track which vouchers are used in which orders
+CREATE TABLE IF NOT EXISTS `voucher_usage` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `voucher_id` int(11) NOT NULL,
+  `order_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `discount_amount` bigint(20) NOT NULL COMMENT 'Số tiền được giảm',
+  `used_at` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `voucher_id` (`voucher_id`),
+  KEY `order_id` (`order_id`),
+  KEY `user_id` (`user_id`),
+  CONSTRAINT `voucher_usage_ibfk_1` FOREIGN KEY (`voucher_id`) REFERENCES `vouchers` (`id`),
+  CONSTRAINT `voucher_usage_ibfk_2` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`),
+  CONSTRAINT `voucher_usage_ibfk_3` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Add voucher_id column to orders table
+ALTER TABLE `orders` 
+ADD COLUMN `voucher_id` int(11) DEFAULT NULL,
+ADD COLUMN `discount_amount` bigint(20) DEFAULT 0,
+ADD CONSTRAINT `orders_voucher_fk` FOREIGN KEY (`voucher_id`) REFERENCES `vouchers` (`id`); 
+
+-- Sample voucher data for testing
+USE shopsneaker3;
+
+-- Insert sample vouchers
+INSERT INTO `vouchers` (`code`, `name`, `description`, `discount_percentage`, `min_order_value`, `max_discount_amount`, `quantity`, `remaining_quantity`, `valid_from`, `valid_to`, `is_active`) VALUES
+('SALE66', 'Sale 6/6', 'Giảm giá nhân dịp 6/6', 20, 500000, 100000, 100, 100, '2024-06-01 00:00:00', '2024-06-30 23:59:59', 1),
+('SALE77', 'Sale 7/7', 'Giảm giá nhân dịp 7/7', 15, 300000, 50000, 50, 50, '2024-07-01 00:00:00', '2024-07-31 23:59:59', 1),
+('WELCOME10', 'Welcome New User', 'Giảm 10% cho khách hàng mới', 10, 0, 30000, 200, 200, '2024-01-01 00:00:00', '2024-12-31 23:59:59', 1),
+('SUMMER25', 'Summer Sale', 'Giảm giá mùa hè', 25, 1000000, 200000, 30, 30, '2024-05-01 00:00:00', '2024-08-31 23:59:59', 1),
+('EXPIRED20', 'Expired Voucher', 'Voucher đã hết hạn', 20, 0, NULL, 10, 10, '2023-01-01 00:00:00', '2023-12-31 23:59:59', 1),
+('INACTIVE15', 'Inactive Voucher', 'Voucher không hoạt động', 15, 0, NULL, 20, 20, '2024-01-01 00:00:00', '2024-12-31 23:59:59', 0),
+('OUTOFSTOCK', 'Out of Stock', 'Voucher đã hết số lượng', 30, 0, NULL, 5, 0, '2024-01-01 00:00:00', '2024-12-31 23:59:59', 1); 
