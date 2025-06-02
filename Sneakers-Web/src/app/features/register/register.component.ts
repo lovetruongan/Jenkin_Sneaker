@@ -80,6 +80,7 @@ export class RegisterComponent extends BaseComponent implements AfterViewInit {
             password: this.registerForm.value.password,
             retype_password: this.registerForm.value.retypePassword,
             date_of_birth: this.registerForm.value.date,
+            email: this.registerForm.value.email
           }).pipe(
             tap(() => {
               this.toastService.success("Đăng ký thành công");

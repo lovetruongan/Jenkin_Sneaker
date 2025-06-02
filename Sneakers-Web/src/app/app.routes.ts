@@ -21,7 +21,7 @@ import { CategoryManageComponent } from './features/components/category-manage/c
 import { UserManageComponent } from './features/components/user-manage/user-manage.component';
 import { OrderManageComponent } from './features/components/order-manage/order-manage.component';
 import { ADMIN_ROUTES } from './features/admin/admin.routes';
-import { VoucherManageComponent } from './features/components/voucher-manage/voucher-manage.component';
+// import { VoucherManageComponent } from './features/components/voucher-manage/voucher-manage.component';
 
 export const routes: Routes = [
   {
@@ -112,11 +112,11 @@ export const routes: Routes = [
         children: ADMIN_ROUTES,
         canActivate: [RoleGuard]
       },
-      {
-        path: 'voucherManage',
-        component: VoucherManageComponent,
-        canActivate: [RoleGuard]
-      }
+      // {
+      //   path: 'voucherManage',
+      //   component: VoucherManageComponent,
+      //   canActivate: [RoleGuard]
+      // }
     ]
   }
 ];
