@@ -20,7 +20,6 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@ToString
 public class User extends BaseEntity implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,10 +33,6 @@ public class User extends BaseEntity implements UserDetails {
 
     @Column(name = "address", length = 200)
     private String address;
-
-    @Column(name = "email")
-    private String email;
-
 
     @Column(name = "password", length = 100, nullable = false)
     private String password;

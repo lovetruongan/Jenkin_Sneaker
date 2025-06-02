@@ -24,19 +24,19 @@ public class Order {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @Column(name = "fullname",length = 100)
+    @Column(name = "fullname", length = 100)
     private String fullName;
 
-    @Column(name = "email",length = 100)
+    @Column(name = "email", length = 100)
     private String email;
 
-    @Column(name = "phone_number",nullable = false,length = 11)
+    @Column(name = "phone_number", nullable = false, length = 11)
     private String phoneNumber;
 
-    @Column(name = "address",nullable = false,length = 200)
+    @Column(name = "address", nullable = false, length = 200)
     private String address;
 
-    @Column(name = "note",length = 200)
+    @Column(name = "note", length = 200)
     private String note;
 
     @Column(name = "order_date")
@@ -60,7 +60,17 @@ public class Order {
     @Column(name = "active")
     private Boolean active;
 
+    @ManyToOne
+    @JoinColumn(name = "voucher_id")
+    private Voucher voucher;
+
+    @Column(name = "discount_amount")
+    private Long discountAmount;
+
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference
     private List<OrderDetail> orderDetails;
+
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<VoucherUsage> voucherUsages;
 }

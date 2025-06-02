@@ -14,7 +14,6 @@ import java.sql.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@ToString
 public class UserDTO {
     @JsonProperty("fullname")
     private String fullName;
@@ -24,7 +23,6 @@ public class UserDTO {
     private String phoneNumber;
 
     private String address;
-    private String email;
 
     @NotBlank(message = "Password cannot be blank")
     private String password;
