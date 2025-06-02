@@ -1,26 +1,406 @@
 <div class="container user-manage-admin">
-    <p-confirmDialog></p-confirmDialog>
-    <p-toast></p-toast>
-    @for (user of users; track user) {
-        @if(userId != user.id){
-            <div class="row">
-                <div class="col-10 col-lg-10 offset-lg-1">
-                    <p-panel class="user-infor-wrapper" [toggleable]="true" [collapsed]="true">
-                        <ng-template pTemplate="header">
-                            <div class="flex align-items-center gap-2">
-                                <span class="font-bold">{{user.fullname}}</span>
-                            </div>
-                        </ng-template>
-                        <p>Số điện thoại: {{user.phone_number}}</p>
-                        <p>Địa chỉ: {{user.address}}</p>
-                        <p>Ngày sinh: {{user.date_of_birth | date: 'dd/MM/yyyy'}}</p>
-                        <p-dropdown [options]="userOptions" [placeholder]="roleMap[user.role.id-1]"
-                      (onChange)="onCategoryChange(user.id,$event)"></p-dropdown>
-                        <p-button class="delete--button" (click)="confirmDelete(user.id)" label="Xóa người dùng" severity="danger"></p-button>
-                    </p-panel>
-                </div>
+    <div class="search-bar">
+        <mat-form-field appearance="outline">
+            <mat-label>Tìm kiếm theo tên</mat-label>
+            <input matInput [(ngModel)]="searchTerm" (ngModelChange)="filterUsers()" placeholder="Nhập tên người dùng">
+            <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+    </div>
+
+    <div class="add-user-button">
+        <button mat-raised-button color="accent" (click)="openAddUserDialog()">
+            <mat-icon>person_add</mat-icon>
+            Thêm người dùng
+        </button>
+    </div>
+    @if (users && userId != null) {
+    <div class="mat-elevation-z8">
+        <table mat-table [dataSource]="filterLsedUsers" class="mat-table">
+
+            <!-- Họ tên Column -->
+            <ng-container matColumnDef="fullname">
+                <th mat-header-cell *matHeaderCellDef>Họ tên</th>
+                <td mat-cell *matCellDef="let user">{{ user?.fullname }}</td>
+            </ng-container>
+
+            <!-- Số điện thoại Column -->
+            <ng-container matColumnDef="phone">
+                <th mat-header-cell *matHeaderCellDef>Số điện thoại</th>
+                <td mat-cell *matCellDef="let user">{{ user?.phone_number }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="email">
+                <th mat-header-cell *matHeaderCellDef>Email</th>
+                <td mat-cell *matCellDef="let user">{{ user?.email }}</td>
+            </ng-container>
+
+            <!-- Địa chỉ Column -->
+            <ng-container matColumnDef="address">
+                <th mat-header-cell *matHeaderCellDef>Địa chỉ</th>
+                <td mat-cell *matCellDef="let user">{{ user?.address }}</td>
+            </ng-container>
+
+            <!-- Ngày sinh Column -->
+            <ng-container matColumnDef="dateOfBirth">
+                <th mat-header-cell *matHeaderCellDef>Ngày sinh</th>
+                <td mat-cell *matCellDef="let user">
+                    {{ user?.date_of_birth ? (user.date_of_birth | date: 'dd/MM/yyyy') : '' }}
+                </td>
+
+            </ng-container>
+
+            <!-- Trạng thái Column -->
+            <ng-container matColumnDef="status">
+                <th mat-header-cell *matHeaderCellDef>Trạng thái</th>
+                <td mat-cell *matCellDef="let user">
+                    <div class="status-container" (click)="changeActiveStatus(user)" style="cursor: pointer;">
+                        <span [class]="user?.is_active ? 'status-active' : 'status-inactive'"
+                            [matTooltip]="user?.is_active ? 'Đang hoạt động - Click để vô hiệu hóa' : 'Đang vô hiệu hóa - Click để kích hoạt'"
+                            aria-label="Toggle user status" style="cursor: pointer;">
+                            {{ user?.is_active ? '🔓' : '🔒' }}
+                        </span>
+                    </div>
+                </td>
+            </ng-container>
+
+            <!-- Vai trò Column -->
+            <ng-container matColumnDef="role">
+                <th mat-header-cell *matHeaderCellDef>Vai trò</th>
+                <td mat-cell *matCellDef="let user">
+                    <mat-select [value]="user?.role?.id" (selectionChange)="onCategoryChange(user.id, $event)"
+                        placeholder="Chọn vai trò">
+                        <mat-option *ngFor="let option of userOptions" [value]="option.value">
+                            {{ option.label }}
+                        </mat-option>
+                    </mat-select>
+                </td>
+            </ng-container>
+
+            <!-- Actions Column -->
+            <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef>Thao tác</th>
+                <td mat-cell *matCellDef="let user">
+                    <div class="action-buttons">
+                        <button mat-raised-button color="primary" (click)="editUser(user)" class="edit-button1">
+                            <!-- <mat-icon>edit</mat-icon> -->
+                            Sửa
+                        </button>
+                        <button mat-raised-button color="warn" (click)="confirmDelete(user.id)" class="delete-button">
+                            <!-- <mat-icon>delete</mat-icon> -->
+                            Xóa
+                        </button>
+                    </div>
+                </td>
+            </ng-container>
+
+            <!-- Header and Row Declarations -->
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+
+        <!-- Nếu không có dữ liệu -->
+        @if (filteredUsers.length === 0) {
+        <div class="no-data">
+            <mat-icon>person_off</mat-icon>
+            <p>Không có người dùng nào</p>
+        </div>
+        }
+    </div>
+    }
+
+    <!-- Edit User Dialog -->
+    @if (showEditDialog) {
+    <div class="dialog-overlay" (click)="closeEditDialog()">
+        <div class="edit-dialog" (click)="$event.stopPropagation()">
+            <div class="dialog-header">
+                <h2>Chỉnh sửa thông tin người dùng</h2>
+                <button mat-icon-button (click)="closeEditDialog()" class="close-button">
+                    <mat-icon>close</mat-icon>
+                </button>
             </div>
+
+            <div class="dialog-content">
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Họ tên</mat-label>
+                    <input matInput [(ngModel)]="editingUser.fullname" placeholder="Nhập họ tên">
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Số điện thoại</mat-label>
+                    <input matInput [(ngModel)]="editingUser.phone_number" placeholder="Nhập số điện thoại">
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Địa chỉ</mat-label>
+                    <textarea matInput [(ngModel)]="editingUser.address" placeholder="Nhập địa chỉ" rows="3"></textarea>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Email</mat-label>
+                    <textarea matInput [(ngModel)]="editingUser.email" placeholder="Nhập email" rows="3"></textarea>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Ngày sinh</mat-label>
+                    <input matInput [matDatepicker]="picker" [(ngModel)]="editingUser.date_of_birth">
+                    <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                    <mat-datepicker #picker></mat-datepicker>
+                </mat-form-field>
+                \
+            </div>
+
+            <div class="dialog-actions">
+                <button mat-button (click)="closeEditDialog()" class="cancel-button">
+                    Hủy
+                </button>
+                <button mat-raised-button color="primary" (click)="saveUser()" class="save-button">
+                    <mat-icon>save</mat-icon>
+                    Lưu thay đổi
+                </button>
+            </div>
+        </div>
+    </div>
+    }
+
+    <!-- Add User Dialog -->
+    @if (showAddDialog) {
+    <div class="dialog-overlay" (click)="closeAddDialog()">
+        <div class="edit-dialog" (click)="$event.stopPropagation()">
+            <div class="dialog-header">
+                <h2>Thêm người dùng</h2>
+                <button mat-icon-button (click)="closeAddDialog()" class="close-button">
+                    <mat-icon>close</mat-icon>
+                </button>
+            </div>
+
+            <div class="dialog-content">
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Họ tên</mat-label>
+                    <input matInput [(ngModel)]="addUser.fullname" placeholder="Nhập họ tên">
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Số điện thoại</mat-label>
+                    <input matInput [(ngModel)]="addUser.phone_number" placeholder="Nhập số điện thoại">
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Email</mat-label>
+                    <input matInput [(ngModel)]="addUser.email" placeholder="Nhập họ Email">
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Mật khẩu</mat-label>
+                    <input type="password" matInput [(ngModel)]="addUser.password" placeholder="Nhập mật khẩu"
+                        required />
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Địa chỉ</mat-label>
+                    <textarea matInput [(ngModel)]="addUser.address" placeholder="Nhập địa chỉ" rows="3"></textarea>
+                </mat-form-field>
+
+
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Ngày sinh</mat-label>
+                    <input matInput [matDatepicker]="picker" [(ngModel)]="addUser.date_of_birth">
+                    <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                    <mat-datepicker #picker></mat-datepicker>
+                </mat-form-field>
+            </div>
+
+            <div class="dialog-actions">
+                <button mat-button (click)="closeAddDialog()" class="cancel-button">
+                    Hủy
+                </button>
+                <button mat-raised-button color="primary" (click)="addUserF()" class="save-button">
+                    <mat-icon>save</mat-icon>
+                    Lưu thay đổi
+                </button>
+            </div>
+        </div>
+    </div>
+    }
+</div>
+
+<style>
+    .user-manage-admin {
+        padding: 20px;
+    }
+
+    .mat-table {
+        width: 100%;
+    }
+
+    .mat-header-cell {
+        font-weight: bold;
+        color: #333;
+    }
+
+    .mat-cell {
+        padding: 12px 8px;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+    }
+
+    .edit-button1,
+    .delete-button {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-width: auto;
+        padding: 8px 16px;
+    }
+
+    .edit-button1 mat-icon,
+    .delete-button mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+    }
+
+    .status-active {
+        font-size: 16px;
+        color: #4caf50;
+    }
+
+    .status-inactive {
+        font-size: 16px;
+        color: #f44336;
+    }
+
+    .no-data {
+        text-align: center;
+        padding: 40px;
+        color: #666;
+    }
+
+    .no-data mat-icon {
+        font-size: 48px;
+        width: 48px;
+        height: 48px;
+        margin-bottom: 16px;
+    }
+
+    .mat-elevation-z8 {
+        margin: 20px 0;
+    }
+
+    mat-select {
+        width: 150px;
+    }
+
+    /* Edit Dialog Styles */
+    .dialog-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+    }
+
+    .edit-dialog {
+        background: white;
+        border-radius: 8px;
+        width: 90%;
+        max-width: 500px;
+        max-height: 90vh;
+        overflow-y: auto;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .dialog-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px 24px 16px;
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+    .dialog-header h2 {
+        margin: 0;
+        color: #333;
+        font-size: 20px;
+        font-weight: 500;
+    }
+
+    .close-button {
+        color: #666;
+    }
+
+    .dialog-content {
+        padding: 24px;
+    }
+
+    .full-width {
+        width: 100%;
+        margin-bottom: 16px;
+    }
+
+    .status-field {
+        margin: 16px 0;
+    }
+
+    .dialog-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        padding: 16px 24px 24px;
+        border-top: 1px solid #e0e0e0;
+    }
+
+    .cancel-button {
+        color: #666;
+    }
+
+    .save-button {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .save-button mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .action-buttons {
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .edit-button1,
+        .delete-button {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .edit-dialog {
+            width: 95%;
+            margin: 20px;
         }
     }
-    
-</div>
+
+    .add-user-button {
+        margin-bottom: 16px;
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .search-bar {
+        margin-bottom: 16px;
+        max-width: 300px;
+    }
+</style>
