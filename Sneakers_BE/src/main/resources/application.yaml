@@ -22,6 +22,14 @@ spring:
     basename: i18n/messages
     encoding: UTF-8
     default-locate: en
+  google:
+    ai:
+      project-id: thermal-micron-435515-i8 # Replace with your Google Cloud project ID
+      location: us-central1
+      model: gemini-2.0-flash-001
+  autoconfigure:
+    exclude:
+      - org.springframework.ai.autoconfigure.vectorstore.chroma.ChromaVectorStoreAutoConfiguration
 api:
   prefix: api/v1
 jwt:
@@ -29,3 +37,14 @@ jwt:
   secretKey: U0roD0fdqXHh6yEzmYciXkhmHlFsS7v2Xa3bLVPsyLQ=
 
 logging.level.org.springframework.security: DEBUG
+
+# Chroma Vector Database Configuration
+chroma:
+  collection:
+    name: sneakers-collection
+  base:
+    url: ${CHROMA_BASE_URL:http://localhost:8000}
+
+# AI Features Configuration
+ai:
+  enabled: true # Set to true when Google Cloud is configured

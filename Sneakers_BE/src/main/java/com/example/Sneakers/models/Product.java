@@ -12,20 +12,20 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Product extends BaseEntity{
+public class Product extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "name",nullable = false,length = 350)
+    @Column(name = "name", nullable = false, length = 350)
     private String name;
 
     private Long price;
 
-    @Column(name = "thumbnail",length = 300)
+    @Column(name = "thumbnail", length = 300)
     private String thumbnail;
 
-    @Column(name = "description",nullable = false)
+    @Column(name = "description", nullable = false)
     private String description;
 
     @ManyToOne
