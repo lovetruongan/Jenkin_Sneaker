@@ -347,17 +347,17 @@ INSERT INTO `users` (`id`, `fullname`, `phone_number`, `address`, `password`, `c
 (4, 'Nguyễn Văn A', '0197252343', 'Thái Nguyên', '$2a$10$EaQ4vkmvqt.cTdgfq7WLN.wyhDnD3iEm4CNKWK75pQLImwFod1Flm', '2024-02-23 10:45:57', '2024-02-23 10:45:57', 1, '2006-02-23', 0, 0, 1, 'nguyen.van.a@gmail.com'),
 (5, 'Đỗ Tùng Lâm', '0456123789', 'Thái Nguyên', '$2a$10$Q2vfr2lGKvN2u8VzfaZeJurW0AiKdhm3xTzKeNu7XoYEqzqQUk8l2', '2024-02-23 15:02:28', '2024-02-23 15:02:28', 1, '2006-02-23', 0, 0, 1, 'do.tung.lam@gmail.com'),
 (6, 'Hà Quang Dương', '0967854321', 'Thái Nguyên', '$2a$10$yah7HFxQ652PAOaxXOXHfulu4ML1PidYvYAa8.m..pLIO/SiK4nti', '2024-02-23 15:59:41', '2024-02-23 15:59:41', 1, '2005-02-23', 0, 0, 1, 'ha.quang.duong@gmail.com'),
-(7, 'Hà Quang Dương', '0967854321', 'Thái Nguyên', '$2a$10$cHyGqlu9q5VHC0zNTsDXmu/jFiT.ZmK3Rz1jwKL785mja7/irc2fS', '2024-02-23 16:35:24', '2024-02-23 16:35:24', 1, '2005-02-23', 0, 0, 1, 'ha.quang.duong@gmail.com'),
+(7, 'Hà Quang Dương', '0967854321', 'Thái Nguyên', '$2a$10$cHyGqlu9q5VHC0zNTsDXmu/jFiT.ZmK3Rz1jwKL785mja7/irc2fS', '2024-02-23 16:35:24', '2024-02-23 16:35:24', 1, '2005-02-23', 0, 0, 1, 'ha.quang.duong2@gmail.com'),
 (8, 'Long ăn cứt', '0678123459', 'Hà Nội', '$2a$10$aWgT6VW6M/hU4Lnreu6f7.v8UyvuRWU0Z7t/DU2Is541rGzFwSIpG', '2024-02-24 07:46:00', '2024-02-24 07:46:00', 1, '2005-02-24', 0, 0, 1, 'long.an.cut@gmail.com'),
-(9, 'Long ăn cứt', '0678123459', 'Hà Nội', '$2a$10$xCyTUzu/7myRDS/Aa67s/uA6nYF3UdfMD/vrwASyPMzvBscBOcRP6', '2024-02-24 07:46:00', '2024-02-24 07:46:00', 1, '2005-02-24', 0, 0, 1, 'long.an.cut@gmail.com'),
-(10, 'Long ăn cứt', '0678123459', 'Hà Nội', '$2a$10$GI9/NYptwgzaSzkZH5LaaueSZLbga0WbbST8smzca/ufe.n0yqv7C', '2024-02-24 07:46:00', '2024-02-24 07:46:00', 1, '2005-02-24', 0, 0, 1, 'long.an.cut@gmail.com'),
-(11, 'Long ăn cứt', '0678123459', 'Hà Nội', '$2a$10$DJesTEN3ThvfZjl4tvmBbeIE8vAHIj0Hus5/L8A163CiNeXkDHR0m', '2024-02-24 07:46:00', '2024-02-24 07:46:00', 1, '2005-02-24', 0, 0, 1, 'long.an.cut@gmail.com'),
+(9, 'Long ăn cứt', '0678123459', 'Hà Nội', '$2a$10$xCyTUzu/7myRDS/Aa67s/uA6nYF3UdfMD/vrwASyPMzvBscBOcRP6', '2024-02-24 07:46:00', '2024-02-24 07:46:00', 1, '2005-02-24', 0, 0, 1, 'long.an.cut2@gmail.com'),
+(10, 'Long ăn cứt', '0678123459', 'Hà Nội', '$2a$10$GI9/NYptwgzaSzkZH5LaaueSZLbga0WbbST8smzca/ufe.n0yqv7C', '2024-02-24 07:46:00', '2024-02-24 07:46:00', 1, '2005-02-24', 0, 0, 1, 'long.an.cut3@gmail.com'),
+(11, 'Long ăn cứt', '0678123459', 'Hà Nội', '$2a$10$DJesTEN3ThvfZjl4tvmBbeIE8vAHIj0Hus5/L8A163CiNeXkDHR0m', '2024-02-24 07:46:00', '2024-02-24 07:46:00', 1, '2005-02-24', 0, 0, 1, 'long.an.cut4@gmail.com'),
 (12, 'Nguyễn Phương Mai', '0865211203', 'Hà Nội', '$2a$10$ihJRuUH5BsZ0PJ1LPqUMCuXFI0u4QFMkN5byGadeKOguCyjgdzNOW', '2024-02-25 15:36:49', '2024-02-25 15:36:49', 1, '2005-02-25', 0, 0, 1, 'nguyen.phuong.mai@gmail.com'),
 (13, 'Nguyễn Vũ Bảo Long', '0113355779', 'Hà Nội', '$2a$10$0p4m7/W1QVDZG2ui5aPytujxppt4xK2C8S.OMJKlurjovveRvnzqm', '2024-03-19 10:09:29', '2024-03-23 08:41:48', 1, '2003-09-13', 0, 0, 1, 'nguyen.vu.bao.long@gmail.com'),
-(14, 'Trần Đức Anh', '0865247234', 'Hà Nội', '$2a$10$yjh/pZGtFpeyfaPSCb0IceZfG8sIS3H.7OmmV.dQq7GQ3WefLFADO', '2024-03-21 06:43:07', '2024-03-21 06:43:07', 1, '2003-11-21', 0, 0, 1, 'tran.duc.anh@gmail.com'),
-(15, 'Hà Quang Dương', '0911725756', 'Thái Nguyên', '$2a$10$PPWS5r60c0pvkeWlVSeGlucfqBnJwtHQ7/FBgeRKx05ixVmg6fhlC', '2024-03-28 15:55:14', '2024-03-28 15:55:14', 1, '2003-03-20', 0, 0, 1, 'ha.quang.duong@gmail.com'),
+(14, 'Trần Đức Anh', '0865247234', 'Hà Nội', '$2a$10$yjh/pZGtFpeyfaPSCb0IceZfG8sIS3H.7OmmV.dQq7GQ3WefLFADO', '2024-03-21 06:43:07', '2024-03-21 06:43:07', 1, '2003-11-21', 0, 0, 1, 'tran.duc.anh2@gmail.com'),
+(15, 'Hà Quang Dương', '0911725756', 'Thái Nguyên', '$2a$10$PPWS5r60c0pvkeWlVSeGlucfqBnJwtHQ7/FBgeRKx05ixVmg6fhlC', '2024-03-28 15:55:14', '2024-03-28 15:55:14', 1, '2003-03-20', 0, 0, 1, 'ha.quang.duong3@gmail.com'),
 (16, 'Hoàng Ngọc Hà', '0911123456', 'Hà Nội', '$2a$10$wzTu2DbgN6MLTrcDdDkQE.jqiIl4ySdr/RZzEEKDlyxkqI6DihlLi', '2024-03-28 15:56:02', '2024-03-28 15:56:02', 1, '2003-10-15', 0, 0, 1, 'hoang.ngoc.ha@gmail.com'),
-(17, 'Trần Đức Anh', '0123786457', 'Hà Nội', '$2a$10$J4/bvTOHxOT2DiAg.ga81.vvoFdrSKbNuQ20lFaoOQI4zLHAfl7IO', '2024-03-28 16:09:07', '2024-03-28 16:09:07', 1, '2003-11-21', 0, 0, 1, 'tran.duc.anh@gmail.com');
+(17, 'Trần Đức Anh', '0123786457', 'Hà Nội', '$2a$10$J4/bvTOHxOT2DiAg.ga81.vvoFdrSKbNuQ20lFaoOQI4zLHAfl7IO', '2024-03-28 16:09:07', '2024-03-28 16:09:07', 1, '2003-11-21', 0, 0, 1, 'tran.duc.anh3@gmail.com');
 
 
 
