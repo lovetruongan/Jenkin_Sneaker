@@ -131,6 +131,21 @@ export class HomeComponent extends BaseComponent implements OnInit {
   }
 
   navigateToDetail(productId: number) {
-    this.router.navigateByUrl(`/detailProduct/${productId}`);
+    this.router.navigate(['/detailProduct', productId]);
+  }
+
+  getProductImageUrl(product: ProductDto): string {
+    // If product has a thumbnail, use it
+    if (product.thumbnail && product.thumbnail.trim() !== '') {
+      return product.thumbnail.startsWith('assets/') ? product.thumbnail : (this.apiImage + product.thumbnail);
+    }
+    
+    // If no thumbnail but has product_images, use the first one
+    if (product.product_images && product.product_images.length > 0) {
+      return this.apiImage + product.product_images[0].image_url;
+    }
+    
+    // Default image if no images available
+    return this.apiImage + 'notfound.jpg';
   }
 }

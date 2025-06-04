@@ -13,17 +13,32 @@ import java.util.List;
 
 public interface IProductService {
     Product createProduct(ProductDTO productDTO) throws Exception;
+
     Product getProductById(Long productId) throws Exception;
+
     Page<ProductResponse> getAllProducts(String keyword, Long categoryId, PageRequest pageRequest);
+
     List<Product> allProducts();
-    Product updateProduct(Long id,ProductDTO productDTO) throws Exception;
+
+    Product updateProduct(Long id, ProductDTO productDTO) throws Exception;
+
     void deleteProduct(Long id);
+
     boolean existsByName(String name);
+
     ProductImage createProductImage(Long productId, ProductImageDTO productImageDTO) throws Exception;
+
     List<Product> findProductsByIds(List<Long> productIds);
+
     long totalProducts();
+
     ListProductResponse getProductsByPrice(Long minPrice, Long maxPrice);
+
     ListProductResponse getProductsByKeyword(String keyword);
+
     ListProductResponse getProductsByCategory(Long categoryId);
+
     ListProductResponse getRelatedProducts(Long productId) throws Exception;
+
+    void updateProductThumbnail(Long productId, String thumbnailUrl) throws Exception;
 }

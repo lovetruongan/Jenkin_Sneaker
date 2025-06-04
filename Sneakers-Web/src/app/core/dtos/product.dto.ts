@@ -8,6 +8,6 @@ export interface ProductDto {
     category_id: number | null,
     product_images: {
         id: number;
-        imageUrl: string;
+        image_url: string;
     }[],
 }

@@ -60,7 +60,7 @@ export class DetailProductComponent extends BaseComponent implements OnInit,Afte
   private id !: string ;
   public mainProduct !: ProductDto;
   public responsiveOptions : any[] = [];
-  public images : {id : number,imageUrl : string}[] = [];
+  public images : {id : number, image_url : string}[] = [];
   public relatedProducts: ProductDto[] = [];
   public quantity : number = 1;
   public sizes : number[] = [36,37,38,39,40,41,42,43,44];

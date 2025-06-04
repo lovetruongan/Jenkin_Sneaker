@@ -86,7 +86,7 @@
                 <div (click)="navigateToDetail(item.id)" class="product-item">
                   <div class="row g-0 align-items-center">
                     <div class="col-4">
-                      <img [src]="apiImage + item.thumbnail" alt="{{item.name}}" class="img-fluid">
+                      <img [src]="getProductImageUrl(item)" alt="{{item.name}}" class="img-fluid">
                     </div>
                     <div class="col-8 ps-3">
                       <h6 class="product-name">{{item.name}}</h6>
@@ -125,7 +125,7 @@
                         @if(item.discount > 0){
                           <p-badge [value]="-item.discount + '%'" severity="danger"></p-badge>
                         }
-                        <img [src]="apiImage + item.thumbnail" [alt]="item.name" class="img-fluid">
+                        <img [src]="getProductImageUrl(item)" [alt]="item.name" class="img-fluid">
                       </div>
                       <div class="product-info">
                         <h3 class="product-name" (click)="navigateToDetail(item.id)">{{item.name}}</h3>

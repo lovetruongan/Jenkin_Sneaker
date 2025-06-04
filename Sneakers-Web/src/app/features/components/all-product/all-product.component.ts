@@ -216,4 +216,19 @@ export class AllProductComponent extends BaseComponent implements OnInit, AfterV
       })
     ).subscribe();
   }
+
+  getProductImageUrl(product: ProductDto): string {
+    // If product has a thumbnail, use it
+    if (product.thumbnail && product.thumbnail.trim() !== '') {
+      return this.apiImage + product.thumbnail;
+    }
+    
+    // If no thumbnail but has product_images, use the first one
+    if (product.product_images && product.product_images.length > 0) {
+      return this.apiImage + product.product_images[0].image_url;
+    }
+    
+    // Default image if no images available
+    return this.apiImage + 'notfound.jpg';
+  }
 }
