@@ -22,14 +22,17 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             nativeQuery = true)
     Page<Order> findByKeyword(@Param("keyword") String keyword, Pageable pageable);
     
-    @Query(value = "SELECT COALESCE(SUM(o.total_money), 0) FROM orders o WHERE o.order_date = :date AND o.total_money > 0",
+    @Query(value = "SELECT COALESCE(SUM(o.total_money - COALESCE(o.discount_amount, 0)), 0) " +
+           "FROM orders o " +
+           "WHERE DATE(o.order_date) = :date " +
+           "AND o.status IN ('pending', 'shipped', 'delivered') AND o.active = true",
             nativeQuery = true)
     Double getDailyRevenue(@Param("date") LocalDate date);
 
-    @Query(value = "SELECT o.order_date, COALESCE(SUM(o.total_money), 0) " +
+    @Query(value = "SELECT o.order_date, COALESCE(SUM(o.total_money - COALESCE(o.discount_amount, 0)), 0) " +
            "FROM orders o " +
            "WHERE o.order_date BETWEEN :startDate AND :endDate " +
-           "AND o.total_money > 0 " +
+           "AND o.status IN ('pending', 'shipped', 'delivered') AND o.active = true " +
            "GROUP BY o.order_date " +
            "ORDER BY o.order_date",
            nativeQuery = true)
@@ -37,10 +40,11 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate);
 
-    @Query(value = "SELECT YEAR(o.order_date), MONTH(o.order_date), COALESCE(SUM(o.total_money), 0) " +
+    @Query(value = "SELECT YEAR(o.order_date), MONTH(o.order_date), " +
+           "COALESCE(SUM(o.total_money - COALESCE(o.discount_amount, 0)), 0) " +
            "FROM orders o " +
            "WHERE o.order_date BETWEEN :startDate AND :endDate " +
-           "AND o.total_money > 0 " +
+           "AND o.status IN ('pending', 'shipped', 'delivered') AND o.active = true " +
            "GROUP BY YEAR(o.order_date), MONTH(o.order_date) " +
            "ORDER BY YEAR(o.order_date), MONTH(o.order_date)",
            nativeQuery = true)
@@ -48,10 +52,11 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate);
 
-    @Query(value = "SELECT YEAR(o.order_date), COALESCE(SUM(o.total_money), 0) " +
+    @Query(value = "SELECT YEAR(o.order_date), " +
+           "COALESCE(SUM(o.total_money - COALESCE(o.discount_amount, 0)), 0) " +
            "FROM orders o " +
            "WHERE YEAR(o.order_date) BETWEEN :startYear AND :endYear " +
-           "AND o.total_money > 0 " +
+           "AND o.status IN ('pending', 'shipped', 'delivered') AND o.active = true " +
            "GROUP BY YEAR(o.order_date) " +
            "ORDER BY YEAR(o.order_date)",
            nativeQuery = true)
@@ -60,12 +65,14 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             @Param("endYear") int endYear);
 
     // Đếm số đơn hàng trong ngày
-    @Query(value = "SELECT COUNT(*) FROM orders WHERE DATE(order_date) = CURRENT_DATE",
+    @Query(value = "SELECT COUNT(*) FROM orders WHERE DATE(order_date) = CURRENT_DATE " +
+           "AND status IN ('pending', 'shipped', 'delivered') AND active = true",
            nativeQuery = true)
     Long countOrdersToday();
 
     // Tính tổng doanh thu từ các đơn hàng đã hoàn thành
-    @Query(value = "SELECT COALESCE(SUM(total_money), 0) FROM orders WHERE status IN ('COMPLETED', 'delivered')",
+    @Query(value = "SELECT COALESCE(SUM(total_money - COALESCE(discount_amount, 0)), 0) " +
+           "FROM orders WHERE status IN ('pending', 'shipped', 'delivered') AND active = true",
            nativeQuery = true)
     Long calculateTotalRevenue();
 
@@ -73,7 +80,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     @Query(value = "SELECT COALESCE(SUM(od.number_of_products), 0) " +
            "FROM orders o " +
            "JOIN order_details od ON o.id = od.order_id " +
-           "WHERE o.status IN ('COMPLETED', 'delivered')",
+           "WHERE o.status IN ('pending', 'shipped', 'delivered') AND o.active = true",
            nativeQuery = true)
     Long countTotalProductsSold();
 }

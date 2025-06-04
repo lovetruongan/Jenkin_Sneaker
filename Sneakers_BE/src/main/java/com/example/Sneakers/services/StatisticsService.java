@@ -188,7 +188,6 @@ public class StatisticsService {
                             obj[3] != null ? ((Number) obj[3]).doubleValue() : 0.0
                         );
                     } catch (Exception e) {
-                        // Log error and return default DTO
                         System.err.println("Error mapping brand statistics: " + e.getMessage());
                         return new BrandSoldStatisticsDTO(0L, "Error", 0L, 0.0);
                     }
@@ -231,8 +230,6 @@ public class StatisticsService {
     }
 
     public Long getOrdersToday() {
-        // Đếm số đơn hàng trong ngày
-        Long todayOrders = orderRepository.countOrdersToday();
-        return todayOrders;
+        return orderRepository.countOrdersToday();
     }
 } 
