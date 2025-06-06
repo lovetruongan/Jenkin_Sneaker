@@ -89,7 +89,7 @@ export class HomeComponent extends BaseComponent implements OnInit {
     ).subscribe();
   }
 
-  navigateToDetail(id: number) {
+  navigateToDetail(id: number): void {
     this.router.navigate(['/detailProduct', id]);
   }
 
