@@ -41,7 +41,6 @@ interface OrderHistoryResponse {
 })
 export class OrderHistoryService {
   private readonly apiUrl = environment.apiUrl;
-  private token: string | null = null;
   private readonly isBrowser: boolean;
 
   constructor(
@@ -49,24 +48,35 @@ export class OrderHistoryService {
     @Inject(PLATFORM_ID) platformId: Object
   ) {
     this.isBrowser = isPlatformBrowser(platformId);
-    if (this.isBrowser) {
-      this.updateToken();
-    }
-  }
-
-  private updateToken() {
-    if (this.isBrowser) {
-      this.token = localStorage.getItem('token');
-    }
   }
 
   private getHeaders(): HttpHeaders {
-    this.updateToken();
-    return new HttpHeaders().set('Authorization', `Bearer ${this.token}`);
+    if (!this.isBrowser) {
+      return new HttpHeaders({
+        'Content-Type': 'application/json'
+      });
+    }
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+      return new HttpHeaders({
+        'Content-Type': 'application/json'
+      });
+    }
+
+    return new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    });
   }
 
   getUserOrderHistory(): Observable<OrderHistoryItem[]> {
-    if (!this.isBrowser || !this.token) {
+    if (!this.isBrowser) {
+      return of([]);
+    }
+
+    const token = localStorage.getItem('token');
+    if (!token) {
       return of([]);
     }
 

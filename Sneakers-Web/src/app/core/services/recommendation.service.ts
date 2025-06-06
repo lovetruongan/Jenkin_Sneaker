@@ -2,10 +2,11 @@ import { Injectable, PLATFORM_ID, Inject } from '@angular/core';
 import { ProductDto } from '../dtos/product.dto';
 import { UserService } from './user.service';
 import { ProductService } from './product.service';
-import { Observable, map, of, switchMap, tap, forkJoin } from 'rxjs';
+import { Observable, map, of, switchMap, tap, forkJoin, catchError } from 'rxjs';
 import { LoggingService, RecommendationLog } from './logging.service';
 import { isPlatformBrowser } from '@angular/common';
 import { OrderHistoryService, OrderHistoryItem } from './order-history.service';
+import { HttpHeaders } from '@angular/common/http';
 
 interface ScoredProduct {
   product: ProductDto;
@@ -51,6 +52,26 @@ export class RecommendationService {
     this.isBrowser = isPlatformBrowser(platformId);
   }
 
+  private getHeaders(): HttpHeaders {
+    if (!this.isBrowser) {
+      return new HttpHeaders({
+        'Content-Type': 'application/json'
+      });
+    }
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+      return new HttpHeaders({
+        'Content-Type': 'application/json'
+      });
+    }
+
+    return new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    });
+  }
+
   // Get recommended products for the current user
   getRecommendedProducts(count: number = 8): Observable<ProductDto[]> {
     if (!this.isBrowser) {
@@ -71,7 +92,9 @@ export class RecommendationService {
 
         return forkJoin({
           products: this.productService.getAllProduct(),
-          orderHistory: this.orderHistoryService.getUserOrderHistory()
+          orderHistory: this.orderHistoryService.getUserOrderHistory().pipe(
+            catchError(() => of([]))  // Return empty array if order history fails
+          )
         }).pipe(
           map(({ products, orderHistory }) => {
             const allProducts = products.products || [];
@@ -82,8 +105,12 @@ export class RecommendationService {
             }
 
             // Get user preferences from order history
-            const categoryPreferences = this.orderHistoryService.calculateCategoryPreferences(orderHistory);
-            const pricePreferences = this.orderHistoryService.calculatePriceRangePreference(orderHistory);
+            const categoryPreferences = orderHistory.length > 0 
+              ? this.orderHistoryService.calculateCategoryPreferences(orderHistory)
+              : new Map();
+            const pricePreferences = orderHistory.length > 0
+              ? this.orderHistoryService.calculatePriceRangePreference(orderHistory)
+              : { minPrice: 0, maxPrice: Infinity, avgPrice: 0 };
             const productPreferences = this.calculateProductPreferences(orderHistory);
 
             // Update similarity matrix
@@ -110,7 +137,8 @@ export class RecommendationService {
             return scoredProducts.map(sp => sp.product);
           })
         );
-      })
+      }),
+      catchError(() => this.getDefaultRecommendations(count))
     );
   }
 

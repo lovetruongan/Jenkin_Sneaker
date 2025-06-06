@@ -1,6 +1,6 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable, PLATFORM_ID, Inject } from '@angular/core';
-import { environment } from '../../../environments/environment.development';
+import { environment } from '../../../environments/environment';
 import { loginDetailDto } from '../dtos/login.dto';
 import { loginReq } from '../types/loginReq';
 import { registerReq } from '../types/registerReq';
@@ -13,7 +13,7 @@ import { isPlatformBrowser } from '@angular/common';
   providedIn: 'root'
 })
 export class UserService {
-  private readonly apiUrl: string = environment.apiUrl;
+  private readonly apiUrl = environment.apiUrl;
   private readonly isBrowser: boolean;
 
   constructor(
@@ -23,17 +23,12 @@ export class UserService {
     this.isBrowser = isPlatformBrowser(platformId);
   }
 
-  private getToken(): string | null {
-    if (!this.isBrowser) return null;
-    return localStorage.getItem("token");
-  }
-
-  private getAuthHeaders(token?: string | null): HttpHeaders {
+  private getHeaders(token?: string | null): HttpHeaders {
     const headers = new HttpHeaders({
       'Content-Type': 'application/json'
     });
 
-    const authToken = token || this.getToken();
+    const authToken = token || (this.isBrowser ? localStorage.getItem('token') : null);
     if (authToken) {
       return headers.set('Authorization', `Bearer ${authToken}`);
     }
@@ -42,37 +37,37 @@ export class UserService {
   }
 
   login(loginObject: loginReq) {
-    return this.httpClient.post<loginDetailDto>(`${this.apiUrl}users/login`, loginObject);
+    return this.httpClient.post<loginDetailDto>(`${this.apiUrl}/users/login`, loginObject);
   }
 
   register(registerValue: registerReq) {
-    return this.httpClient.post<registerDto>(`${this.apiUrl}users/register`, registerValue);
+    return this.httpClient.post<registerDto>(`${this.apiUrl}/users/register`, registerValue);
   }
 
   getInforUser(token?: string | null) {
-    return this.httpClient.get<UserDto>(`${this.apiUrl}users/details`, {
-      headers: this.getAuthHeaders(token)
+    return this.httpClient.get<UserDto>(`${this.apiUrl}/users/details`, {
+      headers: this.getHeaders(token)
     });
   }
 
   getAllUser() {
-    return this.httpClient.get<UserDto[]>(`${this.apiUrl}users/getAll`, {
-      headers: this.getAuthHeaders()
+    return this.httpClient.get<UserDto[]>(`${this.apiUrl}/users/getAll`, {
+      headers: this.getHeaders()
     });
   }
 
   deleteUser(id: number) {
-    return this.httpClient.delete<{ users: UserDto[], message: string }>(`${this.apiUrl}users/delete/${id}`, {
-      headers: this.getAuthHeaders()
+    return this.httpClient.delete<{ users: UserDto[], message: string }>(`${this.apiUrl}/users/delete/${id}`, {
+      headers: this.getHeaders()
     });
   }
 
   changeRoleUser(roleId: number, userId: number) {
     return this.httpClient.put<{ users: UserDto[], message: string }>(
-      `${this.apiUrl}users/changeRole/${userId}`, 
-      roleId,
+      `${this.apiUrl}/users/changeRole/${userId}`, 
+      { roleId },
       {
-        headers: this.getAuthHeaders()
+        headers: this.getHeaders()
       }
     );
   }
@@ -81,11 +76,11 @@ export class UserService {
     const params = new HttpParams().set('activeUser', activeUser.toString());
 
     return this.httpClient.put<UserDto>(
-      `${this.apiUrl}users/change-active/${userId}`,
+      `${this.apiUrl}/users/change-active/${userId}`,
       {}, // không có body
       {
         params,
-        headers: this.getAuthHeaders()
+        headers: this.getHeaders()
       }
     );
   }
@@ -101,7 +96,7 @@ export class UserService {
    * @returns Observable containing updated user data
    */
   updateUser(userData: any): Observable<UserDto> {
-    const url = `${this.apiUrl}users/details/${userData.id}`;
+    const url = `${this.apiUrl}/users/details/${userData.id}`;
     
     // Chuẩn bị dữ liệu theo format UpdateUserDTO
     const requestBody = {
@@ -118,7 +113,7 @@ export class UserService {
     };
 
     return this.httpClient.put<UserDto>(url, requestBody, { 
-      headers: this.getAuthHeaders()
+      headers: this.getHeaders()
     });
   }
 }

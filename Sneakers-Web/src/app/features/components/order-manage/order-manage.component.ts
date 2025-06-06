@@ -19,6 +19,7 @@ import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
 import { CardModule } from 'primeng/card';
 import { ConfirmationService } from 'primeng/api';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-order-manage',
@@ -53,20 +54,35 @@ export class OrderManageComponent extends BaseComponent implements OnInit {
   public orderStateOptions: MenuItem[] = [
     { label: 'Đang chờ', value: 'pending' },
     { label: 'Đang xử lý', value: 'processing' },
-    { label: 'Đã được giao', value: 'delivered' },
     { label: 'Đang được giao', value: 'shipped' },
-    { label: 'Đã giao hàng', value: 'success' },
-    { label: 'Đã hủy', value: 'cancelled' },
+    { label: 'Đã được giao', value: 'delivered' },
+    { label: 'Đã hủy', value: 'canceled' }
   ];
 
   constructor(
     private orderService: OrderService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private router: Router
   ) {
     super();
   }
 
   ngOnInit(): void {
+    // Check if user is logged in and has admin role
+    const userInfo = localStorage.getItem('userInfor');
+    if (!userInfo) {
+      this.toastService.fail('Vui lòng đăng nhập để tiếp tục');
+      this.router.navigate(['/login']);
+      return;
+    }
+
+    const user = JSON.parse(userInfo);
+    if (!user.role || user.role.id !== 2) { // 2 is admin role
+      this.toastService.fail('Bạn không có quyền truy cập trang này');
+      this.router.navigate(['/']);
+      return;
+    }
+
     this.loadData();
   }
 
@@ -80,7 +96,8 @@ export class OrderManageComponent extends BaseComponent implements OnInit {
         this.loading = false;
       }),
       catchError(err => {
-        this.toastService.fail(err.error.message);
+        const errorMessage = err?.error?.message || 'Không thể tải danh sách đơn hàng';
+        this.toastService.fail(errorMessage);
         this.loading = false;
         return of(err);
       })
@@ -88,6 +105,21 @@ export class OrderManageComponent extends BaseComponent implements OnInit {
   }
 
   onOrderStateChange(event: any, orderId: number) {
+    // Check if user is still logged in and has admin role
+    const userInfo = localStorage.getItem('userInfor');
+    if (!userInfo) {
+      this.toastService.fail('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại');
+      this.router.navigate(['/login']);
+      return;
+    }
+
+    const user = JSON.parse(userInfo);
+    if (!user.role || user.role.id !== 2) {
+      this.toastService.fail('Bạn không có quyền thực hiện thao tác này');
+      this.router.navigate(['/']);
+      return;
+    }
+
     this.orderService.changeOrderState(event.value, orderId).pipe(
       tap((res: {message: string}) => {
         this.toastService.success(res.message);
@@ -96,7 +128,13 @@ export class OrderManageComponent extends BaseComponent implements OnInit {
         this.loadData();
       }),
       catchError((err) => {
-        this.toastService.fail(err.error.message);
+        if (err.status === 403) {
+          this.toastService.fail('Bạn không có quyền thực hiện thao tác này');
+          this.router.navigate(['/']);
+        } else {
+          const errorMessage = err?.error?.message || 'Không thể cập nhật trạng thái đơn hàng';
+          this.toastService.fail(errorMessage);
+        }
         return of(err);
       })
     ).subscribe();
@@ -112,9 +150,7 @@ export class OrderManageComponent extends BaseComponent implements OnInit {
         return 'Đang được giao';
       case 'delivered':
         return 'Đã được giao';
-      case 'success':
-        return 'Đã giao hàng';
-      case 'cancelled':
+      case 'canceled':
         return 'Đã hủy';
       default:
         return 'Trạng thái';

@@ -1,9 +1,10 @@
+import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { environment } from '../../../environments/environment.development';
+import { environment } from '../../../environments/environment';
 import { OrderDto } from '../dtos/Order.dto';
 import { InfoOrderDto } from '../dtos/InfoOrder.dto';
 import { HistoryOrderDto } from '../dtos/HistoryOrder.dto';
+import { isPlatformBrowser } from '@angular/common';
 
 export interface DashboardStatsDTO {
   totalRevenue: number;
@@ -15,67 +16,81 @@ export interface DashboardStatsDTO {
   providedIn: 'root'
 })
 export class OrderService {
-  private apiUrl: string = environment.apiUrl;
-  private token: string | null = null;
-  
-  constructor(
-    private httpClient: HttpClient
-  ) {
-    this.updateToken();
-  }
+  private readonly apiUrl = environment.apiUrl;
+  private readonly isBrowser: boolean;
 
-  private updateToken() {
-    if (typeof localStorage !== 'undefined') {
-      this.token = localStorage.getItem('token');
-    }
+  constructor(
+    private httpClient: HttpClient,
+    @Inject(PLATFORM_ID) platformId: Object
+  ) {
+    this.isBrowser = isPlatformBrowser(platformId);
   }
 
   private getHeaders(): HttpHeaders {
-    this.updateToken();
+    if (!this.isBrowser) {
+      return new HttpHeaders({
+        'Content-Type': 'application/json'
+      });
+    }
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+      return new HttpHeaders({
+        'Content-Type': 'application/json'
+      });
+    }
+
     return new HttpHeaders({
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${this.token}`
+      'Authorization': `Bearer ${token}`
     });
   }
 
   postOrder(orderInfo: OrderDto) {
-    return this.httpClient.post(`${this.apiUrl}orders`, orderInfo, {
+    return this.httpClient.post(`${this.apiUrl}/orders`, orderInfo, {
       headers: this.getHeaders()
     });
   }
 
   getOrderInfor(id: number) {
-    return this.httpClient.get<InfoOrderDto>(`${this.apiUrl}orders/user/${id}`, {
+    return this.httpClient.get<InfoOrderDto>(`${this.apiUrl}/orders/user/${id}`, {
       headers: this.getHeaders()
     });
   }
 
   getHistoryOrder() {
-    return this.httpClient.get<HistoryOrderDto[]>(`${this.apiUrl}orders/user`, {
+    return this.httpClient.get<HistoryOrderDto[]>(`${this.apiUrl}/orders/user`, {
       headers: this.getHeaders()
     });
   }
 
   getAllOrders() {
-    return this.httpClient.get<HistoryOrderDto[]>(`${this.apiUrl}orders/admin`, {
+    return this.httpClient.get<HistoryOrderDto[]>(`${this.apiUrl}/orders/admin`, {
       headers: this.getHeaders()
     });
   }
 
   changeOrderState(state: string, orderId: number) {
-    return this.httpClient.put<{message: string}>(`${this.apiUrl}orders/update/${orderId}`, JSON.stringify(state), {
-      headers: this.getHeaders()
-    });
+    const statusDto = {
+      status: state
+    };
+    return this.httpClient.put<{message: string}>(
+      `${this.apiUrl}/orders/update/${orderId}`, 
+      statusDto,
+      {
+        headers: this.getHeaders()
+      }
+    );
   }
 
   getTotalRevenue() {
-    return this.httpClient.get<number>(`${this.apiUrl}orders/revenue`, {
+    return this.httpClient.get<number>(`${this.apiUrl}/orders/revenue`, {
       headers: this.getHeaders()
     });
   }
 
   getDashboardStats() {
-    return this.httpClient.get<DashboardStatsDTO>(`${this.apiUrl}orders/dashboard-stats`, {
+    return this.httpClient.get<DashboardStatsDTO>(`${this.apiUrl}/orders/dashboard-stats`, {
       headers: this.getHeaders()
     });
   }
