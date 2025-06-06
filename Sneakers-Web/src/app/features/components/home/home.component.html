@@ -48,6 +48,42 @@
       </div>
     </section>
 
+    <!-- Recommended Products Section -->
+    <section class="recommended-products py-5">
+      <div class="container">
+        <div class="row text-center mb-5">
+          <div class="col-12">
+            <h2 class="section-title">Gợi Ý Cho Bạn</h2>
+            <p class="section-subtitle">Dựa trên sở thích và lịch sử mua sắm của bạn</p>
+          </div>
+        </div>
+        <div class="row g-4">
+          @for(product of recommendedProducts; track product){
+            <div class="col-lg-3 col-md-6">
+              <div class="product-card-recommended" (click)="navigateToDetail(product.id)">
+                <div class="product-image">
+                  <img [src]="getProductImageUrl(product)" [alt]="product.name" class="img-fluid">
+                  @if(product.discount > 0) {
+                    <span class="discount-badge">-{{product.discount}}%</span>
+                  }
+                </div>
+                <div class="product-info">
+                  <h5 class="product-title">{{product.name}}</h5>
+                  <div class="product-price">
+                    <span class="current-price">{{product.price | currency:'VND':'symbol':'1.0-0'}}</span>
+                    @if(product.discount > 0) {
+                      <span class="original-price">{{product.price / (1-product.discount/100) | currency:'VND':'symbol':'1.0-0'}}</span>
+                    }
+                  </div>
+                  <button class="btn btn-primary btn-sm mt-2">Xem Chi Tiết</button>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </section>
+
     <!-- Categories Section -->
     <section class="categories-section py-5">
       <div class="container">

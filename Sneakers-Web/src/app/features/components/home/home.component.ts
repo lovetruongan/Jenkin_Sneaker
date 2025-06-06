@@ -9,6 +9,7 @@ import { environment } from '../../../../environments/environment.development';
 import { CurrencyPipe } from '@angular/common';
 import { BadgeModule } from 'primeng/badge';
 import { Router, RouterModule } from '@angular/router';
+import { RecommendationService } from '../../../core/services/recommendation.service';
 
 @Component({
   selector: 'app-home',
@@ -27,10 +28,12 @@ export class HomeComponent extends BaseComponent implements OnInit {
   public productsHighlight: ProductDto[] = [];
   public productNewest: ProductDto[] = [];
   public productsDiscount: ProductDto[] = [];
+  public recommendedProducts: ProductDto[] = [];
   public apiImage: string = environment.apiImage;
 
   constructor(
     private productService: ProductService,
+    private recommendationService: RecommendationService,
     private router: Router
   ) {
     super();
@@ -38,6 +41,7 @@ export class HomeComponent extends BaseComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadProducts();
+    this.loadRecommendedProducts();
   }
 
   loadProducts(): void {
@@ -55,6 +59,18 @@ export class HomeComponent extends BaseComponent implements OnInit {
         this.productsDiscount = this.products.filter((product) => {
           return product.discount && product.discount > 0;
         });
+      })
+    ).subscribe();
+  }
+
+  loadRecommendedProducts(): void {
+    this.recommendationService.getRecommendedProducts(8).pipe(
+      tap(products => {
+        this.recommendedProducts = products;
+      }),
+      catchError(error => {
+        console.error('Error loading recommended products:', error);
+        return of([]);
       })
     ).subscribe();
   }

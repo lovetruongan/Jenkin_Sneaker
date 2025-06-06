@@ -1,5 +1,5 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, PLATFORM_ID, Inject } from '@angular/core';
 import { environment } from '../../../environments/environment.development';
 import { loginDetailDto } from '../dtos/login.dto';
 import { loginReq } from '../types/loginReq';
@@ -7,19 +7,38 @@ import { registerReq } from '../types/registerReq';
 import { registerDto } from '../dtos/register.dto';
 import { UserDto } from '../dtos/user.dto';
 import { Observable } from 'rxjs';
+import { isPlatformBrowser } from '@angular/common';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
-  private readonly token!: string | null;
   private readonly apiUrl: string = environment.apiUrl;
+  private readonly isBrowser: boolean;
+
   constructor(
     private readonly httpClient: HttpClient,
+    @Inject(PLATFORM_ID) platformId: Object
   ) {
-    if (typeof localStorage !== 'undefined') {
-      this.token = localStorage.getItem("token");
+    this.isBrowser = isPlatformBrowser(platformId);
+  }
+
+  private getToken(): string | null {
+    if (!this.isBrowser) return null;
+    return localStorage.getItem("token");
+  }
+
+  private getAuthHeaders(token?: string | null): HttpHeaders {
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json'
+    });
+
+    const authToken = token || this.getToken();
+    if (authToken) {
+      return headers.set('Authorization', `Bearer ${authToken}`);
     }
+
+    return headers;
   }
 
   login(loginObject: loginReq) {
@@ -30,39 +49,34 @@ export class UserService {
     return this.httpClient.post<registerDto>(`${this.apiUrl}users/register`, registerValue);
   }
 
-  getInforUser(token: string | null) {
+  getInforUser(token?: string | null) {
     return this.httpClient.get<UserDto>(`${this.apiUrl}users/details`, {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`
-      })
+      headers: this.getAuthHeaders(token)
     });
   }
+
   getAllUser() {
     return this.httpClient.get<UserDto[]>(`${this.apiUrl}users/getAll`, {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${this.token}`
-      })
+      headers: this.getAuthHeaders()
     });
   }
+
   deleteUser(id: number) {
     return this.httpClient.delete<{ users: UserDto[], message: string }>(`${this.apiUrl}users/delete/${id}`, {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${this.token}`
-      })
+      headers: this.getAuthHeaders()
     });
   }
 
   changeRoleUser(roleId: number, userId: number) {
-    return this.httpClient.put<{ users: UserDto[], message: string }>(`${this.apiUrl}users/changeRole/${userId}`, roleId, {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${this.token}`
-      })
-    });
+    return this.httpClient.put<{ users: UserDto[], message: string }>(
+      `${this.apiUrl}users/changeRole/${userId}`, 
+      roleId,
+      {
+        headers: this.getAuthHeaders()
+      }
+    );
   }
+
   changeActive(userId: number, activeUser: boolean) {
     const params = new HttpParams().set('activeUser', activeUser.toString());
 
@@ -71,13 +85,11 @@ export class UserService {
       {}, // không có body
       {
         params,
-        headers: new HttpHeaders({
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${this.token}`
-        })
+        headers: this.getAuthHeaders()
       }
     );
   }
+
   /**
    * Cập nhật thông tin người dùng
    * @param userData - Dữ liệu người dùng cần cập nhật
@@ -90,10 +102,6 @@ export class UserService {
    */
   updateUser(userData: any): Observable<UserDto> {
     const url = `${this.apiUrl}users/details/${userData.id}`;
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${this.token}`,
-      'Content-Type': 'application/json'
-    });
     
     // Chuẩn bị dữ liệu theo format UpdateUserDTO
     const requestBody = {
@@ -109,7 +117,8 @@ export class UserService {
       google_account_id: userData.google_account_id || 0
     };
 
-    return this.httpClient.put<UserDto>(url, requestBody, { headers });
+    return this.httpClient.put<UserDto>(url, requestBody, { 
+      headers: this.getAuthHeaders()
+    });
   }
-  
 }
