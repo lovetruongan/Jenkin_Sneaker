@@ -58,7 +58,9 @@ export class LoginComponent extends BaseComponent implements AfterViewInit {
     this.loginForm = this.fb.group({
       userName: [, Validators.required],
       password: [, Validators.required]
-    })
+    });
+    console.log('LoginComponent initialized');
+    console.log('Current token:', localStorage.getItem('token'));
   }
 
   ngAfterViewInit(): void {
@@ -71,30 +73,37 @@ export class LoginComponent extends BaseComponent implements AfterViewInit {
         return true;
       }),
       switchMap(() => {
+        console.log('Submitting login form...');
         return this.userSerivce.login({
-          phone_number : this.loginForm.value.userName,
-          password : this.loginForm.value.password,
+          phone_number: this.loginForm.value.userName,
+          password: this.loginForm.value.password,
         }).pipe(
-          tap((loginVal : loginDetailDto) => {
+          tap((loginVal: loginDetailDto) => {
+            console.log('Login successful');
             this.toastService.success(loginVal.message);
-            localStorage.setItem("token",loginVal.token);
+            console.log('Saving token to localStorage...');
+            localStorage.setItem("token", loginVal.token);
             this.token = loginVal.token;
+            console.log('Token saved:', this.token ? 'exists' : 'not found');
             this.blockUi();
           }),
           delay(1000),
           switchMap(() => {
+            console.log('Getting user info...');
             return this.userSerivce.getInforUser(this.token).pipe(
               tap((userInfor: UserDto) => {
+                console.log('Saving user info...');
                 localStorage.setItem("userInfor", JSON.stringify(userInfor));
+                console.log('User info saved');
               })
             );
           }),
           tap(() => {
+            console.log('Redirecting to home page...');
             window.location.href = '/Home';
           }),
           catchError((error) => {
-            console.log(error);
-            
+            console.error('Login error:', error);
             this.toastService.fail(error.error.message);
             return of();
           })
@@ -109,5 +118,10 @@ export class LoginComponent extends BaseComponent implements AfterViewInit {
     setTimeout(() => {
         this.blockedUi = false;
     }, 1000);
+  }
+
+  onSubmit() {
+    console.log('Form submitted');
+    this.formSubmitSubject.next();
   }
 }

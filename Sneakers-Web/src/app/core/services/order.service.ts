@@ -18,7 +18,7 @@ export interface DashboardStatsDTO {
 export class OrderService {
   private readonly apiUrl = environment.apiUrl;
   private readonly isBrowser: boolean;
-
+  
   constructor(
     private httpClient: HttpClient,
     @Inject(PLATFORM_ID) platformId: Object
@@ -78,7 +78,7 @@ export class OrderService {
       `${this.apiUrl}/orders/update/${orderId}`, 
       statusDto,
       {
-        headers: this.getHeaders()
+      headers: this.getHeaders()
       }
     );
   }

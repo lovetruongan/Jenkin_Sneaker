@@ -10,6 +10,8 @@ import { CurrencyPipe } from '@angular/common';
 import { BadgeModule } from 'primeng/badge';
 import { Router, RouterModule } from '@angular/router';
 import { RecommendationService } from '../../../core/services/recommendation.service';
+import { CategoriesService } from '../../../core/services/categories.service';
+import { CategoryDto } from '../../../core/dtos/Category.dto';
 
 @Component({
   selector: 'app-home',
@@ -30,10 +32,12 @@ export class HomeComponent extends BaseComponent implements OnInit {
   public productsDiscount: ProductDto[] = [];
   public recommendedProducts: ProductDto[] = [];
   public apiImage: string = environment.apiImage;
+  public categories: CategoryDto[] = [];
 
   constructor(
     private productService: ProductService,
     private recommendationService: RecommendationService,
+    private categoriesService: CategoriesService,
     private router: Router
   ) {
     super();
@@ -41,7 +45,7 @@ export class HomeComponent extends BaseComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadProducts();
-    this.loadRecommendedProducts();
+    this.loadCategories();
   }
 
   loadProducts(): void {
@@ -58,27 +62,28 @@ export class HomeComponent extends BaseComponent implements OnInit {
         this.productsDiscount = this.products.filter((product) => {
           return product.discount && product.discount > 0;
         });
+        this.loadRecommendedProducts();
+      })
+    ).subscribe();
+  }
+
+  loadCategories(): void {
+    this.categoriesService.getCategories().pipe(
+      filter((categories: CategoryDto[]) => !!categories),
+      tap((categories: CategoryDto[]) => {
+        this.categories = categories;
       })
     ).subscribe();
   }
 
   loadRecommendedProducts(): void {
-    this.recommendationService.getRecommendedProducts().pipe(
-      catchError(error => {
-        console.error('Error loading recommended products:', error);
-        // Return a subset of regular products as fallback
-        return this.productService.getAllProduct().pipe(
-          map(response => {
-            const products = response.products || [];
-            // Mix of discounted and newest products as fallback
-            const discounted = products.filter(p => p.discount && p.discount > 0).slice(0, 4);
-            const newest = products.slice(0, 4);
-            return [...new Set([...discounted, ...newest])].slice(0, 8);
-          }),
-          catchError(() => of([]))
-        );
-      }),
-      tap(products => {
+    if (!this.products.length) {
+      return;
+    }
+
+    this.recommendationService.getRecommendations(this.products).pipe(
+      filter((products: ProductDto[]) => !!products),
+      tap((products: ProductDto[]) => {
         this.recommendedProducts = products;
       })
     ).subscribe();

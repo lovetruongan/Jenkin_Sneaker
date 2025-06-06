@@ -82,6 +82,11 @@ public class JwtTokenFilter extends OncePerRequestFilter{
             return true;
         }
 
+        // Không bypass cho /orders/history
+        if (requestPath.contains("/orders/history")) {
+            return false;
+        }
+
         if (requestPath.equals(String.format("%s/orders", apiPrefix))
                 && requestMethod.equals("GET")) {
             // Allow access to %s/orders

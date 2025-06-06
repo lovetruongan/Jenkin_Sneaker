@@ -1,446 +1,287 @@
-import { Injectable, PLATFORM_ID, Inject } from '@angular/core';
+import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import { ProductDto } from '../dtos/product.dto';
-import { UserService } from './user.service';
-import { ProductService } from './product.service';
-import { Observable, map, of, switchMap, tap, forkJoin, catchError } from 'rxjs';
-import { LoggingService, RecommendationLog } from './logging.service';
+import { OrderService } from './order.service';
+import { Observable, map, of } from 'rxjs';
 import { isPlatformBrowser } from '@angular/common';
-import { OrderHistoryService, OrderHistoryItem } from './order-history.service';
-import { HttpHeaders } from '@angular/common/http';
+import { HistoryOrderDto } from '../dtos/HistoryOrder.dto';
 
-interface ScoredProduct {
-  product: ProductDto;
-  score: number;
-  factors: {
-    discount: number;
-    price: number;
-    category: number;
-    purchaseHistory: number;
-    diversity: number;
-    random: number;
-  };
+interface PriceRanges {
+  min: number;
+  max: number;
+  avg: number;
+  total: number;
+  count: number;
+  standardDeviation: number;
 }
 
-interface ProductPreferences {
-  purchasedProducts: Set<number>;
-  purchasedCategories: Set<number>;
-  lastPurchaseDates: Map<number, Date>;
-  categoryPurchaseCount: Map<number, number>;
-  averageSpending: number;
+interface ScoreFactors {
+  discount: number;
+  price: number;
+  purchaseHistory: number;
+  category: number;
+  random: number;
+}
+
+interface CategoryStats {
+  count: number;
+  totalSpent: number;
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class RecommendationService {
-  private similarityMatrix: Map<number, Map<number, number>> = new Map();
-  private readonly ALGORITHM_VERSION = '2.2.0';
   private readonly isBrowser: boolean;
-  private readonly DIVERSITY_THRESHOLD = 0.7; // Threshold for product similarity
-  private readonly PURCHASE_PENALTY = -0.5; // Strong penalty for previously purchased products
-  private readonly CATEGORY_SATURATION = 3; // Max number of products from same category
-  private readonly MAX_PRICE = 100000000; // Maximum price (100 million VND)
-  private readonly PRICE_RANGE_FLEXIBILITY = 0.5; // Allow recommendations 50% above/below average spending
+  private readonly MAX_RECOMMENDATIONS = 8;
 
   constructor(
-    private userService: UserService,
-    private productService: ProductService,
-    private loggingService: LoggingService,
-    private orderHistoryService: OrderHistoryService,
+    private orderService: OrderService,
     @Inject(PLATFORM_ID) platformId: Object
   ) {
     this.isBrowser = isPlatformBrowser(platformId);
+    console.log('=== Khởi tạo RecommendationService ===');
+    console.log('- Môi trường browser:', this.isBrowser);
+    if (this.isBrowser) {
+      const token = localStorage.getItem('token');
+      console.log('- Token:', token ? 'Đã đăng nhập' : 'Chưa đăng nhập');
+      const userInfo = localStorage.getItem('userInfor');
+      console.log('- Thông tin user:', userInfo ? JSON.parse(userInfo).name : 'Không có');
+    }
   }
 
-  private getHeaders(): HttpHeaders {
+  getRecommendations(products: ProductDto[]): Observable<ProductDto[]> {
+    console.log('\n=== Bắt đầu tính toán gợi ý ===');
+    console.log('- Số lượng sản phẩm:', products.length);
+    
     if (!this.isBrowser) {
-      return new HttpHeaders({
-        'Content-Type': 'application/json'
-      });
+      console.log('- Không phải môi trường browser, trả về gợi ý mặc định');
+      return of(this.getDefaultRecommendations(products));
     }
 
     const token = localStorage.getItem('token');
+    console.log('- Kiểm tra token:', token ? 'Có' : 'Không');
+    
     if (!token) {
-      return new HttpHeaders({
-        'Content-Type': 'application/json'
-      });
+      console.log('- Chưa đăng nhập, trả về gợi ý mặc định');
+      return of(this.getDefaultRecommendations(products));
     }
 
-    return new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    });
-  }
-
-  // Get recommended products for the current user
-  getRecommendedProducts(count: number = 8): Observable<ProductDto[]> {
-    if (!this.isBrowser) {
-      return this.getDefaultRecommendations(count);
-    }
-
-    const token = localStorage.getItem('token');
-    if (!token) {
-      return this.getDefaultRecommendations(count);
-    }
-
-    return this.userService.getInforUser(token).pipe(
-      switchMap(user => {
-        const userId = user?.id;
-        if (!userId) {
-          return this.getDefaultRecommendations(count);
+    console.log('- Đã đăng nhập, lấy lịch sử mua hàng...');
+    return this.orderService.getHistoryOrder().pipe(
+      map(orderHistory => {
+        if (!orderHistory || orderHistory.length === 0) {
+          console.log('- Không có lịch sử mua hàng, trả về gợi ý mặc định');
+          return this.getDefaultRecommendations(products);
         }
 
-        return forkJoin({
-          products: this.productService.getAllProduct(),
-          orderHistory: this.orderHistoryService.getUserOrderHistory().pipe(
-            catchError(() => of([]))  // Return empty array if order history fails
-          )
-        }).pipe(
-          map(({ products, orderHistory }) => {
-            const allProducts = products.products || [];
-            
-            if (allProducts.length <= count) {
-              this.logRecommendation([], allProducts, [], userId);
-              return allProducts;
-            }
-
-            // Get user preferences from order history
-            const categoryPreferences = orderHistory.length > 0 
-              ? this.orderHistoryService.calculateCategoryPreferences(orderHistory)
-              : new Map();
-            const pricePreferences = orderHistory.length > 0
-              ? this.orderHistoryService.calculatePriceRangePreference(orderHistory)
-              : { minPrice: 0, maxPrice: Infinity, avgPrice: 0 };
-            const productPreferences = this.calculateProductPreferences(orderHistory);
-
-            // Update similarity matrix
-            this.updateSimilarityMatrix(allProducts);
-
-            // Get recommendations with scores
-            const scoredProducts = this.getPersonalizedRecommendations(
-              allProducts,
-              count,
-              categoryPreferences,
-              pricePreferences,
-              productPreferences
-            );
-
-            // Log the recommendation
-            this.logRecommendation(
-              scoredProducts.map(sp => sp.product.id),
-              allProducts,
-              scoredProducts,
-              userId
-            );
-
-            // Return only the products
-            return scoredProducts.map(sp => sp.product);
-          })
-        );
-      }),
-      catchError(() => this.getDefaultRecommendations(count))
-    );
-  }
-
-  private calculateProductPreferences(orderHistory: OrderHistoryItem[]): ProductPreferences {
-    const preferences: ProductPreferences = {
-      purchasedProducts: new Set(),
-      purchasedCategories: new Set(),
-      lastPurchaseDates: new Map(),
-      categoryPurchaseCount: new Map(),
-      averageSpending: 0
-    };
-
-    let totalSpent = 0;
-    let totalItems = 0;
-
-    orderHistory.forEach(item => {
-      // Track purchased products
-      preferences.purchasedProducts.add(item.productId);
-
-      // Track categories
-      if (item.categoryId !== null) {
-        preferences.purchasedCategories.add(item.categoryId);
+        console.log('\n=== Phân tích lịch sử mua hàng ===');
+        console.log('- Số đơn hàng:', orderHistory.length);
         
-        // Update category purchase count
-        const currentCount = preferences.categoryPurchaseCount.get(item.categoryId) || 0;
-        preferences.categoryPurchaseCount.set(item.categoryId, currentCount + item.quantity);
-      }
+        const priceRanges = this.analyzePriceRanges(orderHistory);
+        console.log('- Phân tích giá:');
+        console.log('  + Thấp nhất:', priceRanges.min.toLocaleString('vi-VN'), 'VND');
+        console.log('  + Cao nhất:', priceRanges.max.toLocaleString('vi-VN'), 'VND');
+        console.log('  + Trung bình:', priceRanges.avg.toLocaleString('vi-VN'), 'VND');
+        console.log('  + Độ lệch chuẩn:', priceRanges.standardDeviation.toLocaleString('vi-VN'), 'VND');
+        console.log('  + Tổng chi tiêu:', priceRanges.total.toLocaleString('vi-VN'), 'VND');
+        console.log('  + Số lần mua:', priceRanges.count);
 
-      // Track last purchase dates
-      const currentDate = preferences.lastPurchaseDates.get(item.productId);
-      const itemDate = new Date(item.purchaseDate);
-      if (!currentDate || itemDate > currentDate) {
-        preferences.lastPurchaseDates.set(item.productId, itemDate);
-      }
+        const categoryStats = this.analyzeCategoryStats(products, orderHistory);
+        console.log('\n- Phân tích danh mục:');
+        Object.entries(categoryStats).forEach(([categoryId, stats]) => {
+          console.log(`  + Danh mục ${categoryId}:`);
+          console.log(`    - Số lần mua: ${stats.count}`);
+          console.log(`    - Tổng chi tiêu: ${stats.totalSpent.toLocaleString('vi-VN')} VND`);
+        });
 
-      // Calculate average spending
-      totalSpent += item.price * item.quantity;
-      totalItems += item.quantity;
-    });
-
-    preferences.averageSpending = totalItems > 0 ? totalSpent / totalItems : this.MAX_PRICE / 2;
-
-    return preferences;
-  }
-
-  private getDefaultRecommendations(count: number): Observable<ProductDto[]> {
-    return this.productService.getAllProduct().pipe(
-      map(response => {
-        const allProducts = response.products || [];
-        
-        if (allProducts.length <= count) {
-          this.logRecommendation([], allProducts, []);
-          return allProducts;
-        }
-
-        // Update similarity matrix
-        this.updateSimilarityMatrix(allProducts);
-
-        const scoredProducts = this.getPersonalizedRecommendations(
-          allProducts,
-          count,
-          new Map(), // Empty category preferences
-          { minPrice: 0, maxPrice: Infinity, avgPrice: 0 }, // Default price preferences
-          {
-            purchasedProducts: new Set(),
-            purchasedCategories: new Set(),
-            lastPurchaseDates: new Map(),
-            categoryPurchaseCount: new Map(),
-            averageSpending: this.MAX_PRICE / 2 // Default to half of max price
-          }
-        );
-        
-        this.logRecommendation(
-          scoredProducts.map(sp => sp.product.id),
-          allProducts,
-          scoredProducts
-        );
-
-        return scoredProducts.map(sp => sp.product);
+        return this.getPersonalizedRecommendations(products, priceRanges, orderHistory, categoryStats);
       })
     );
   }
 
-  private getPersonalizedRecommendations(
-    products: ProductDto[],
-    count: number,
-    categoryPreferences: Map<number, number>,
-    pricePreferences: { minPrice: number; maxPrice: number; avgPrice: number },
-    productPreferences: ProductPreferences
-  ): ScoredProduct[] {
-    // Keep track of selected categories for diversity
-    const selectedCategories = new Map<number, number>();
+  private analyzePriceRanges(orderHistory: HistoryOrderDto[]): PriceRanges {
+    const ranges: PriceRanges = {
+      min: Infinity,
+      max: -Infinity,
+      avg: 0,
+      total: 0,
+      count: 0,
+      standardDeviation: 0
+    };
 
-    // Sort products by initial scores
-    const scoredProducts = products.map(product => {
-      const scores = this.calculatePersonalizedScores(
-        product,
-        categoryPreferences,
-        pricePreferences,
-        productPreferences,
-        selectedCategories
-      );
-      return {
-        product,
-        score: scores.total,
-        factors: scores.factors
-      };
+    // Tính giá trị min, max, total và count
+    orderHistory.forEach(order => {
+      ranges.min = Math.min(ranges.min, order.total_money);
+      ranges.max = Math.max(ranges.max, order.total_money);
+      ranges.total += order.total_money;
+      ranges.count++;
     });
 
-    // Sort by score in descending order
-    scoredProducts.sort((a, b) => b.score - a.score);
+    // Tính giá trị trung bình
+    ranges.avg = ranges.total / ranges.count;
 
-    // Filter and re-rank products for diversity
-    const finalRecommendations: ScoredProduct[] = [];
-    const consideredProducts = new Set<number>();
+    // Tính độ lệch chuẩn
+    const squaredDiffs = orderHistory.map(order => 
+      Math.pow(order.total_money - ranges.avg, 2)
+    );
+    const avgSquaredDiff = squaredDiffs.reduce((sum, diff) => sum + diff, 0) / ranges.count;
+    ranges.standardDeviation = Math.sqrt(avgSquaredDiff);
 
-    while (finalRecommendations.length < count && scoredProducts.length > 0) {
-      const candidate = scoredProducts.shift();
-      if (!candidate) break;
-
-      // Skip if too similar to already selected products
-      const isTooSimilar = Array.from(consideredProducts).some(productId => {
-        const similarity = this.similarityMatrix.get(candidate.product.id)?.get(productId) || 0;
-        return similarity > this.DIVERSITY_THRESHOLD;
-      });
-
-      if (!isTooSimilar) {
-        // Update category count
-        if (candidate.product.category_id !== null) {
-          const currentCount = selectedCategories.get(candidate.product.category_id) || 0;
-          if (currentCount < this.CATEGORY_SATURATION) {
-            selectedCategories.set(candidate.product.category_id, currentCount + 1);
-            finalRecommendations.push(candidate);
-            consideredProducts.add(candidate.product.id);
-          }
-        } else {
-          finalRecommendations.push(candidate);
-          consideredProducts.add(candidate.product.id);
-        }
-      }
-    }
-
-    return finalRecommendations;
+    return ranges;
   }
 
-  private calculatePersonalizedScores(
+  private analyzeCategoryStats(products: ProductDto[], orderHistory: HistoryOrderDto[]): Record<number, CategoryStats> {
+    const categoryStats: Record<number, CategoryStats> = {};
+
+    // Tạo map để tra cứu nhanh category_id từ tên sản phẩm
+    const productNameToCategoryMap = new Map<string, number>();
+    products.forEach(product => {
+      if (product.category_id !== null) {
+        productNameToCategoryMap.set(product.name, product.category_id);
+      }
+    });
+
+    orderHistory.forEach(order => {
+      const categoryId = productNameToCategoryMap.get(order.product_name);
+      if (categoryId !== undefined) {
+        if (!categoryStats[categoryId]) {
+          categoryStats[categoryId] = { count: 0, totalSpent: 0 };
+        }
+        categoryStats[categoryId].count++;
+        categoryStats[categoryId].totalSpent += order.total_money;
+      }
+    });
+
+    return categoryStats;
+  }
+
+  private getPersonalizedRecommendations(
+    products: ProductDto[],
+    priceRanges: PriceRanges,
+    orderHistory: HistoryOrderDto[],
+    categoryStats: Record<number, CategoryStats>
+  ): ProductDto[] {
+    console.log('\n=== Tính điểm cho từng sản phẩm ===');
+    console.log('Trọng số các yếu tố:');
+    console.log('- Giảm giá: 35%');
+    console.log('- Giá phù hợp: 35%');
+    console.log('- Danh mục: 15%');
+    console.log('- Lịch sử mua: 10%');
+    console.log('- Ngẫu nhiên: 5%');
+
+    const scoredProducts = products.map(product => {
+      const score = this.calculateScore(product, priceRanges, orderHistory, categoryStats);
+      return { product, score };
+    });
+
+    console.log('\n=== Top 8 sản phẩm được gợi ý ===');
+    const recommendations = scoredProducts
+      .sort((a, b) => b.score - a.score)
+      .slice(0, this.MAX_RECOMMENDATIONS);
+
+    recommendations.forEach(({ product, score }, index) => {
+      console.log(`${index + 1}. ${product.name}`);
+      console.log(`   - Giá: ${product.price.toLocaleString('vi-VN')} VND`);
+      console.log(`   - Giảm giá: ${product.discount}%`);
+      console.log(`   - Danh mục: ${product.category_id || 'Không có'}`);
+      console.log(`   - Điểm: ${score.toFixed(4)}`);
+    });
+
+    return recommendations.map(item => item.product);
+  }
+
+  private calculateScore(
     product: ProductDto,
-    categoryPreferences: Map<number, number>,
-    pricePreferences: { minPrice: number; maxPrice: number; avgPrice: number },
-    productPreferences: ProductPreferences,
-    selectedCategories: Map<number, number>
-  ): {
-    total: number;
-    factors: {
-      discount: number;
-      price: number;
-      category: number;
-      purchaseHistory: number;
-      diversity: number;
-      random: number;
-    };
-  } {
-    const factors = {
+    priceRanges: PriceRanges,
+    orderHistory: HistoryOrderDto[],
+    categoryStats: Record<number, CategoryStats>
+  ): number {
+    const factors = this.calculateFactors(product, priceRanges, orderHistory, categoryStats);
+    const total = Object.values(factors).reduce((sum, score) => sum + score, 0);
+
+    console.log(`\nSản phẩm: ${product.name}`);
+    console.log(`- Giá: ${product.price.toLocaleString('vi-VN')} VND`);
+    console.log(`- Giảm giá: ${product.discount}%`);
+    console.log(`- Danh mục: ${product.category_id || 'Không có'}`);
+    console.log('Điểm thành phần:');
+    console.log('- Điểm giảm giá:', factors.discount.toFixed(4), '(35%)');
+    console.log('- Điểm giá:', factors.price.toFixed(4), '(35%)');
+    console.log('- Điểm danh mục:', factors.category.toFixed(4), '(15%)');
+    console.log('- Điểm lịch sử:', factors.purchaseHistory.toFixed(4), '(10%)');
+    console.log('- Điểm ngẫu nhiên:', factors.random.toFixed(4), '(5%)');
+    console.log('- Tổng điểm:', total.toFixed(4));
+
+    return total;
+  }
+
+  private calculateFactors(
+    product: ProductDto,
+    priceRanges: PriceRanges,
+    orderHistory: HistoryOrderDto[],
+    categoryStats: Record<number, CategoryStats>
+  ): ScoreFactors {
+    const factors: ScoreFactors = {
       discount: 0,
       price: 0,
-      category: 0,
       purchaseHistory: 0,
-      diversity: 0,
+      category: 0,
       random: 0
     };
 
-    // Factor 1: Discount - products with discounts get a boost
+    // Factor 1: Discount score (35%)
     if (product.discount > 0) {
-      factors.discount = product.discount * 0.3;
+      const discountDecimal = product.discount / 100;
+      factors.discount = discountDecimal * 0.35;
     }
 
-    // Factor 2: Price range preference
-    const avgSpending = productPreferences.averageSpending;
-    const minPreferredPrice = Math.max(0, avgSpending * (1 - this.PRICE_RANGE_FLEXIBILITY));
-    const maxPreferredPrice = Math.min(this.MAX_PRICE, avgSpending * (1 + this.PRICE_RANGE_FLEXIBILITY));
+    // Factor 2: Price score (35%)
+    // Sử dụng phân phối chuẩn để tính điểm giá
+    const zScore = Math.abs(product.price - priceRanges.avg) / priceRanges.standardDeviation;
+    // Chuyển z-score thành điểm từ 0-0.35 (35%)
+    // Sử dụng hàm Gaussian để cho điểm cao nhất khi gần giá trung bình
+    // và giảm dần khi xa giá trung bình
+    factors.price = 0.35 * Math.exp(-Math.pow(zScore, 2) / 2);
 
-    if (product.price >= minPreferredPrice && product.price <= maxPreferredPrice) {
-      // Calculate how close the price is to the average spending
-      const priceDiff = Math.abs(product.price - avgSpending);
-      const maxDiff = avgSpending * this.PRICE_RANGE_FLEXIBILITY;
-      
-      // Higher score for prices closer to average spending
-      factors.price = 0.25 * (1 - priceDiff / maxDiff);
-    } else {
-      // Penalty for products far outside the preferred price range
-      const distanceFromRange = Math.min(
-        Math.abs(product.price - minPreferredPrice),
-        Math.abs(product.price - maxPreferredPrice)
-      );
-      const penaltyFactor = Math.min(1, distanceFromRange / (avgSpending * this.PRICE_RANGE_FLEXIBILITY));
-      factors.price = -0.25 * penaltyFactor;
+    // Factor 3: Category score (15%)
+    if (product.category_id !== null && categoryStats[product.category_id]) {
+      const totalPurchases = Object.values(categoryStats).reduce((sum, stats) => sum + stats.count, 0);
+      const categoryShare = categoryStats[product.category_id].count / totalPurchases;
+      factors.category = Math.min(categoryShare * 0.15, 0.15);
     }
 
-    // Factor 3: Category preference
-    if (product.category_id !== null) {
-      const categoryId = product.category_id;
-      const categoryScore = categoryPreferences.get(categoryId) || 0;
-      
-      // Reduce score if we already have enough products from this category
-      const currentCategoryCount = selectedCategories.get(categoryId) || 0;
-      const categoryPenalty = currentCategoryCount >= this.CATEGORY_SATURATION ? -0.3 : 0;
-      
-      factors.category = (categoryScore * 0.3) + categoryPenalty;
-    }
+    // Factor 4: Purchase history penalty (10%)
+    const recentPurchases = orderHistory
+      .filter(order => order.product_name === product.name)
+      .length;
+    factors.purchaseHistory = Math.max(0, 0.1 - (recentPurchases * 0.025));
 
-    // Factor 4: Purchase history - strong penalty for previously purchased items
-    if (productPreferences.purchasedProducts.has(product.id)) {
-      factors.purchaseHistory = this.PURCHASE_PENALTY;
-      
-      // Add time-based decay to the penalty
-      const lastPurchaseDate = productPreferences.lastPurchaseDates.get(product.id);
-      if (lastPurchaseDate) {
-        const daysSinceLastPurchase = (new Date().getTime() - lastPurchaseDate.getTime()) / (1000 * 60 * 60 * 24);
-        // Gradually reduce penalty over 180 days
-        const timeFactor = Math.min(daysSinceLastPurchase / 180, 1);
-        factors.purchaseHistory *= (1 - timeFactor);
-      }
-    }
+    // Factor 5: Random score (5%)
+    factors.random = Math.random() * 0.05;
 
-    // Factor 5: Diversity score
-    if (product.category_id !== null) {
-      const categoryCount = selectedCategories.get(product.category_id) || 0;
-      factors.diversity = Math.max(0, 0.2 * (1 - categoryCount / this.CATEGORY_SATURATION));
-    }
-
-    // Factor 6: Random factor to add some variety (0-0.15)
-    factors.random = Math.random() * 0.15;
-
-    // Calculate total score
-    const total = Object.values(factors).reduce((sum, value) => sum + value, 0);
-
-    return { total, factors };
+    return factors;
   }
 
-  private logRecommendation(
-    recommendedProductIds: number[],
-    allProducts: ProductDto[],
-    scoredProducts: ScoredProduct[],
-    userId?: number
-  ): void {
-    // Create base log object
-    const log: RecommendationLog = {
-      timestamp: new Date(),
-      userId,
-      recommendedProducts: recommendedProductIds,
-      algorithmVersion: this.ALGORITHM_VERSION,
-      factors: {
-        discount: 0.3,
-        price: 0.25,
-        category: 0.3,
-        purchaseHistory: 0.1,
-        random: 0.15
-      },
-      productScores: scoredProducts.map(sp => ({
-        productId: sp.product.id,
-        productName: sp.product.name,
-        totalScore: sp.score,
-        factors: sp.factors
+  private getDefaultRecommendations(products: ProductDto[]): ProductDto[] {
+    console.log('\n=== Lấy gợi ý mặc định ===');
+    console.log('- Sắp xếp theo % giảm giá và yếu tố ngẫu nhiên');
+    
+    const recommendations = products
+      .map(product => ({
+        product,
+        score: ((product.discount || 0) * 0.01 * 0.95) + (Math.random() * 0.05) // 95% discount + 5% random
       }))
-    };
+      .sort((a, b) => b.score - a.score)
+      .slice(0, this.MAX_RECOMMENDATIONS);
 
-    this.loggingService.logRecommendation(log);
-  }
-
-  private updateSimilarityMatrix(products: ProductDto[]): void {
-    products.forEach(product1 => {
-      if (!this.similarityMatrix.has(product1.id)) {
-        this.similarityMatrix.set(product1.id, new Map());
-      }
-      
-      products.forEach(product2 => {
-        if (product1.id !== product2.id) {
-          const similarity = this.calculateProductSimilarity(product1, product2);
-          this.similarityMatrix.get(product1.id)?.set(product2.id, similarity);
-        }
-      });
+    console.log('\nTop 8 sản phẩm giảm giá cao nhất:');
+    recommendations.forEach(({ product, score }, index) => {
+      console.log(`${index + 1}. ${product.name}`);
+      console.log(`   - Giá: ${product.price.toLocaleString('vi-VN')} VND`);
+      console.log(`   - Giảm giá: ${product.discount}%`);
+      console.log(`   - Danh mục: ${product.category_id || 'Không có'}`);
+      console.log(`   - Điểm: ${score.toFixed(4)}`);
     });
-  }
 
-  private calculateProductSimilarity(product1: ProductDto, product2: ProductDto): number {
-    let similarity = 0;
-
-    // Category similarity
-    if (product1.category_id !== null && product2.category_id !== null && product1.category_id === product2.category_id) {
-      similarity += 0.3;
-    }
-
-    // Price range similarity (within 20% of each other)
-    const priceRatio = Math.min(product1.price, product2.price) / Math.max(product1.price, product2.price);
-    if (priceRatio > 0.8) {
-      similarity += 0.3 * priceRatio;
-    }
-
-    // Discount similarity
-    const discountDiff = Math.abs(product1.discount - product2.discount);
-    similarity += 0.2 * (1 - discountDiff / 100);
-
-    return similarity;
+    return recommendations.map(item => item.product);
   }
 } 

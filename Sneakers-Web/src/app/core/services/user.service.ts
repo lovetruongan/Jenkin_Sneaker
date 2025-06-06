@@ -24,16 +24,32 @@ export class UserService {
   }
 
   private getHeaders(token?: string | null): HttpHeaders {
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json'
-    });
-
-    const authToken = token || (this.isBrowser ? localStorage.getItem('token') : null);
-    if (authToken) {
-      return headers.set('Authorization', `Bearer ${authToken}`);
+    if (!this.isBrowser) {
+      return new HttpHeaders({
+        'Content-Type': 'application/json'
+      });
     }
 
-    return headers;
+    // If token is provided as parameter, use it
+    if (token) {
+      return new HttpHeaders({
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      });
+    }
+
+    // Otherwise try to get from localStorage
+    const storedToken = localStorage.getItem('token');
+    if (!storedToken) {
+      return new HttpHeaders({
+        'Content-Type': 'application/json'
+      });
+    }
+
+    return new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${storedToken}`
+    });
   }
 
   login(loginObject: loginReq) {

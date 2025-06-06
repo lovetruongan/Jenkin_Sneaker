@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { NgSwitch, NgSwitchCase } from '@angular/common';
-import { CurrencyPipe, DatePipe } from '@angular/common';
+import { CurrencyPipe, DatePipe, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BaseComponent } from '../../../core/commonComponent/base.component';
 import { HistoryOrderDto } from '../../../core/dtos/HistoryOrder.dto';
@@ -62,17 +62,22 @@ export class OrderManageComponent extends BaseComponent implements OnInit {
   constructor(
     private orderService: OrderService,
     private toastService: ToastService,
-    private router: Router
+    private router: Router,
+    @Inject(PLATFORM_ID) private platformId: Object
   ) {
     super();
   }
 
   ngOnInit(): void {
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
+
     // Check if user is logged in and has admin role
     const userInfo = localStorage.getItem('userInfor');
     if (!userInfo) {
       this.toastService.fail('Vui lòng đăng nhập để tiếp tục');
-      this.router.navigate(['/login']);
+      this.router.navigate(['/auth-login']);
       return;
     }
 
@@ -105,11 +110,15 @@ export class OrderManageComponent extends BaseComponent implements OnInit {
   }
 
   onOrderStateChange(event: any, orderId: number) {
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
+
     // Check if user is still logged in and has admin role
     const userInfo = localStorage.getItem('userInfor');
     if (!userInfo) {
       this.toastService.fail('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại');
-      this.router.navigate(['/login']);
+      this.router.navigate(['/auth-login']);
       return;
     }
 

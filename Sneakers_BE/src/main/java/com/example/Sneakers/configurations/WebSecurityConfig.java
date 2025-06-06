@@ -68,8 +68,10 @@ public class WebSecurityConfig {
                             .requestMatchers(GET,
                                     String.format("%s/users/getAll", apiPrefix)).permitAll()
 
-                            .requestMatchers(POST,
+                            .requestMatchers(GET,
+                                    String.format("%s/users/details", apiPrefix)).permitAll()
 
+                            .requestMatchers(POST,
                                     String.format("%s/users**", apiPrefix)).hasRole(Role.ADMIN)
 
                             .requestMatchers(PUT,
@@ -115,6 +117,9 @@ public class WebSecurityConfig {
                             .requestMatchers(GET,
                                     String.format("%s/orders/**", apiPrefix)).permitAll()
 
+                            .requestMatchers(GET,
+                                    String.format("%s/orders/history/**", apiPrefix)).hasAnyRole(Role.USER, Role.ADMIN)
+
                             .requestMatchers(PUT,
                                     String.format("%s/orders/**", apiPrefix)).hasRole(Role.ADMIN)
 
@@ -158,10 +163,11 @@ public class WebSecurityConfig {
             @Override
             public void customize(CorsConfigurer<HttpSecurity> httpSecurityCorsConfigurer) {
                 CorsConfiguration configuration = new CorsConfiguration();
-                configuration.setAllowedOrigins(List.of("*"));
+                configuration.setAllowedOrigins(List.of("http://localhost:4200")); // Angular dev server
                 configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
                 configuration.setAllowedHeaders(Arrays.asList("authorization", "content-type", "x-auth-token"));
                 configuration.setExposedHeaders(List.of("x-auth-token"));
+                configuration.setAllowCredentials(true); // Allow credentials
                 UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
                 source.registerCorsConfiguration("/**", configuration);
                 httpSecurityCorsConfigurer.configurationSource(source);

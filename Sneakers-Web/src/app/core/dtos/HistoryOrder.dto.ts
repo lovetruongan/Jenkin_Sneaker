@@ -7,5 +7,6 @@ export interface HistoryOrderDto {
     product_name: string,
     order_date: Date,
     buyer_name: string,
-    phone_number: string
+    phone_number: string,
+    brand: string
 }

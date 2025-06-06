@@ -135,8 +135,8 @@ export class LoggingService {
 
     try {
       const logs = this.getLogs();
-      const thirtyDaysAgo = new Date();
-      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
       const recentLogs = logs.filter(log => {
         const logDate = new Date(log.timestamp);

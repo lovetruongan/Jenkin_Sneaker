@@ -6,6 +6,7 @@ export interface ProductDto {
     description: string,
     discount: number,
     category_id: number | null,
+    brand: string,
     product_images: {
         id: number;
         image_url: string;
