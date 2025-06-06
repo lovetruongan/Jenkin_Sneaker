@@ -11,6 +11,7 @@ export interface RecommendationLog {
     discount: number;
     price: number;
     category: number;
+    purchaseHistory: number;
     random: number;
   };
   productScores?: Array<{
@@ -21,6 +22,7 @@ export interface RecommendationLog {
       discount: number;
       price: number;
       category: number;
+      purchaseHistory: number;
       random: number;
     };
   }>;
@@ -131,14 +133,20 @@ export class LoggingService {
   private cleanOldLogs(): void {
     if (!this.isBrowser) return;
 
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    try {
+      const logs = this.getLogs();
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-    const logs = this.getLogs().filter(log => 
-      new Date(log.timestamp) >= thirtyDaysAgo
-    );
+      const recentLogs = logs.filter(log => {
+        const logDate = new Date(log.timestamp);
+        return logDate >= thirtyDaysAgo;
+      });
 
-    localStorage.setItem(this.LOG_KEY, JSON.stringify(logs));
+      localStorage.setItem(this.LOG_KEY, JSON.stringify(recentLogs));
+    } catch (error) {
+      console.error('Error cleaning old logs:', error);
+    }
   }
 
   private sendToServer(log: RecommendationLog): void {
@@ -169,6 +177,7 @@ export class LoggingService {
       'Discount Factor',
       'Price Factor',
       'Category Factor',
+      'Purchase History Factor',
       'Random Factor'
     ];
 
@@ -183,6 +192,7 @@ export class LoggingService {
         log.factors.discount,
         log.factors.price,
         log.factors.category,
+        log.factors.purchaseHistory,
         log.factors.random
       ].join(','))
     ].join('\n');
