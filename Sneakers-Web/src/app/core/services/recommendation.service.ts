@@ -65,13 +65,21 @@ export class RecommendationService {
 
       const allOrderDetails = await Promise.all(orderDetailsPromises);
 
-      // Collect all unique product IDs from order details
+      // Track purchased product quantities
+      const purchaseQuantities = new Map<number, number>();
+      let totalPurchasedQuantity = 0;
+
+      // Collect all unique product IDs and their quantities from order details
       const productIds = new Set<number>();
       allOrderDetails.forEach(orderInfo => {
         if (orderInfo?.order_details) {
           orderInfo.order_details.forEach(detail => {
             if (detail?.product?.id) {
               productIds.add(detail.product.id);
+              // Track quantity for this product
+              const currentQuantity = purchaseQuantities.get(detail.product.id) || 0;
+              purchaseQuantities.set(detail.product.id, currentQuantity + detail.numberOfProducts);
+              totalPurchasedQuantity += detail.numberOfProducts;
             }
           });
         }
@@ -160,51 +168,36 @@ export class RecommendationService {
         const scoreComponents = {
           price: 0,
           category: 0,
-          random: Math.random() * 0.10, // 10% random factor
-          discount: 0, // Will be calculated based on discount percentage
+          random: Math.random() * 0.05, // 5% random factor
+          discount: product.discount ? 0.4 : 0, // 40% boost for discounted items
           penalty: 0, // Penalty for previously purchased products
           total: 0
         };
 
-        // Price score (30% weight) - products closer to average price get higher scores
+        // Price score (35% weight) - products closer to average price get higher scores
         const priceDeviation = Math.abs(product.price - priceStats.average);
         const normalizedPriceScore = Math.max(0, 1 - (priceDeviation / (2 * priceStats.standardDeviation)));
-        scoreComponents.price = normalizedPriceScore * 0.30;
+        scoreComponents.price = normalizedPriceScore * 0.35;
 
-        // Category score (25% weight) - calculate based on category's share of total frequency
+        // Category score (30% weight) - calculate based on category's share of total frequency
         if (product.category_id && this.categoryFrequency.has(product.category_id) && totalCategoryFrequency > 0) {
           const categoryCount = this.categoryFrequency.get(product.category_id) || 0;
-          // Calculate the category's share of total purchases
           const categoryShare = categoryCount / totalCategoryFrequency;
-          // Apply exponential weighting to emphasize strong preferences
           const weightedShare = Math.pow(categoryShare, 1.5);
-          scoreComponents.category = weightedShare * 0.25;
-
-          // Log category score calculation details
-          console.log(`Category score calculation for product ${product.id} (${product.name}):`, {
-            category_id: product.category_id,
-            category_frequency: categoryCount,
-            total_frequency: totalCategoryFrequency,
-            category_share: categoryShare.toFixed(3),
-            weighted_share: weightedShare.toFixed(3),
-            final_score: scoreComponents.category.toFixed(3)
-          });
+          scoreComponents.category = weightedShare * 0.30;
         }
 
-        // Discount score (50% weight) - calculated based on actual discount percentage
-        if (product.discount) {
-          // Convert discount percentage to decimal and multiply by weight
-          scoreComponents.discount = (product.discount / 100) * 0.50;
-          console.log(`Discount score calculation for ${product.name}:`, {
-            discount_percentage: `${product.discount}%`,
-            discount_score: scoreComponents.discount.toFixed(3)
+        // Apply quantity-based penalty for previously purchased products (20% penalty weighted by quantity ratio)
+        if (this.purchasedProducts.has(product.id) && totalPurchasedQuantity > 0) {
+          const productQuantity = purchaseQuantities.get(product.id) || 0;
+          const quantityRatio = productQuantity / totalPurchasedQuantity;
+          scoreComponents.penalty = -0.20 * quantityRatio; // 20% penalty weighted by quantity ratio
+          console.log(`Applying quantity-based penalty to ${product.name}:`, {
+            productQuantity,
+            totalPurchasedQuantity,
+            quantityRatio,
+            penalty: scoreComponents.penalty.toFixed(3)
           });
-        }
-
-        // Apply penalty for previously purchased products (20% reduction)
-        if (this.purchasedProducts.has(product.id)) {
-          scoreComponents.penalty = -0.10; // 20% penalty
-          console.log(`Applying purchase history penalty to ${product.name}: -0.10`);
         }
 
         // Calculate total score with penalty
@@ -213,16 +206,6 @@ export class RecommendationService {
                               scoreComponents.random + 
                               scoreComponents.discount +
                               scoreComponents.penalty;
-
-        // Log detailed scoring breakdown
-        console.log(`\nScoring breakdown for ${product.name}:`, {
-          price_score: `${scoreComponents.price.toFixed(3)} (30% weight)`,
-          category_score: `${scoreComponents.category.toFixed(3)} (25% weight)`,
-          random_factor: `${scoreComponents.random.toFixed(3)} (10% weight)`,
-          discount_score: `${scoreComponents.discount.toFixed(3)} (50% weight, based on ${product.discount || 0}% discount)`,
-          purchase_penalty: `${scoreComponents.penalty.toFixed(3)} (-20% if previously purchased)`,
-          total_score: scoreComponents.total.toFixed(3)
-        });
 
         return {
           product,

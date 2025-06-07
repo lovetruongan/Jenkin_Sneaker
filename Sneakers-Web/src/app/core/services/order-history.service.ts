@@ -1,6 +1,6 @@
 import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, map, of } from 'rxjs';
+import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
+import { Observable, map, of, throwError, catchError, retry } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { isPlatformBrowser } from '@angular/common';
 
@@ -10,6 +10,8 @@ export interface OrderHistoryItem {
   quantity: number;
   purchaseDate: Date;
   price: number;
+  status: string;
+  orderId: number;
 }
 
 interface OrderDetail {
@@ -70,6 +72,19 @@ export class OrderHistoryService {
     });
   }
 
+  private handleError(error: HttpErrorResponse) {
+    let errorMessage = 'An error occurred';
+    if (error.error instanceof ErrorEvent) {
+      // Client-side error
+      errorMessage = error.error.message;
+    } else {
+      // Server-side error
+      errorMessage = `Error Code: ${error.status}\nMessage: ${error.message}`;
+    }
+    console.error(errorMessage);
+    return throwError(() => new Error(errorMessage));
+  }
+
   getUserOrderHistory(): Observable<OrderHistoryItem[]> {
     if (!this.isBrowser) {
       return of([]);
@@ -83,6 +98,8 @@ export class OrderHistoryService {
     return this.http.get<OrderHistoryResponse[]>(`${this.apiUrl}/orders/user`, {
       headers: this.getHeaders()
     }).pipe(
+      retry(3), // Retry failed requests 3 times
+      catchError(this.handleError),
       map(orders => {
         if (!orders || !Array.isArray(orders)) {
           return [];
@@ -103,9 +120,64 @@ export class OrderHistoryService {
             categoryId: detail.product.category_id,
             quantity: detail.numberOfProducts,
             purchaseDate: new Date(order.order_date),
-            price: detail.price
+            price: detail.price,
+            status: order.status,
+            orderId: order.id
           }));
         });
+      })
+    );
+  }
+
+  getTodayOrders(): Observable<OrderHistoryItem[]> {
+    if (!this.isBrowser) {
+      return of([]);
+    }
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+      return of([]);
+    }
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    return this.http.get<OrderHistoryResponse[]>(`${this.apiUrl}/orders/user`, {
+      headers: this.getHeaders()
+    }).pipe(
+      retry(3),
+      catchError(this.handleError),
+      map(orders => {
+        if (!orders || !Array.isArray(orders)) {
+          return [];
+        }
+        
+        return orders
+          .filter(order => {
+            const orderDate = new Date(order.order_date);
+            orderDate.setHours(0, 0, 0, 0);
+            return orderDate.getTime() === today.getTime();
+          })
+          .flatMap(order => {
+            if (!order || !order.orderDetails || !Array.isArray(order.orderDetails)) {
+              return [];
+            }
+
+            return order.orderDetails.filter(detail => 
+              detail && 
+              detail.product && 
+              typeof detail.product.id !== 'undefined' && 
+              typeof detail.product.category_id !== 'undefined'
+            ).map(detail => ({
+              productId: detail.product.id,
+              categoryId: detail.product.category_id,
+              quantity: detail.numberOfProducts,
+              purchaseDate: new Date(order.order_date),
+              price: detail.price,
+              status: order.status,
+              orderId: order.id
+            }));
+          });
       })
     );
   }

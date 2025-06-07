@@ -28,7 +28,7 @@ export class UserService {
       return new HttpHeaders({
         'Content-Type': 'application/json'
       });
-    }
+  }
 
     // If token is provided as parameter, use it
     if (token) {
@@ -42,8 +42,8 @@ export class UserService {
     const storedToken = localStorage.getItem('token');
     if (!storedToken) {
       return new HttpHeaders({
-        'Content-Type': 'application/json'
-      });
+      'Content-Type': 'application/json'
+    });
     }
 
     return new HttpHeaders({
