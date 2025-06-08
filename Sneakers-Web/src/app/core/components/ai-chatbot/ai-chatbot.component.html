@@ -49,6 +49,9 @@
     @for (message of messages(); track message.timestamp) {
       <div class="message" [class.user]="message.sender === 'user'" [class.bot]="message.sender === 'bot'" [class.error]="message.isError">
         <div class="message-bubble">
+          @if (message.image) {
+            <img [src]="message.image" alt="Uploaded image" class="message-image">
+          }
           <p [innerHTML]="message.content"></p>
         </div>
         <span class="timestamp">{{ message.timestamp | date:'short' }}</span>

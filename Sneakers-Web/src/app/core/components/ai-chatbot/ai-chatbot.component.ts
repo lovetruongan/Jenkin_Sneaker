@@ -11,6 +11,7 @@ interface ChatMessage {
   sender: 'user' | 'bot';
   timestamp: Date;
   isError?: boolean;
+  image?: string; // Base64 image data
 }
 
 @Component({
@@ -69,16 +70,23 @@ How can I help you find the perfect sneakers today?`;
     const message = this.userInput().trim();
     const image = this.selectedImage();
 
-    if (message) {
+    if (message && !image) {
       this.addMessage(message, 'user');
     }
 
     if (image && message) {
       // Send image with prompt
+      const preview = this.imagePreview();
+      if (preview) {
+        this.addMessageWithImage(message, 'user', preview);
+      }
       this.sendImageMessage(image, message);
     } else if (image) {
       // Send image with default prompt
-      this.addMessage('[Image uploaded]', 'user');
+      const preview = this.imagePreview();
+      if (preview) {
+        this.addMessageWithImage('What can you tell me about this sneaker?', 'user', preview);
+      }
       this.sendImageMessage(image, 'What can you tell me about this sneaker?');
     } else if (message) {
       // Send text message
@@ -164,6 +172,17 @@ How can I help you find the perfect sneakers today?`;
       sender,
       timestamp: new Date(),
       isError
+    }]);
+    this.scrollToBottom();
+  }
+
+  private addMessageWithImage(content: string, sender: 'user' | 'bot', image: string, isError: boolean = false): void {
+    this.messages.update(msgs => [...msgs, {
+      content,
+      sender,
+      timestamp: new Date(),
+      isError,
+      image
     }]);
     this.scrollToBottom();
   }
