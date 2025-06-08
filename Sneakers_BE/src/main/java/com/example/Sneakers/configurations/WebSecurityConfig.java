@@ -194,10 +194,20 @@ public class WebSecurityConfig {
                                                                                         apiPrefix))
                                                         .permitAll()
                                                         .requestMatchers(GET,
-                                                                        String.format("%s/ai/**", apiPrefix))
+                                                                        String.format("%s/ai/initialize/index-all",
+                                                                                        apiPrefix))
                                                         .permitAll()
                                                         .requestMatchers(POST,
-                                                                        String.format("%s/ai/**", apiPrefix))
+                                                                        String.format("%s/ai/initialize/index-all",
+                                                                                        apiPrefix))
+                                                        .permitAll()
+                                                        .requestMatchers(GET,
+                                                                        String.format("%s/ai/**",
+                                                                                        apiPrefix))
+                                                        .permitAll()
+                                                        .requestMatchers(POST,
+                                                                        String.format("%s/ai/**",
+                                                                                        apiPrefix))
                                                         .permitAll()
 
                                                         .anyRequest().authenticated();

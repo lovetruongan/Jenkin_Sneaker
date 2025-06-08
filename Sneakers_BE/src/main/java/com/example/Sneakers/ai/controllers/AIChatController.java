@@ -1,5 +1,6 @@
 package com.example.Sneakers.ai.controllers;
 
+import com.example.Sneakers.ai.services.AIProductAssistantService;
 import dev.langchain4j.data.message.ImageContent;
 import dev.langchain4j.data.message.TextContent;
 import dev.langchain4j.data.message.UserMessage;
@@ -14,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.Base64;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -24,6 +26,7 @@ import java.util.Map;
 public class AIChatController {
 
     private final ChatModel geminiChatModel;
+    private final AIProductAssistantService aiProductAssistantService;
 
     @PostMapping("/text")
     public ResponseEntity<Map<String, Object>> chatWithText(@RequestBody Map<String, String> request) {
@@ -73,9 +76,18 @@ public class AIChatController {
             byte[] imageBytes = image.getBytes();
             String base64Image = Base64.getEncoder().encodeToString(imageBytes);
 
+            // Get the content type from the uploaded file
+            String mimeType = image.getContentType();
+            if (mimeType == null || mimeType.isEmpty()) {
+                // Default to JPEG if content type is not available
+                mimeType = "image/jpeg";
+            }
+
+            log.info("Image MIME type: {}", mimeType);
+
             var response = geminiChatModel.chat(
                     UserMessage.from(
-                            ImageContent.from(base64Image),
+                            ImageContent.from(base64Image, mimeType),
                             TextContent.from(prompt)));
 
             Map<String, Object> result = new HashMap<>();
@@ -109,21 +121,13 @@ public class AIChatController {
                         .body(Map.of("error", "Query cannot be empty"));
             }
 
-            // Create a prompt for product assistance
-            String enhancedPrompt = String.format("""
-                    You are a helpful sneaker shopping assistant.
-                    The user has asked: "%s"
+            log.info("Processing product assistant request with database context");
 
-                    Please provide helpful information about sneakers, recommendations,
-                    or answer their question in a friendly and knowledgeable manner.
-                    If they're asking about specific products, suggest they use our search feature.
-                    """, userQuery);
-
-            log.info("Processing product assistant request");
-            var response = geminiChatModel.chat(UserMessage.from(enhancedPrompt));
+            // Use the enhanced AI service that searches the database
+            String response = aiProductAssistantService.answerProductQuery(userQuery);
 
             Map<String, Object> result = new HashMap<>();
-            result.put("response", response.aiMessage().text());
+            result.put("response", response);
             result.put("success", true);
             result.put("type", "product-assistant");
             result.put("timestamp", System.currentTimeMillis());
@@ -132,6 +136,101 @@ public class AIChatController {
 
         } catch (Exception e) {
             log.error("Error in product assistant", e);
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("error", e.getMessage());
+            errorResponse.put("success", false);
+            return ResponseEntity.internalServerError().body(errorResponse);
+        }
+    }
+
+    @PostMapping("/product-assistant/by-category")
+    public ResponseEntity<Map<String, Object>> productAssistantByCategory(@RequestBody Map<String, String> request) {
+        try {
+            String userQuery = request.get("query");
+            String category = request.get("category");
+
+            if (userQuery == null || userQuery.trim().isEmpty()) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("error", "Query cannot be empty"));
+            }
+
+            log.info("Processing product assistant request for category: {}", category);
+
+            String response = aiProductAssistantService.answerProductQueryByCategory(userQuery, category);
+
+            Map<String, Object> result = new HashMap<>();
+            result.put("response", response);
+            result.put("success", true);
+            result.put("type", "product-assistant-category");
+            result.put("timestamp", System.currentTimeMillis());
+
+            return ResponseEntity.ok(result);
+
+        } catch (Exception e) {
+            log.error("Error in product assistant by category", e);
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("error", e.getMessage());
+            errorResponse.put("success", false);
+            return ResponseEntity.internalServerError().body(errorResponse);
+        }
+    }
+
+    @PostMapping("/product-assistant/compare")
+    public ResponseEntity<Map<String, Object>> compareProducts(@RequestBody Map<String, Object> request) {
+        try {
+            @SuppressWarnings("unchecked")
+            List<Long> productIds = (List<Long>) request.get("productIds");
+
+            if (productIds == null || productIds.isEmpty()) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("error", "Product IDs cannot be empty"));
+            }
+
+            log.info("Comparing products: {}", productIds);
+
+            String response = aiProductAssistantService.compareProducts(productIds);
+
+            Map<String, Object> result = new HashMap<>();
+            result.put("response", response);
+            result.put("success", true);
+            result.put("type", "product-comparison");
+            result.put("timestamp", System.currentTimeMillis());
+
+            return ResponseEntity.ok(result);
+
+        } catch (Exception e) {
+            log.error("Error in product comparison", e);
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("error", e.getMessage());
+            errorResponse.put("success", false);
+            return ResponseEntity.internalServerError().body(errorResponse);
+        }
+    }
+
+    @PostMapping("/product-assistant/recommend")
+    public ResponseEntity<Map<String, Object>> recommendProducts(@RequestBody Map<String, String> request) {
+        try {
+            String preferences = request.get("preferences");
+
+            if (preferences == null || preferences.trim().isEmpty()) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("error", "Preferences cannot be empty"));
+            }
+
+            log.info("Generating product recommendations");
+
+            String response = aiProductAssistantService.provideProductRecommendations(preferences);
+
+            Map<String, Object> result = new HashMap<>();
+            result.put("response", response);
+            result.put("success", true);
+            result.put("type", "product-recommendations");
+            result.put("timestamp", System.currentTimeMillis());
+
+            return ResponseEntity.ok(result);
+
+        } catch (Exception e) {
+            log.error("Error in product recommendations", e);
             Map<String, Object> errorResponse = new HashMap<>();
             errorResponse.put("error", e.getMessage());
             errorResponse.put("success", false);

@@ -9,6 +9,7 @@ import { environment } from '../../../../environments/environment.development';
 import { CurrencyPipe } from '@angular/common';
 import { BadgeModule } from 'primeng/badge';
 import { Router, RouterModule } from '@angular/router';
+import { AiChatbotComponent } from '../../../core/components/ai-chatbot/ai-chatbot.component';
 
 @Component({
   selector: 'app-home',
@@ -17,7 +18,8 @@ import { Router, RouterModule } from '@angular/router';
     CarouselModule,
     CurrencyPipe,
     BadgeModule,
-    RouterModule
+    RouterModule,
+    AiChatbotComponent
   ],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']

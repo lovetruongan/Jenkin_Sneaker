@@ -1,0 +1,115 @@
+<!-- Chat Button -->
+<button
+  class="chat-button"
+  (click)="toggleChat()"
+  [class.active]="isOpen()"
+  aria-label="Toggle AI Assistant">
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+  </svg>
+</button>
+
+<!-- Chat Window -->
+<div class="chat-container" [class.open]="isOpen()">
+  <div class="chat-header">
+    <div class="header-content">
+      <h3>AI Shopping Assistant</h3>
+      <span class="status-indicator"></span>
+    </div>
+    <div class="header-actions">
+      <button class="icon-button" (click)="initializeAI()" title="Initialize AI Database (Admin only)">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+          <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+          <line x1="12" y1="22.08" x2="12" y2="12"></line>
+        </svg>
+      </button>
+      <button class="icon-button" (click)="clearChat()" title="Clear chat">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="3 6 5 6 21 6"></polyline>
+          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+        </svg>
+      </button>
+      <button class="icon-button" (click)="toggleChat()" title="Close">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="chat-messages" #scrollContainer>
+    @if (!hasMessages()) {
+      <div class="empty-state">
+        <p>Start a conversation!</p>
+      </div>
+    }
+
+    @for (message of messages(); track message.timestamp) {
+      <div class="message" [class.user]="message.sender === 'user'" [class.bot]="message.sender === 'bot'" [class.error]="message.isError">
+        <div class="message-bubble">
+          <p [innerHTML]="message.content"></p>
+        </div>
+        <span class="timestamp">{{ message.timestamp | date:'short' }}</span>
+      </div>
+    }
+
+    @if (isLoading()) {
+      <div class="message bot loading">
+        <div class="message-bubble">
+          <div class="typing-indicator">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+
+  <div class="chat-input-container">
+    @if (imagePreview()) {
+      <div class="image-preview">
+        <img [src]="imagePreview()" alt="Selected image">
+        <button class="remove-image" (click)="clearImage()">×</button>
+      </div>
+    }
+
+    <div class="chat-input">
+      <input
+        type="file"
+        #fileInput
+        accept="image/*"
+        (change)="onImageSelected($event)"
+        style="display: none;">
+      
+      <button 
+        class="attach-button"
+        (click)="triggerFileInput()"
+        title="Attach image">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
+        </svg>
+      </button>
+
+      <input
+        type="text"
+        [(ngModel)]="userInput"
+        (keypress)="onKeyPress($event)"
+        placeholder="Ask about sneakers..."
+        [disabled]="isLoading()"
+        class="message-input">
+
+      <button 
+        class="send-button"
+        (click)="sendMessage()"
+        [disabled]="!canSend() || isLoading()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="22" y1="2" x2="11" y2="13"></line>
+          <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+        </svg>
+      </button>
+    </div>
+  </div>
+</div> 
