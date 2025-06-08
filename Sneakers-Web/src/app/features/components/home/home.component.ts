@@ -9,9 +9,13 @@ import { environment } from '../../../../environments/environment.development';
 import { CurrencyPipe } from '@angular/common';
 import { BadgeModule } from 'primeng/badge';
 import { Router, RouterModule } from '@angular/router';
+<<<<<<< HEAD
 import { RecommendationService } from '../../../core/services/recommendation.service';
 import { CategoriesService } from '../../../core/services/categories.service';
 import { CategoryDto } from '../../../core/dtos/Category.dto';
+=======
+import { AiChatbotComponent } from '../../../core/components/ai-chatbot/ai-chatbot.component';
+>>>>>>> rag
 
 @Component({
   selector: 'app-home',
@@ -20,7 +24,8 @@ import { CategoryDto } from '../../../core/dtos/Category.dto';
     CarouselModule,
     CurrencyPipe,
     BadgeModule,
-    RouterModule
+    RouterModule,
+    AiChatbotComponent
   ],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']

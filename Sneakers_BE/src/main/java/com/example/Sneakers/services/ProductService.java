@@ -1,5 +1,7 @@
 package com.example.Sneakers.services;
 
+import com.example.Sneakers.ai.listeners.ProductEventListener.ProductDeleteEvent;
+import com.example.Sneakers.ai.listeners.ProductEventListener.ProductSaveEvent;
 import com.example.Sneakers.dtos.ProductDTO;
 import com.example.Sneakers.dtos.ProductImageDTO;
 import com.example.Sneakers.exceptions.DataNotFoundException;
@@ -14,6 +16,7 @@ import com.example.Sneakers.responses.ListProductResponse;
 import com.example.Sneakers.responses.ProductResponse;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -30,6 +33,10 @@ public class ProductService implements IProductService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
     private final ProductImageRepository productImageRepository;
+<<<<<<< HEAD
+=======
+    private final ApplicationEventPublisher eventPublisher;
+>>>>>>> rag
 
     @Override
     @Transactional
@@ -45,7 +52,12 @@ public class ProductService implements IProductService {
                 .category(existingCategory)
                 .discount(productDTO.getDiscount())
                 .build();
-        return productRepository.save(newProduct);
+        Product savedProduct = productRepository.save(newProduct);
+
+        // Publish event for indexing
+        eventPublisher.publishEvent(new ProductSaveEvent(savedProduct));
+
+        return savedProduct;
     }
 
     @Override
@@ -87,7 +99,12 @@ public class ProductService implements IProductService {
                 existingProduct.setThumbnail(productDTO.getThumbnail());
             }
             existingProduct.setDiscount(productDTO.getDiscount());
-            return productRepository.save(existingProduct);
+            Product updatedProduct = productRepository.save(existingProduct);
+
+            // Publish event for re-indexing
+            eventPublisher.publishEvent(new ProductSaveEvent(updatedProduct));
+
+            return updatedProduct;
         }
         return null;
     }
@@ -96,7 +113,11 @@ public class ProductService implements IProductService {
     @Transactional
     public void deleteProduct(Long id) {
         Optional<Product> optionalProduct = productRepository.findById(id);
-        optionalProduct.ifPresent(productRepository::delete);
+        if (optionalProduct.isPresent()) {
+            productRepository.delete(optionalProduct.get());
+            // Publish event for removing from index
+            eventPublisher.publishEvent(new ProductDeleteEvent(id));
+        }
     }
 
     @Override
