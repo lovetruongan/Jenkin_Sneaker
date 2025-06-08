@@ -33,10 +33,7 @@ public class ProductService implements IProductService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
     private final ProductImageRepository productImageRepository;
-<<<<<<< HEAD
-=======
     private final ApplicationEventPublisher eventPublisher;
->>>>>>> rag
 
     @Override
     @Transactional
