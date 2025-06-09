@@ -21,6 +21,8 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { VoucherService } from '../../../core/services/voucher.service';
 import { VoucherApplicationResponseDto } from '../../../core/dtos/voucherApplication.dto';
 import { ButtonModule } from 'primeng/button';
+import { StripePaymentComponent } from '../stripe-payment/stripe-payment.component';
+import { DialogModule } from 'primeng/dialog';
 
 @Component({
   selector: 'app-order',
@@ -37,7 +39,9 @@ import { ButtonModule } from 'primeng/button';
     BlockUIModule,
     ProgressSpinnerModule,
     AsyncPipe,
-    ButtonModule
+    ButtonModule,
+    StripePaymentComponent,
+    DialogModule
   ],
   providers: [
     ToastService,
@@ -59,7 +63,7 @@ export class OrderComponent extends BaseComponent implements OnInit,AfterViewIni
   
   private productOrderLocalStorage: ProductsInCartDto[] = [];
   public blockedUi: boolean = false;
-  private orderId: number = 0;
+  public orderId: number = 0;
 
   public methodShipping!: {
     name: string,
@@ -75,7 +79,12 @@ export class OrderComponent extends BaseComponent implements OnInit,AfterViewIni
   }[] = [
     { name: 'Thanh toán khi nhận hàng', key: 'Cash' },
     { name: 'Chuyển khoản ngân hàng', key: 'Banking' },
+    { name: 'Thanh toán bằng thẻ Visa/Mastercard', key: 'Stripe' },
   ];
+
+  // Stripe payment properties
+  public showStripeDialog: boolean = false;
+  public isStripePayment: boolean = false;
 
   constructor(
     private fb: FormBuilder,
@@ -173,44 +182,122 @@ export class OrderComponent extends BaseComponent implements OnInit,AfterViewIni
     if (this.inforShipForm.invalid){
       this.toastService.fail("Vui lòng nhập đầy đủ thông tin giao hàng");
     } else {
-      this.blockUi();
-      const orderData = {
-        fullname: this.inforShipForm.value.fullName,
-        email: this.inforShipForm.value.email,
-        phone_number: this.inforShipForm.value.phoneNumber,
-        address: this.inforShipForm.value.address,
-        note: this.inforShipForm.value.note,
-        shipping_method: this.methodShippingValue.name,
-        payment_method: this.selectedPayMethod.name,
-        cart_items: this.productOrder,
-        total_money: this.totalCost, // Original total
-        ...(this.isVoucherApplied && { voucher_code: this.voucherCode }) // Add voucher code if applied
-      };
-      
-      this.orderService.postOrder(orderData).pipe(
-        tap((orderInfor: any) => {
-          this.orderId = orderInfor.id;
-          this.commonService.orderId.next(orderInfor.id); 
-        }),
-        switchMap(() => {
-          this.productOrderLocalStorage = JSON.parse(localStorage.getItem("productOrder")!);
-          const fncDel = this.productOrderLocalStorage.map((po) => this.productService.deleteProductFromCart(po.id))
-          return forkJoin(fncDel);
-        }),
-        tap(() => {
-          this.commonService.intermediateObservable.next(true);
-          localStorage.removeItem("productOrder");
-          this.blockUi();
-          this.router.navigate([`/order-detail/${this.orderId}`]);
-        }),
-        catchError((err) => {
-          this.blockUi();
-          this.toastService.fail("Đặt hàng không thành công");
-          return of(err);
-        }),
-        takeUntil(this.destroyed$)
-      ).subscribe();
+      // Check if Stripe payment is selected
+      if (this.selectedPayMethod.key === 'Stripe') {
+        this.processStripeOrder();
+      } else {
+        this.processRegularOrder();
+      }
     }
+  }
+
+  private processStripeOrder(): void {
+    // Create order first, then show Stripe payment dialog
+    this.blockUi();
+    const orderData = {
+      fullname: this.inforShipForm.value.fullName,
+      email: this.inforShipForm.value.email,
+      phone_number: this.inforShipForm.value.phoneNumber,
+      address: this.inforShipForm.value.address,
+      note: this.inforShipForm.value.note,
+      shipping_method: this.methodShippingValue.name,
+      payment_method: 'Pending Stripe Payment',
+      cart_items: this.productOrder,
+      total_money: this.totalCost,
+      ...(this.isVoucherApplied && { voucher_code: this.voucherCode })
+    };
+
+    this.orderService.postOrder(orderData).pipe(
+      tap((orderInfor: any) => {
+        this.orderId = orderInfor.id;
+        this.commonService.orderId.next(orderInfor.id);
+        this.blockUi();
+        // Show Stripe payment dialog
+        this.showStripeDialog = true;
+        this.isStripePayment = true;
+      }),
+      catchError((err) => {
+        this.blockUi();
+        this.toastService.fail("Không thể tạo đơn hàng");
+        return of(err);
+      }),
+      takeUntil(this.destroyed$)
+    ).subscribe();
+  }
+
+  private processRegularOrder(): void {
+    this.blockUi();
+    const orderData = {
+      fullname: this.inforShipForm.value.fullName,
+      email: this.inforShipForm.value.email,
+      phone_number: this.inforShipForm.value.phoneNumber,
+      address: this.inforShipForm.value.address,
+      note: this.inforShipForm.value.note,
+      shipping_method: this.methodShippingValue.name,
+      payment_method: this.selectedPayMethod.name,
+      cart_items: this.productOrder,
+      total_money: this.totalCost,
+      ...(this.isVoucherApplied && { voucher_code: this.voucherCode })
+    };
+
+    this.orderService.postOrder(orderData).pipe(
+      tap((orderInfor: any) => {
+        this.orderId = orderInfor.id;
+        this.commonService.orderId.next(orderInfor.id);
+      }),
+      switchMap(() => {
+        this.productOrderLocalStorage = JSON.parse(localStorage.getItem("productOrder")!);
+        const fncDel = this.productOrderLocalStorage.map((po) => this.productService.deleteProductFromCart(po.id))
+        return forkJoin(fncDel);
+      }),
+      tap(() => {
+        this.commonService.intermediateObservable.next(true);
+        localStorage.removeItem("productOrder");
+        this.blockUi();
+        this.router.navigate([`/order-detail/${this.orderId}`]);
+      }),
+      catchError((err) => {
+        this.blockUi();
+        this.toastService.fail("Đặt hàng không thành công");
+        return of(err);
+      }),
+      takeUntil(this.destroyed$)
+    ).subscribe();
+  }
+
+  onStripePaymentSuccess(paymentIntent: any): void {
+    // Clear cart and redirect to order detail
+    this.productOrderLocalStorage = JSON.parse(localStorage.getItem("productOrder")!);
+    const fncDel = this.productOrderLocalStorage.map((po) => this.productService.deleteProductFromCart(po.id));
+    
+    forkJoin(fncDel).pipe(
+      tap(() => {
+        this.commonService.intermediateObservable.next(true);
+        localStorage.removeItem("productOrder");
+        this.showStripeDialog = false;
+        this.toastService.success("Thanh toán thành công!");
+        this.router.navigate([`/order-detail/${this.orderId}`]);
+      }),
+      catchError((err) => {
+        console.error('Error clearing cart:', err);
+        // Still redirect even if cart clearing fails
+        this.showStripeDialog = false;
+        this.router.navigate([`/order-detail/${this.orderId}`]);
+        return of(err);
+      }),
+      takeUntil(this.destroyed$)
+    ).subscribe();
+  }
+
+  onStripePaymentError(error: string): void {
+    this.toastService.fail(`Thanh toán thất bại: ${error}`);
+    // Keep dialog open for retry
+  }
+
+  onStripePaymentCancel(): void {
+    this.showStripeDialog = false;
+    this.toastService.success("Đã hủy thanh toán");
+    // Order is already created but payment is pending
   }
 
   blockUi() {

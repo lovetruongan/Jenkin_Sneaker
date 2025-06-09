@@ -1,0 +1,210 @@
+.stripe-test-container {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  padding: 2rem 0;
+
+  .container {
+    max-width: 1200px;
+  }
+
+  h2 {
+    color: white;
+    font-weight: 700;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  }
+
+  .test-form {
+    .form-section {
+      border-bottom: 1px solid #e9ecef;
+      padding-bottom: 1.5rem;
+
+      h5 {
+        color: #495057;
+        margin-bottom: 1rem;
+        font-weight: 600;
+      }
+
+      label {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 0.5rem;
+        display: block;
+      }
+    }
+
+    .test-cards-info {
+      .card-info {
+        background: #f8f9fa;
+        transition: transform 0.2s ease;
+
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h6 {
+          margin-bottom: 0.75rem;
+          font-weight: 600;
+        }
+
+        p {
+          margin-bottom: 0.25rem;
+          font-size: 0.9rem;
+          
+          strong {
+            color: #495057;
+          }
+        }
+      }
+    }
+
+    .test-actions {
+      padding-top: 1.5rem;
+      border-top: 1px solid #e9ecef;
+
+      .p-button {
+        margin: 0 0.5rem;
+        min-width: 200px;
+        
+        &.p-button-lg {
+          padding: 1rem 2rem;
+          font-size: 1.1rem;
+          font-weight: 600;
+        }
+      }
+    }
+  }
+
+  .test-result-details {
+    p {
+      margin-bottom: 0.75rem;
+      font-size: 1rem;
+      
+      strong {
+        color: #495057;
+      }
+    }
+
+    .success-details {
+      border-left: 4px solid #28a745;
+      
+      h6 {
+        color: #155724;
+        margin-bottom: 0.75rem;
+      }
+      
+      p {
+        color: #155724;
+        margin-bottom: 0.5rem;
+      }
+    }
+
+    .error-details {
+      border-left: 4px solid #dc3545;
+      
+      h6 {
+        color: #721c24;
+        margin-bottom: 0.75rem;
+      }
+    }
+  }
+
+  // PrimeNG overrides
+  ::ng-deep {
+    .p-card {
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+      border: none;
+
+      .p-card-header {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 12px 12px 0 0;
+      }
+
+      .p-card-body {
+        padding: 2rem;
+      }
+    }
+
+    .p-inputtext, .p-inputnumber-input {
+      border-radius: 6px;
+      border: 1px solid #ddd;
+      padding: 0.75rem;
+      font-size: 1rem;
+
+      &:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+      }
+    }
+
+    .p-button {
+      border-radius: 6px;
+      transition: all 0.3s ease;
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      }
+
+      &.p-button-secondary {
+        background: #6c757d;
+        border-color: #6c757d;
+
+        &:hover {
+          background: #5a6268;
+          border-color: #545b62;
+        }
+      }
+    }
+
+    .p-toast {
+      .p-toast-message {
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      }
+    }
+  }
+}
+
+// Mobile responsiveness
+@media (max-width: 768px) {
+  .stripe-test-container {
+    padding: 1rem 0;
+
+    .container {
+      padding: 0 1rem;
+    }
+
+    .test-actions {
+      .p-button {
+        display: block;
+        width: 100%;
+        margin: 0.5rem 0;
+        min-width: auto;
+      }
+    }
+
+    .test-cards-info {
+      .row > div {
+        margin-bottom: 1rem;
+      }
+    }
+  }
+}
+
+// Animation keyframes
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.stripe-test-container .p-card {
+  animation: fadeInUp 0.5s ease-out;
+} 

@@ -98,8 +98,31 @@
                         </li>
                     }
                 </ul>
-                <button (click)="order()" class="order-button">Đặt hàng</button>
+                <button (click)="order()" class="order-button">
+                    {{ selectedPayMethod.key === 'Stripe' ? 'Tiến hành thanh toán' : 'Đặt hàng' }}
+                </button>
             </div> 
         </div>
     </div>
+
+    <!-- Stripe Payment Dialog -->
+    <p-dialog 
+        header="Thanh toán bằng thẻ" 
+        [(visible)]="showStripeDialog" 
+        [modal]="true" 
+        [style]="{ width: '600px' }"
+        [closable]="false"
+        [draggable]="false"
+        [resizable]="false">
+        
+        <app-stripe-payment
+            [paymentAmount]="finalCost + methodShippingValue.price"
+            [orderId]="orderId"
+            [customerName]="inforShipForm.value.fullName"
+            [customerEmail]="inforShipForm.value.email"
+            (paymentSuccess)="onStripePaymentSuccess($event)"
+            (paymentError)="onStripePaymentError($event)"
+            (paymentCancel)="onStripePaymentCancel()">
+        </app-stripe-payment>
+    </p-dialog>
 </div>

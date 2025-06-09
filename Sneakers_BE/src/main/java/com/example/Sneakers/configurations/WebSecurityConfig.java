@@ -47,6 +47,11 @@ public class WebSecurityConfig {
                                     String.format("%s/users/login", apiPrefix)
                             )
                             .permitAll()
+                            
+                            // Allow all Stripe endpoints
+                            .requestMatchers(GET, String.format("%s/stripe/**", apiPrefix)).permitAll()
+                            .requestMatchers(POST, String.format("%s/stripe/**", apiPrefix)).permitAll()
+                            .requestMatchers(PUT, String.format("%s/stripe/**", apiPrefix)).permitAll()
 
                             // Allow all statistics endpoints
                             .requestMatchers(GET, String.format("%s/statistics/**", apiPrefix)).permitAll()
