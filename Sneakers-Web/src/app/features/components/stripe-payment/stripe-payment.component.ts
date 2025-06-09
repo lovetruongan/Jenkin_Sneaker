@@ -157,55 +157,71 @@ export class StripePaymentComponent implements OnInit, AfterViewInit, OnDestroy 
   async processPayment(): Promise<void> {
     if (!this.cardElement || this.isProcessing) return;
 
-    try {
-      this.isProcessing = true;
-      this.stripeService.resetPaymentStatus();
+    this.isProcessing = true;
+    this.stripeService.resetPaymentStatus();
 
-      // Create payment intent
-      const paymentRequest: StripePaymentRequest = {
-        amount: this.paymentAmount * 100, // Convert to cents
-        currency: 'vnd',
-        order_id: this.orderId,
-        customer_email: this.customerEmail,
-        customer_name: this.customerName
-      };
+    // 1. Create Payment Intent on our backend
+    const paymentRequest: StripePaymentRequest = {
+      amount: this.paymentAmount,
+      currency: 'vnd',
+      order_id: this.orderId,
+      customer_email: this.customerEmail,
+      customer_name: this.customerName
+    };
 
-      this.stripeService.createPaymentIntent(paymentRequest)
-        .pipe(takeUntil(this.destroy$))
-        .subscribe({
-          next: async (response) => {
-            try {
-              const paymentIntent = await this.stripeService.confirmPayment(
-                response.client_secret,
-                {
-                  name: this.customerName,
-                  email: this.customerEmail
-                }
-              );
-
-              if (paymentIntent.status === 'succeeded') {
-                this.toastService.success('Thanh toán thành công!');
-                this.paymentSuccess.emit(paymentIntent);
+    this.stripeService.createPaymentIntent(paymentRequest)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: async (response) => {
+          try {
+            // 2. Confirm the card payment on the client-side with Stripe.js
+            const paymentResult = await this.stripeService.confirmPayment(
+              response.client_secret,
+              {
+                name: this.customerName,
+                email: this.customerEmail
               }
-            } catch (confirmError: any) {
-              this.toastService.fail(`Thanh toán thất bại: ${confirmError.message}`);
-              this.paymentError.emit(confirmError.message);
-            } finally {
-              this.isProcessing = false;
-            }
-          },
-          error: (error) => {
-            this.isProcessing = false;
-            this.toastService.fail('Không thể tạo thanh toán. Vui lòng thử lại.');
-            this.paymentError.emit(error.message || 'Payment creation failed');
-          }
-        });
+            );
 
-    } catch (error: any) {
-      this.isProcessing = false;
-      this.toastService.fail(`Lỗi thanh toán: ${error.message}`);
-      this.paymentError.emit(error.message);
-    }
+            if (paymentResult.status === 'succeeded') {
+              // 3. Inform our backend that the payment was successful
+              this.stripeService.confirmPaymentStatus(paymentResult.id)
+                .pipe(takeUntil(this.destroy$))
+                .subscribe({
+                  next: (backendConfirmResponse) => {
+                    if (backendConfirmResponse.status === 'succeeded') {
+                      this.toastService.success('Thanh toán thành công!');
+                      this.paymentSuccess.emit(paymentResult);
+                    } else {
+                      const errorMessage = backendConfirmResponse.message || 'Trạng thái thanh toán không thành công.';
+                      this.toastService.fail(`Xác nhận thanh toán thất bại: ${errorMessage}`);
+                      this.paymentError.emit(errorMessage);
+                    }
+                    this.isProcessing = false;
+                  },
+                  error: (backendError) => {
+                    this.isProcessing = false;
+                    this.toastService.fail('Lỗi khi xác nhận thanh toán với máy chủ.');
+                    this.paymentError.emit(backendError.message || 'Backend confirmation failed');
+                  }
+                });
+            } else {
+              this.isProcessing = false;
+              this.toastService.fail(`Thanh toán thất bại: ${paymentResult.status}`);
+              this.paymentError.emit(`Trạng thái thanh toán: ${paymentResult.status}`);
+            }
+          } catch (confirmError: any) {
+            this.isProcessing = false;
+            this.toastService.fail(`Lỗi xác nhận thanh toán: ${confirmError.message}`);
+            this.paymentError.emit(confirmError.message);
+          }
+        },
+        error: (error) => {
+          this.isProcessing = false;
+          this.toastService.fail('Không thể tạo yêu cầu thanh toán.');
+          this.paymentError.emit(error.message || 'Payment creation failed');
+        }
+      });
   }
 
   cancelPayment(): void {

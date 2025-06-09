@@ -4,6 +4,7 @@ import com.example.Sneakers.dtos.StripePaymentRequestDTO;
 import com.example.Sneakers.dtos.StripePaymentResponseDTO;
 import com.example.Sneakers.exceptions.DataNotFoundException;
 import com.example.Sneakers.models.Order;
+import com.example.Sneakers.models.OrderStatus;
 import com.example.Sneakers.repositories.OrderRepository;
 import com.stripe.exception.StripeException;
 import com.stripe.model.PaymentIntent;
@@ -24,16 +25,27 @@ public class StripeService implements IStripeService {
     
     private final OrderRepository orderRepository;
 
+    private Long getShippingCost(String shippingMethod) throws Exception {
+        return switch (shippingMethod) {
+            case "Tiêu chuẩn" -> 30000L;
+            case "Nhanh" -> 40000L;
+            case "Hỏa tốc" -> 60000L;
+            default -> 0L; // Or throw an exception for unknown method
+        };
+    }
+
     @Override
     public StripePaymentResponseDTO createPaymentIntent(StripePaymentRequestDTO request) throws Exception {
         try {
             // Verify order exists
             Order order = orderRepository.findById(request.getOrderId())
                     .orElseThrow(() -> new DataNotFoundException("Order not found with id: " + request.getOrderId()));
-
+            
+            Long shippingCost = getShippingCost(order.getShippingMethod());
+            Long totalAmount = request.getAmount() + shippingCost;
             // Create payment intent
             PaymentIntentCreateParams params = PaymentIntentCreateParams.builder()
-                    .setAmount(request.getAmount()) // Amount in VND cents
+                    .setAmount(totalAmount) // Amount in VND (base unit)
                     .setCurrency(request.getCurrency())
                     .setAutomaticPaymentMethods(
                             PaymentIntentCreateParams.AutomaticPaymentMethods.builder()
@@ -77,8 +89,8 @@ public class StripeService implements IStripeService {
                             .orElseThrow(() -> new DataNotFoundException("Order not found with id: " + orderId));
                     
                     // Update order status to processing
-                    order.setStatus("processing");
-                    order.setPaymentMethod("Stripe Card Payment");
+                    order.setStatus(OrderStatus.PROCESSING);
+                    order.setPaymentMethod("Thanh toán thẻ thành công");
                     orderRepository.save(order);
                 }
             }

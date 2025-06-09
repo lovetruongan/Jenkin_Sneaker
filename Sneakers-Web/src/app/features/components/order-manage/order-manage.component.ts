@@ -1,6 +1,6 @@
 import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { NgSwitch, NgSwitchCase } from '@angular/common';
+import { NgSwitch, NgSwitchCase, NgClass } from '@angular/common';
 import { CurrencyPipe, DatePipe, isPlatformBrowser } from '@angular/common';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BaseComponent } from '../../../core/commonComponent/base.component';
@@ -45,7 +45,8 @@ import { DialogModule } from 'primeng/dialog';
     ReactiveFormsModule,
     InputTextModule,
     CalendarModule,
-    DialogModule
+    DialogModule,
+    NgClass
   ],
   providers: [
     MessageService,
@@ -197,6 +198,19 @@ export class OrderManageComponent extends BaseComponent implements OnInit {
     if (month.length < 2) month = '0' + month;
     if (day.length < 2) day = '0' + day;
     return [year, month, day].join('-');
+  }
+
+  getPaymentMethodClass(paymentMethod: string): string {
+    if (paymentMethod === 'Stripe Card Payment') {
+      return 'payment-method-stripe-success';
+    }
+    if (paymentMethod === 'Pending Stripe Payment') {
+      return 'payment-method-stripe-pending';
+    }
+    if (paymentMethod === 'Thanh toán khi nhận hàng') {
+      return 'payment-method-cod';
+    }
+    return 'payment-method-default';
   }
 
   onOrderStateChange(event: any, orderId: number) {

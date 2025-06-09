@@ -162,3 +162,37 @@
 .header-search-container .p-inputtext:focus {
   width: 350px;
 }
+
+.payment-method-stripe-success,
+.payment-method-stripe-pending,
+.payment-method-cod,
+.payment-method-default {
+    padding: 5px 10px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-align: center;
+    display: inline-block;
+    color: white;
+}
+
+.payment-method-stripe-success {
+    background-color: #28a745; // Green
+    border: 1px solid #218838;
+}
+
+.payment-method-stripe-pending {
+    background-color: #ffc107; // Yellow
+    color: #212529;
+    border: 1px solid #e0a800;
+}
+
+.payment-method-cod {
+    background-color: #17a2b8; // Teal
+    border: 1px solid #138496;
+}
+
+.payment-method-default {
+    background-color: #6c757d; // Gray
+    border: 1px solid #5a6268;
+}

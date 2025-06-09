@@ -70,16 +70,16 @@
                     [sortOrder]="-1">
                 <ng-template pTemplate="header">
                     <tr>
-                        <th style="width:10%">Mã ĐH</th>
-                        <th style="width:20%">Người mua</th>
-                        <th style="width:20%">Email</th>
-                        <th style="width:15%">Điện thoại</th>
-                        <th pSortableColumn="order_date" style="width:15%">
+                        <th style="width:8%">Mã ĐH</th>
+                        <th style="width:15%">Người mua</th>
+                        <th style="width:15%">Email / SĐT</th>
+                        <th style="width:15%">Phương thức TT</th>
+                        <th pSortableColumn="order_date" style="width:12%">
                             Ngày đặt
                             <p-sortIcon field="order_date"></p-sortIcon>
                         </th>
                         <th style="width:15%">Tổng tiền</th>
-                        <th style="width:15%">Trạng thái</th>
+                        <th style="width:15%">Trạng thái ĐH</th>
                         <th style="width:5%"></th>
                     </tr>
                 </ng-template>
@@ -87,11 +87,18 @@
                     <tr>
                         <td data-label="Mã ĐH">#{{ order.id }}</td>
                         <td data-label="Người mua">{{ order.buyer_name }}</td>
-                        <td data-label="Email">{{ order.email }}</td>
-                        <td data-label="Điện thoại">{{ order.phone_number }}</td>
+                        <td data-label="Email / SĐT">
+                            <div>{{ order.email }}</div>
+                            <div>{{ order.phone_number }}</div>
+                        </td>
+                        <td data-label="Phương thức TT">
+                            <span [ngClass]="getPaymentMethodClass(order.payment_method)">
+                                {{ order.payment_method }}
+                            </span>
+                        </td>
                         <td data-label="Ngày đặt">{{ order.order_date | date:'dd/MM/yyyy' }}</td>
                         <td data-label="Tổng tiền">{{ order.total_money | currency:'VND':'symbol':'1.0-0' }}</td>
-                        <td data-label="Trạng thái">
+                        <td data-label="Trạng thái ĐH">
                             <p-dropdown [options]="orderStateOptions" 
                                         [(ngModel)]="order.status"
                                         optionLabel="label" 

@@ -116,7 +116,7 @@
         [resizable]="false">
         
         <app-stripe-payment
-            [paymentAmount]="finalCost + methodShippingValue.price"
+            [paymentAmount]="finalCost"
             [orderId]="orderId"
             [customerName]="inforShipForm.value.fullName"
             [customerEmail]="inforShipForm.value.email"
