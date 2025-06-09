@@ -23,6 +23,7 @@ import { OrderManageComponent } from './features/components/order-manage/order-m
 import { ADMIN_ROUTES } from './features/admin/admin.routes';
 // import { VoucherManageComponent } from './features/components/voucher-manage/voucher-manage.component';
 import { VoucherManageComponent } from './features/components/voucher-manage/voucher-manage.component';
+import { MomoReturnComponent } from './features/components/momo-return/momo-return.component';
 
 export const routes: Routes = [
   {
@@ -34,6 +35,10 @@ export const routes: Routes = [
     path: 'register',
     component: RegisterComponent,
     canActivate: [loginGuard]
+  },
+  {
+    path: 'momo-return',
+    component: MomoReturnComponent
   },
   {
     path: '',

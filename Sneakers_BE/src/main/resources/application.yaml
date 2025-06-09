@@ -35,3 +35,13 @@ stripe:
   api:
     secret-key: sk_test_51RYEK0RoKh7pvaZex5vQJVXSpDURybrQqfp63OQ6bhwPLY0OXQVdfJNegHjea1y7ZXSKJ8NZ2chPBVLA5MHDxWUM00vCyGDa1x
     publishable-key: pk_test_51RYEK0RoKh7pvaZeTzq1TjxJXE4Rfr5xwKIP6uL1kJDET3mb78shODbWhYyL1znUhqyanmoPV18g8zGCTkDUuok6003ObawJA1
+
+# Momo Configuration (Test Mode)
+# Replace with your actual MoMo merchant credentials
+momo:
+  partner-code: "YOUR_MOMO_PARTNER_CODE"
+  access-key: "YOUR_MOMO_ACCESS_KEY"
+  secret-key: "YOUR_MOMO_SECRET_KEY"
+  api-endpoint: "https://test-payment.momo.vn/v2/gateway/api/create"
+  redirect-url: "http://localhost:4200/momo-return" # URL for frontend to handle MoMo return
+  ipn-url: "http://your-backend-domain.com/api/v1/momo/ipn" # Your backend endpoint for IPN
