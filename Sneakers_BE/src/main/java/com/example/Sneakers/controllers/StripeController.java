@@ -83,10 +83,9 @@ public class StripeController {
     @GetMapping("/config")
     public ResponseEntity<?> getStripeConfig() {
         // Return the publishable key for frontend
-        // In a real app, this should be read from a config file or environment variable
         return ResponseEntity.ok(
                 MessageResponse.builder()
-                        .message("pk_test_YOUR_PUBLISHABLE_KEY_HERE")
+                        .message("pk_test_51RYEK0RoKh7pvaZeTzq1TjxJXE4Rfr5xwKIP6uL1kJDET3mb78shODbWhYyL1znUhqyanmoPV18g8zGCTkDUuok6003ObawJA1")
                         .build()
         );
     }
