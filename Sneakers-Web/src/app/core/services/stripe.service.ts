@@ -51,7 +51,8 @@ export class StripeService {
         reject('Stripe.js has not loaded');
       } else {
         if (!this.stripe) {
-          this.stripe = Stripe('pk_test_51RYEK0RoKh7pvaZeTzq1TjxJXE4Rfr5xwKIP6uL1kJDET3mb78shODbWhYyL1znUhqyanmoPV18g8zGCTkDUuok6003ObawJA1');
+          // IMPORTANT: Replace with your actual Stripe Publishable Key
+          this.stripe = Stripe('pk_test_YOUR_PUBLISHABLE_KEY_HERE');
           if (this.stripe) {
             this.elements = this.stripe.elements();
             this.stripeReady.next(true);
