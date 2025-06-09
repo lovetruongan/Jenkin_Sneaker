@@ -39,6 +39,7 @@ export class AllProductComponent extends BaseComponent implements OnInit, AfterV
   private token: string | null = null;
   public roleId!: number;
   public products: ProductDto[] = [];
+  public displayedProducts: ProductDto[] = []; // Products for current page
   public sortOptions: MenuItem[] = [
     { label: 'Giá từ thấp đến cao', value: 'price' },
     { label: 'Giá từ cao đến thấp', value: '!price' },
@@ -51,6 +52,11 @@ export class AllProductComponent extends BaseComponent implements OnInit, AfterV
   public apiImage: string = environment.apiImage;
   public isLoading: boolean = false;
   public error: string | null = null;
+
+  // Pagination properties
+  public first: number = 0;
+  public rows: number = 12;
+  public totalRecords: number = 0;
 
   // Thêm các biến cho bộ lọc thương hiệu
   public brandOptions = [
@@ -84,7 +90,9 @@ export class AllProductComponent extends BaseComponent implements OnInit, AfterV
           filter((product : AllProductDto) => !!product),
           tap((product: AllProductDto) => {
             this.products = product.products;
-            this.productsHighlight = product.products.slice(0, 5);
+            this.totalRecords = this.products.length;
+            this.updateDisplayedProducts();
+            this.productsHighlight = product.products.filter(p => p.quantity > 0).slice(0, 5);
           }),
         )
       }),
@@ -131,6 +139,15 @@ export class AllProductComponent extends BaseComponent implements OnInit, AfterV
     this.filterProducts();
   }
 
+  private sortByAvailability(products: ProductDto[]): ProductDto[] {
+    return [...products].sort((a, b) => {
+      // Ưu tiên sản phẩm còn hàng
+      if (a.quantity > 0 && b.quantity === 0) return -1;
+      if (a.quantity === 0 && b.quantity > 0) return 1;
+      return 0;
+    });
+  }
+
   filterProducts() {
     let filteredProducts = [...this.allProducts];
 
@@ -149,8 +166,12 @@ export class AllProductComponent extends BaseComponent implements OnInit, AfterV
       product.price <= this.priceFilterValue[1] * 500000
     );
 
-    this.products = filteredProducts;
-    this.productsHighlight = filteredProducts.slice(0, 5);
+    // Sắp xếp ưu tiên sản phẩm còn hàng
+    this.products = this.sortByAvailability(filteredProducts);
+    this.totalRecords = this.products.length;
+    this.first = 0; // Reset to first page
+    this.updateDisplayedProducts();
+    this.productsHighlight = filteredProducts.filter(p => p.quantity > 0).slice(0, 5);
   }
 
   onSortChange(event: any) {
@@ -162,6 +183,21 @@ export class AllProductComponent extends BaseComponent implements OnInit, AfterV
       this.sortOrder = 1;
       this.sortField = value;
     }
+    
+    // Sort products by price and availability
+    this.products.sort((a, b) => {
+      // First sort by availability
+      const availabilitySort = this.sortByAvailability([a, b]);
+      if (availabilitySort[0] === a) return -1;
+      if (availabilitySort[0] === b) return 1;
+      
+      // Then sort by price
+      const aValue = a[this.sortField as keyof ProductDto] ?? 0;
+      const bValue = b[this.sortField as keyof ProductDto] ?? 0;
+      return this.sortOrder * (aValue > bValue ? 1 : -1);
+    });
+    
+    this.updateDisplayedProducts();
   }
 
   onCategoryChange(event: any){
@@ -170,8 +206,12 @@ export class AllProductComponent extends BaseComponent implements OnInit, AfterV
       takeUntil(this.destroyed$),
       tap((productByCategory: AllProductDto) => {
         if (productByCategory && productByCategory.products) {
-          this.products = productByCategory.products;
-          this.productsHighlight = productByCategory.products.slice(0, 5);
+          // Sắp xếp ưu tiên sản phẩm còn hàng
+          this.products = this.sortByAvailability(productByCategory.products);
+          this.totalRecords = this.products.length;
+          this.first = 0; // Reset to first page
+          this.updateDisplayedProducts();
+          this.productsHighlight = productByCategory.products.filter(p => p.quantity > 0).slice(0, 5);
           this.error = null;
         } else {
           this.error = 'Không có sản phẩm nào trong danh mục này';
@@ -199,8 +239,12 @@ export class AllProductComponent extends BaseComponent implements OnInit, AfterV
       takeUntil(this.destroyed$),
       tap((product: AllProductDto) => {
         if (product && product.products) {
-          this.products = product.products;
-          this.productsHighlight = product.products.slice(0, 5);
+          // Sắp xếp ưu tiên sản phẩm còn hàng
+          this.products = this.sortByAvailability(product.products);
+          this.totalRecords = this.products.length;
+          this.first = 0; // Reset to first page
+          this.updateDisplayedProducts();
+          this.productsHighlight = product.products.filter(p => p.quantity > 0).slice(0, 5);
           this.error = null;
         } else {
           this.error = 'Không tìm thấy sản phẩm trong khoảng giá này';
@@ -230,5 +274,21 @@ export class AllProductComponent extends BaseComponent implements OnInit, AfterV
     
     // Default image if no images available
     return this.apiImage + 'notfound.jpg';
+  }
+
+  // Pagination methods
+  onPageChange(event: any) {
+    this.first = event.first;
+    this.rows = event.rows;
+    this.updateDisplayedProducts();
+  }
+
+  private updateDisplayedProducts() {
+    // Sắp xếp ưu tiên sản phẩm còn hàng
+    const sortedProducts = this.sortByAvailability(this.products);
+    
+    const startIndex = this.first;
+    const endIndex = startIndex + this.rows;
+    this.displayedProducts = sortedProducts.slice(startIndex, endIndex);
   }
 }

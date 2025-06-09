@@ -33,6 +33,8 @@ public class ProductResponse extends BaseResponse{
 
     private Long discount;
 
+    private Long quantity;
+
     @JsonProperty("product_images")
     private List<ProductImage> productImages= new ArrayList<>();
 
@@ -45,6 +47,7 @@ public class ProductResponse extends BaseResponse{
                 .description(product.getDescription())
                 .categoryId(product.getCategory() != null ? product.getCategory().getId() : null)
                 .discount(product.getDiscount())
+                .quantity(product.getQuantity())
                 .productImages(product.getProductImages())
                 .build();
         productResponse.setCreatedAt(product.getCreatedAt());

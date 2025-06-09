@@ -12,6 +12,7 @@ import com.example.Sneakers.responses.OrderResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface IOrderService {
@@ -24,7 +25,7 @@ public interface IOrderService {
     void deleteOrder(Long id);
     List<OrderHistoryResponse> findByUserId(String token) throws Exception;
     List<OrderHistoryResponse> getAllOrders();
-    Page<Order> getOrdersByKeyword(String keyword, Pageable pageable);
+    Page<Order> getOrdersByKeyword(String keyword, String status, LocalDate startDate, LocalDate endDate, Pageable pageable);
     Order updateOrderStatus(Long orderId, String status) throws Exception;
     Long getTotalRevenue();
     DashboardStatsDTO getDashboardStats();

@@ -44,6 +44,7 @@ public class ProductService implements IProductService {
                 .description(productDTO.getDescription())
                 .category(existingCategory)
                 .discount(productDTO.getDiscount())
+                .quantity(productDTO.getQuantity())
                 .build();
         return productRepository.save(newProduct);
     }
@@ -87,6 +88,7 @@ public class ProductService implements IProductService {
                 existingProduct.setThumbnail(productDTO.getThumbnail());
             }
             existingProduct.setDiscount(productDTO.getDiscount());
+            existingProduct.setQuantity(productDTO.getQuantity());
             return productRepository.save(existingProduct);
         }
         return null;

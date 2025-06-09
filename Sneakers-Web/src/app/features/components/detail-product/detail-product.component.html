@@ -30,7 +30,7 @@
           <h2 class="text-uppercase fw-bold my-4">{{mainProduct.name}}</h2>
           <p class="my-4">Mã sản phẩm: <span class="text-dark fw-bold">{{mainProduct.id}}</span></p>
           <p class="my-4 position-absolute" style="top:27%; left: 60%">Tình trạng:
-            <span class="text-dark fw-bold">Còn hàng</span>
+            <span class="text-dark fw-bold">{{mainProduct.quantity > 0 ? 'Còn hàng' : 'Hết hàng'}}</span>
           </p>
           <div class="d-flex price-wrapper">
             <h2 class="text-danger my-4">{{mainProduct.price | currency:'VND':'symbol':'1.0-0'}}</h2>
@@ -69,8 +69,8 @@
           </div>
           <div class="product-actions">
             <p-toast></p-toast>
-            <button (click)="addToCart()" class="btn btn-dark" style="font-size: 18px;">Thêm vào giỏ hàng</button>
-            <button class="btn btn-danger" style="font-size: 18px;">Mua ngay</button>
+            <button (click)="addToCart()" class="btn btn-dark" style="font-size: 18px;" [disabled]="mainProduct.quantity === 0">Thêm vào giỏ hàng</button>
+            <button class="btn btn-danger" style="font-size: 18px;" [disabled]="mainProduct.quantity === 0">Mua ngay</button>
             <i class="pi pi-heart" title="Thêm vào yêu thích"></i>
           </div>
         </div>
@@ -121,6 +121,10 @@
             <div class="wrapper">
               <label class="font-bold" for="discount">Giảm giá (%)</label>
               <p-inputNumber inputId="discount" formControlName="discount"></p-inputNumber>
+            </div>
+            <div class="wrapper">
+              <label class="font-bold" for="quantity">Số lượng</label>
+              <p-inputNumber inputId="quantity" formControlName="quantity"></p-inputNumber>
             </div>
             <div class="wrapper dropdown-wrapper">
               <p-dropdown [options]="categoriesOptions" [placeholder]="categoryNameOfProduct"

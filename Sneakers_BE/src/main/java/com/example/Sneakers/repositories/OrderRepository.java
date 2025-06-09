@@ -14,13 +14,31 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     //Tìm các đơn hàng của 1 user nào đó
     List<Order> findByUserId(Long userId);
     
-    @Query(value = "SELECT * FROM orders o WHERE o.active = true AND (:keyword IS NULL OR :keyword = '' OR " +
-            "o.fullname LIKE %:keyword% " +
-            "OR o.address LIKE %:keyword% " +
-            "OR o.note LIKE %:keyword% " +
-            "OR o.email LIKE %:keyword%)", 
-            nativeQuery = true)
-    Page<Order> findByKeyword(@Param("keyword") String keyword, Pageable pageable);
+    @Query(value = "SELECT o FROM Order o WHERE o.active = true " +
+            "AND (:keyword IS NULL OR :keyword = '' OR " +
+            "   o.fullName LIKE %:keyword% OR " +
+            "   o.phoneNumber LIKE %:keyword% OR " +
+            "   o.email LIKE %:keyword% OR " +
+            "   o.user.fullName LIKE %:keyword% OR " +
+            "   o.user.phoneNumber LIKE %:keyword%) " +
+            "AND (:status IS NULL OR :status = '' OR o.status = :status) " +
+            "AND ((:startDate IS NULL AND :endDate IS NULL) OR (o.orderDate BETWEEN :startDate AND :endDate))",
+            countQuery = "SELECT COUNT(o) FROM Order o WHERE o.active = true " +
+                    "AND (:keyword IS NULL OR :keyword = '' OR " +
+                    "   o.fullName LIKE %:keyword% OR " +
+                    "   o.phoneNumber LIKE %:keyword% OR " +
+                    "   o.email LIKE %:keyword% OR " +
+                    "   o.user.fullName LIKE %:keyword% OR " +
+                    "   o.user.phoneNumber LIKE %:keyword%) " +
+                    "AND (:status IS NULL OR :status = '' OR o.status = :status) " +
+                    "AND ((:startDate IS NULL AND :endDate IS NULL) OR (o.orderDate BETWEEN :startDate AND :endDate))")
+    Page<Order> findByKeyword(
+            @Param("keyword") String keyword,
+            @Param("status") String status,
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate,
+            Pageable pageable
+    );
     
     @Query(value = "SELECT COALESCE(SUM(o.total_money - COALESCE(o.discount_amount, 0)), 0) " +
            "FROM orders o " +

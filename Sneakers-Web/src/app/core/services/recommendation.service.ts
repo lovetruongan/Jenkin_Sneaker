@@ -42,6 +42,7 @@ export class RecommendationService {
   }
 
   private async calculateRecommendations(products: ProductDto[]): Promise<ProductDto[]> {
+    const inStockProducts = products.filter(p => p.quantity > 0);
     console.log('Starting product suggestion calculation...');
     await this.initializePurchasedProducts();
 
@@ -151,7 +152,7 @@ export class RecommendationService {
       console.log('\nTotal category frequency:', totalCategoryFrequency);
 
       // Calculate price statistics
-      const prices = products.map(p => p.price);
+      const prices = inStockProducts.map(p => p.price);
       const priceStats = {
         average: prices.reduce((a, b) => a + b, 0) / prices.length,
         standardDeviation: Math.sqrt(
@@ -163,16 +164,24 @@ export class RecommendationService {
       };
 
       // Calculate scores for each product
-      const scores = products.map(product => {
+      const scores = inStockProducts.map(product => {
         // Initialize score components
         const scoreComponents = {
           price: 0,
           category: 0,
           random: Math.random() * 0.05, // 5% random factor
-          discount: product.discount ? 0.4 : 0, // 40% boost for discounted items
+          discount: product.discount ? (product.discount / 100) * 0.4 : 0, // Discount score proportional to discount percentage (max 40%)
           penalty: 0, // Penalty for previously purchased products
           total: 0
         };
+
+        // Log discount calculation
+        if (product.discount) {
+          console.log(`Discount score calculation for ${product.name}:`, {
+            discount_percentage: product.discount,
+            discount_score: scoreComponents.discount.toFixed(3)
+          });
+        }
 
         // Price score (35% weight) - products closer to average price get higher scores
         const priceDeviation = Math.abs(product.price - priceStats.average);
@@ -272,9 +281,7 @@ export class RecommendationService {
   }
 
   private getDefaultSuggestions(products: ProductDto[]): ProductDto[] {
-    // Return random products when no user data is available
-    return products
-      .sort(() => Math.random() - 0.5)
-      .slice(0, 8);
+    // Filter out-of-stock products and return the first 8 as default suggestions
+    return products.filter(p => p.quantity > 0).slice(0, 8);
   }
 } 

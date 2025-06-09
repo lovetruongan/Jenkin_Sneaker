@@ -12,10 +12,7 @@ services:
       - Sneaker-network
 
   phpmyadmin8-container:
-    #intel host
-    #image: phpmyadmin/phpmyadmin
-    #mac m1 host
-    image: arm64v8/phpmyadmin
+    image: phpmyadmin/phpmyadmin
     container_name: phpmyadmin8-container
     restart: always
     depends_on:

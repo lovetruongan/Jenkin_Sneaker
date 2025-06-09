@@ -73,7 +73,7 @@ public class StatisticsService {
     public ProductStatisticsDTO getProductStatistics() {
         Long totalProducts = productRepository.count();
         Long soldProducts = orderDetailRepository.countSoldProducts();
-        Long availableProducts = totalProducts - soldProducts;
+        Long availableProducts = productRepository.sumTotalQuantity();
 
         return new ProductStatisticsDTO(
                 totalProducts,

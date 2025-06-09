@@ -15,6 +15,10 @@
             <label class="font-bold" for="discount">Giảm giá (%)</label>
             <p-inputNumber inputId="discount" formControlName="discount"></p-inputNumber>
           </div>
+          <div class="wrapper">
+            <label class="font-bold" for="quantity">Số lượng</label>
+            <p-inputNumber inputId="quantity" formControlName="quantity"></p-inputNumber>
+          </div>
           <div class="wrapper dropdown-wrapper">
             <p-dropdown [options]="categoriesOptions" placeholder="Danh mục"
               (onChange)="onCategoryChange($event)"></p-dropdown> 

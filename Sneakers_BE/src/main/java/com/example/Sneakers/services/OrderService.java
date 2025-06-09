@@ -181,6 +181,12 @@ public class OrderService implements IOrderService {
             Product product = productRepository.findById(productId)
                     .orElseThrow(() -> new DataNotFoundException("Product not found with id: " + productId));
 
+            if(product.getQuantity() < quantity){
+                throw new Exception("Product " + product.getName() + " is out of stock");
+            }
+
+            product.setQuantity(product.getQuantity() - quantity);
+
             // Đặt thông tin cho OrderDetail
             orderDetail.setProduct(product);
             orderDetail.setNumberOfProducts(quantity);
@@ -269,15 +275,15 @@ public class OrderService implements IOrderService {
 
     @Override
     public List<OrderHistoryResponse> getAllOrders() {
-        return orderRepository.findAll()
-                .stream()
+        List<Order> orders = orderRepository.findAll();
+        return orders.stream()
                 .map(OrderHistoryResponse::fromOrder)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public Page<Order> getOrdersByKeyword(String keyword, Pageable pageable) {
-        return orderRepository.findByKeyword(keyword, pageable);
+    public Page<Order> getOrdersByKeyword(String keyword, String status, LocalDate startDate, LocalDate endDate, Pageable pageable) {
+        return orderRepository.findByKeyword(keyword, status, startDate, endDate, pageable);
     }
 
     @Override

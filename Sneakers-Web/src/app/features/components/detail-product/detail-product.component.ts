@@ -94,7 +94,8 @@ export class DetailProductComponent extends BaseComponent implements OnInit,Afte
       productName: [, Validators.required],
       description: [, Validators.required],
       price:[, Validators.required],
-      discount: [, Validators.required]
+      discount: [, Validators.required],
+      quantity: [, Validators.required]
     })
   }
   ngAfterViewInit(): void {
@@ -139,7 +140,8 @@ export class DetailProductComponent extends BaseComponent implements OnInit,Afte
             productName: product.name,
             description: product.description,
             price: product.price,
-            discount: product.discount
+            discount: product.discount,
+            quantity: product.quantity
           })
           this.categoryId = product.category_id?.toString() ?? '';
           this.images = product.product_images;
@@ -165,7 +167,7 @@ export class DetailProductComponent extends BaseComponent implements OnInit,Afte
       this.productService.getRelatedProduct(this.id).pipe(
         filter((product : AllProductDto) => !!product),
         tap((product : AllProductDto) => {
-          this.relatedProducts = product.products;
+          this.relatedProducts = product.products.filter(p => p.quantity > 0);
         }),
       ).subscribe();
     }
@@ -254,54 +256,35 @@ export class DetailProductComponent extends BaseComponent implements OnInit,Afte
     this.myFiles.forEach(file => {
       formData.append('files', file, file.name);
     });
-
-    if (this.productForm.valid && this.myFiles.length > 0 && this.categoryId){
-      this.productService.uploadImageProduct(formData, parseInt(this.id)).pipe(
-        switchMap(() => {
-          return this.productService.updateProduct({
-            name: this.productForm.value.productName,
-            price: this.productForm.value.price,
-            description: this.productForm.value.description,
-            discount: this.productForm.value.discount,
-            category_id: parseInt(this.categoryId)
-          }, parseInt(this.id)).pipe(
-            tap((res: {message: string}) => {
-              this.toastService.success(res.message);
-              this.router.navigate(['/allProduct']);
-            }),
-            catchError((err) => {
-              this.toastService.fail(err.error.message);
-              return of(err);
-            })
-          );
-        }),
-        catchError((err) => {
-          this.toastService.fail(err.error.message);
-          return of(err);
-        })
-      ).subscribe();
-    } else if (this.productForm.valid && this.myFiles.length == 0 && this.categoryId) {
+    
+    if (this.productForm.valid){
       this.productService.updateProduct({
         name: this.productForm.value.productName,
         price: this.productForm.value.price,
         description: this.productForm.value.description,
         discount: this.productForm.value.discount,
-        category_id: parseInt(this.categoryId)
+        category_id: parseInt(this.categoryId),
+        quantity: this.productForm.value.quantity
       }, parseInt(this.id)).pipe(
-        tap((res: {message: string}) => {
-          this.toastService.success(res.message);
-          setTimeout(() => {
-            this.router.navigate(['/allProduct']);
-          }, 1000)
+        switchMap(() => {
+          return this.productService.uploadImageProduct(formData, parseInt(this.id)).pipe(
+            tap((res : {message: string}) => {
+              this.toastService.success(res.message);
+              this.myFiles = [];
+            }),
+            catchError((err) => {
+              this.toastService.fail(err.error.message);
+              return of(err);
+            })
+          )
         }),
         catchError((err) => {
           this.toastService.fail(err.error.message);
           return of(err);
         })
-      ).subscribe();
+      ).subscribe()
     } else {
-      this.toastService.fail("Vui lòng nhập đầy đủ thông tin muốn cập nhật");
+      this.toastService.fail("Vui lòng điền đầy đủ thông tin")
     }
-
   }
 }
