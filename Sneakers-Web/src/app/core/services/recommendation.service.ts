@@ -79,8 +79,8 @@ export class RecommendationService {
               productIds.add(detail.product.id);
               // Track quantity for this product
               const currentQuantity = purchaseQuantities.get(detail.product.id) || 0;
-              purchaseQuantities.set(detail.product.id, currentQuantity + detail.numberOfProducts);
-              totalPurchasedQuantity += detail.numberOfProducts;
+              purchaseQuantities.set(detail.product.id, currentQuantity + detail.number_of_products);
+              totalPurchasedQuantity += detail.number_of_products;
             }
           });
         }
@@ -125,7 +125,7 @@ export class RecommendationService {
               if (completeProduct?.category_id !== undefined && completeProduct?.category_id !== null) {
                 const categoryId = completeProduct.category_id;
                 const currentCount = this.categoryFrequency.get(categoryId) || 0;
-                this.categoryFrequency.set(categoryId, currentCount + detail.numberOfProducts);
+                this.categoryFrequency.set(categoryId, currentCount + detail.number_of_products);
                 productsWithValidCategory++;
                 this.purchasedProducts.add(detail.product.id);
               }

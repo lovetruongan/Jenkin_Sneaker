@@ -44,17 +44,17 @@
                             @for(item of productOrderd; track item){
                                 <li class="d-flex row order-product-item">
                                     <div class="col-3 col-lg-3">
-                                        <img [src]="apiImage + item.product.thumbnail" alt="Giày">
+                                        <img [src]="apiImage + item.product?.thumbnail" alt="Giày">
                                     </div>
                                     <div class="col-6 col-lg-6 name-product-wrapper">
                                         <div>
-                                            <span class="font-bold name-product">{{item.product.name}}</span>
-                                            <span>x{{item.numberOfProducts}}</span>
+                                            <span class="font-bold name-product">{{item.product?.name}}</span>
+                                            <span>x{{item.number_of_products}}</span>
                                         </div>
                                         <span class="font-bold">Size: {{item.size}}</span>
                                     </div>
                                     <div class="col-3 col-lg-3">
-                                        <p class="font-bold">{{item.totalMoney| currency:'VND':'symbol':'1.0-0'}}</p>
+                                        <p class="font-bold">{{item.total_money| currency:'VND':'symbol':'1.0-0'}}</p>
                                     </div>
                                 </li>
                             }

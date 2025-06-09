@@ -9,10 +9,18 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public interface OrderRepository extends JpaRepository<Order, Long> {
     //Tìm các đơn hàng của 1 user nào đó
     List<Order> findByUserId(Long userId);
+    
+    @Query("SELECT o FROM Order o " +
+           "LEFT JOIN FETCH o.orderDetails od " +
+           "LEFT JOIN FETCH od.product " +
+           "LEFT JOIN FETCH o.voucher " +
+           "WHERE o.id = :orderId")
+    Optional<Order> findByIdWithDetails(@Param("orderId") Long orderId);
     
     @Query(value = "SELECT o FROM Order o WHERE o.active = true " +
             "AND (:keyword IS NULL OR :keyword = '' OR " +

@@ -69,7 +69,7 @@ export class OrderDetailComponent extends BaseComponent implements OnInit {
             }
             this.totalMoney = 0;
             this.productOrderd.forEach((item) => {
-              this.totalMoney += item.totalMoney;
+              this.totalMoney += item.total_money;
             });
             if (orderInfor.discount_amount) {
               this.discountAmount = orderInfor.discount_amount;

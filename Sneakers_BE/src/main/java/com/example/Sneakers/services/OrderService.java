@@ -227,12 +227,15 @@ public class OrderService implements IOrderService {
         User user = userService.getUserDetailsFromToken(extractedToken);
 
         if (user.getRole().getName().equals(Role.ADMIN)) {
-            return OrderResponse.fromOrder(orderRepository.findById(orderId)
+            return OrderResponse.fromOrder(orderRepository.findByIdWithDetails(orderId)
                     .orElseThrow(() -> new Exception("Cannot find order with id = " + orderId)));
 
         }
 
-        Order order = orderRepository.findById(orderId).orElse(null);
+        Order order = orderRepository.findByIdWithDetails(orderId).orElse(null);
+        if (order == null) {
+            throw new Exception("Cannot find order with id = " + orderId);
+        }
         if (!user.getId().equals(order.getUser().getId())) {
             throw new Exception("Cannot get order of another user");
         }
