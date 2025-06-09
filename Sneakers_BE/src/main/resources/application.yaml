@@ -33,5 +33,5 @@ logging.level.org.springframework.security: DEBUG
 # Stripe Configuration (Test Mode)
 stripe:
   api:
-    secret-key: sk_test_51RYEK0RoKh7pvaZex5vQJVXSpDURybrQqfp63OQ6bhwPLY0OXQVdfJNegHjea1y7ZXSKJ8NZ2chPBVLA5MHDxWUM00vCyGDa1x
-    publishable-key: pk_test_51RYEK0RoKh7pvaZeTzq1TjxJXE4Rfr5xwKIP6uL1kJDET3mb78shODbWhYyL1znUhqyanmoPV18g8zGCTkDUuok6003ObawJA1
+    secret-key: ${STRIPE_SECRET_KEY:sk_test_YOUR_SECRET_KEY_HERE}
+    publishable-key: ${STRIPE_PUBLISHABLE_KEY:pk_test_YOUR_PUBLISHABLE_KEY_HERE}
