@@ -2,3 +2,4 @@ Sneakers_BE/src/main/resources/logs/application.log
 *.log
 /Sneakers_BE/src/main/resources/logs
 /Sneakers_BE/src/main/resources/logs
+*.log
