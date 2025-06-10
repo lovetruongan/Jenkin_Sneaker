@@ -88,11 +88,12 @@ export class ProductService {
     return this.httpClient.get<AllProductDto>(`${this.apiUrl}/products/related/${id}`)
   }
   deleteProduct(id: string){
-    return this.httpClient.delete(`${this.apiUrl}/products/${id}`,{
+    return this.httpClient.delete(`${this.apiUrl}/products/${id}`, {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         Authorization: `Bearer ${this.token}`
-      })
+      }),
+      responseType: 'text'
     })
   }
 

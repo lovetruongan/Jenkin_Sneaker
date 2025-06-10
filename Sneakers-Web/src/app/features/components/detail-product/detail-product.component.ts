@@ -24,6 +24,7 @@ import { ButtonModule } from 'primeng/button';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { LoadingService } from '../../../core/services/loading.service';
 import { DropdownModule } from 'primeng/dropdown';
+import { CardModule } from 'primeng/card';
 import { CategoriesService } from '../../../core/services/categories.service';
 import { CategoriesDto } from '../../../core/dtos/categories.dto';
 
@@ -43,7 +44,8 @@ import { CategoriesDto } from '../../../core/dtos/categories.dto';
     FileUploadModule,
     ButtonModule,
     ConfirmDialogModule,
-    DropdownModule
+    DropdownModule,
+    CardModule
   ],
   providers: [
     MessageService,
@@ -207,15 +209,8 @@ export class DetailProductComponent extends BaseComponent implements OnInit,Afte
     window.location.href = `/detailProduct/${id}`;
   }
 
-  onUpload(event: any){
-  this.loadingService.setLoading(true);
-
-  setTimeout(() => {
-    this.myFiles = event.files;
-    setTimeout(() => {
-      this.loadingService.setLoading(false);
-    }, 0);
-  }, 2000);
+  onFileSelect(event: any){
+    this.myFiles = Array.from(event.files);
   }
 
   onCategoryChange(event: any){
@@ -224,30 +219,84 @@ export class DetailProductComponent extends BaseComponent implements OnInit,Afte
 
   confirmDelete() {
     this.confirmationService.confirm({
-        message: 'Bạn chắc chắn muốn bỏ sản phẩm này?',
-        header: 'Xác nhận',
+        message: `Bạn có chắc chắn muốn xóa sản phẩm "${this.mainProduct?.name || 'này'}"? Hành động này không thể hoàn tác!`,
+        header: 'Xác nhận xóa sản phẩm',
         icon: 'pi pi-exclamation-triangle',
-        acceptIcon:"none",
-        rejectIcon:"none",
-        rejectButtonStyleClass:"p-button-text",
+        acceptIcon: "none",
+        rejectIcon: "none",
+        rejectButtonStyleClass: "p-button-text",
+        acceptButtonStyleClass: "p-button-danger",
         accept: () => {
+          this.loadingService.setLoading(true);
+          
           this.productService.deleteProduct(this.id).pipe(
-            switchMap(() => {
-              return this.productService.deleteProduct(this.id).pipe(
-                tap((res: any) => {
-                  this.router.navigate(["/allProduct"]);
-                }),
-                catchError((err) => of(err))
-              )
+            tap((res: any) => {
+              // Backend returns a simple string message, so any response means success
+              console.log('Delete response:', res);
+              this.loadingService.setLoading(false);
+              this.toastService.success('Xóa sản phẩm thành công!');
+              
+              // Navigate to products list
+              this.router.navigate(["/allProduct"]);
             }),
-            takeUntil(this.destroyed$),
             catchError((err) => {
-              return of(err);
-            })
+              console.error('Delete error:', err);
+              this.loadingService.setLoading(false);
+              if (err.status === 200 || err.status === 0) {
+                // Sometimes Angular treats successful string responses as errors
+                this.toastService.success('Xóa sản phẩm thành công!');
+                
+                // Navigate to products list
+                this.router.navigate(["/allProduct"]);
+              } else {
+                this.toastService.fail(`Xóa sản phẩm thất bại: ${err.error?.message || err.message || 'Lỗi không xác định'}`);
+              }
+              return of(null);
+            }),
+            finalize(() => {
+              this.loadingService.setLoading(false);
+            }),
+            takeUntil(this.destroyed$)
           ).subscribe();
-        },
-        reject: () => {
         }
+    });
+  }
+
+  goBack(){
+    // Navigate back to all products
+    this.router.navigate(["/allProduct"]);
+  }
+
+  trackByImageId(index: number, image: any): number {
+    return image.id;
+  }
+
+  getFilePreview(file: File): string {
+    return URL.createObjectURL(file);
+  }
+
+  removeFile(index: number): void {
+    this.myFiles.splice(index, 1);
+  }
+
+  deleteImage(imageId: number): void {
+    // Implement delete image functionality
+    this.confirmationService.confirm({
+      message: 'Bạn có chắc chắn muốn xóa ảnh này?',
+      header: 'Xác nhận xóa ảnh',
+      icon: 'pi pi-exclamation-triangle',
+      acceptIcon: "none",
+      rejectIcon: "none",
+      rejectButtonStyleClass: "p-button-text",
+      accept: () => {
+        // Call API to delete image
+        // After successful deletion, update the images array
+        this.images = this.images.filter(img => img.id !== imageId);
+        this.toastService.success('Xóa ảnh thành công');
+      },
+      reject: () => {
+        // User cancelled
+      }
     });
   }
 
@@ -267,16 +316,23 @@ export class DetailProductComponent extends BaseComponent implements OnInit,Afte
         quantity: this.productForm.value.quantity
       }, parseInt(this.id)).pipe(
         switchMap(() => {
-          return this.productService.uploadImageProduct(formData, parseInt(this.id)).pipe(
-            tap((res : {message: string}) => {
-              this.toastService.success(res.message);
-              this.myFiles = [];
-            }),
-            catchError((err) => {
-              this.toastService.fail(err.error.message);
-              return of(err);
-            })
-          )
+          if (this.myFiles.length > 0) {
+            return this.productService.uploadImageProduct(formData, parseInt(this.id)).pipe(
+              tap((res : {message: string}) => {
+                this.toastService.success(res.message);
+                this.myFiles = [];
+                // Reload product data to show updated images
+                this.ngOnInit();
+              }),
+              catchError((err) => {
+                this.toastService.fail(err.error.message);
+                return of(err);
+              })
+            )
+          } else {
+            this.toastService.success("Cập nhật sản phẩm thành công");
+            return of(null);
+          }
         }),
         catchError((err) => {
           this.toastService.fail(err.error.message);

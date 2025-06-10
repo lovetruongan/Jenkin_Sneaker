@@ -1,0 +1,193 @@
+:host {
+  display: block;
+  background-color: #f7f9fc;
+  height: 100%;
+}
+
+.user-manage-container {
+  padding: 1rem;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.user-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.user-header h2 {
+  font-size: 1.5rem;
+  color: #34495e;
+  font-weight: 600;
+  margin: 0;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.header-search-container {
+  cursor: pointer;
+}
+
+.header-search-container .p-inputtext {
+  width: 280px;
+  transition: width 0.3s;
+}
+
+.header-search-container .p-inputtext:focus {
+  width: 350px;
+}
+
+::ng-deep .user-table-card {
+  .p-card-content {
+    padding: 1.5rem;
+  }
+  .p-fluid .field > label {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    display: inline-block;
+  }
+}
+
+.user-table-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  
+  ::ng-deep .p-card-body {
+    padding: 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  ::ng-deep .p-card-content {
+    height: 100%;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+.user-table {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+::ng-deep .p-datatable {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  .p-datatable-wrapper {
+    flex-grow: 1;
+    overflow-y: auto;
+  }
+
+  .p-datatable-thead > tr > th {
+    background-color: #f1f3f5;
+    font-weight: 600;
+    color: #34495e;
+    padding: 1rem 1.5rem;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+
+  .p-datatable-tbody > tr > td {
+    padding: 1rem 1.5rem;
+    vertical-align: middle;
+    border-color: #e9ecef;
+
+    .p-dropdown {
+      min-width: 120px;
+    }
+
+    &[data-label="Địa chỉ"] {
+      max-width: 200px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+
+  .p-paginator.p-paginator-bottom {
+    border-top: 1px solid #e9ecef;
+    padding: 1rem;
+    background: #fff;
+  }
+}
+
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+::ng-deep .p-tag {
+  cursor: pointer;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    transform: scale(1.05);
+  }
+}
+
+// Responsive Design
+@media (max-width: 992px) {
+  .user-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+
+  .header-actions {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .header-search-container .p-inputtext {
+    width: 100%;
+  }
+}
+
+@media (max-width: 767px) {
+  .user-manage-container {
+    padding: 1rem;
+  }
+
+  .user-header h2 {
+    font-size: 1.5rem;
+  }
+
+  .p-datatable-responsive-scroll .p-datatable-wrapper {
+    overflow-x: auto;
+  }
+
+  ::ng-deep .p-dialog {
+    width: 90vw !important;
+  }
+}
+
+// Dialog form styling
+::ng-deep .p-dialog .p-dialog-content {
+  .p-fluid .field {
+    margin-bottom: 1.5rem;
+    
+    label {
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+      display: block;
+      color: #34495e;
+    }
+  }
+}

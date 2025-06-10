@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 import { FileUploadModule } from 'primeng/fileupload';
 import { ButtonModule } from 'primeng/button';
@@ -7,6 +9,7 @@ import { BaseComponent } from '../../../core/commonComponent/base.component';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { DropdownModule } from 'primeng/dropdown';
+import { CardModule } from 'primeng/card';
 import { MenuItem, MessageService } from 'primeng/api';
 import { CategoriesService } from '../../../core/services/categories.service';
 import { catchError, of, switchMap, tap } from 'rxjs';
@@ -21,6 +24,8 @@ import { LoadingService } from '../../../core/services/loading.service';
   selector: 'app-upload-product',
   standalone: true,
   imports: [
+    CommonModule,
+    RouterLink,
     FormsModule,
     ReactiveFormsModule,
     InputTextareaModule,
@@ -29,6 +34,7 @@ import { LoadingService } from '../../../core/services/loading.service';
     InputTextModule,
     InputNumberModule,
     DropdownModule,
+    CardModule,
     ToastModule
   ],
   providers: [
@@ -74,15 +80,8 @@ export class UploadProductComponent extends BaseComponent implements OnInit {
     ).subscribe()
   }
 
-  onUpload(event: any){
-    this.loadingService.setLoading(true);
-  
-    setTimeout(() => {
-      this.myFiles = event.files;
-      setTimeout(() => {
-        this.loadingService.setLoading(false);
-      }, 0);
-    }, 2000);
+  onFileSelect(event: any){
+    this.myFiles = Array.from(event.files);
   }
 
   onCategoryChange(event: any){

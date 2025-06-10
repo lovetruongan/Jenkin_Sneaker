@@ -1,0 +1,1156 @@
+// Admin Edit Layout - 2 Column Design
+.admin-edit-container {
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 1rem;
+
+  // Large screens (1200px and up)
+  @media (min-width: 1200px) {
+    max-width: 1400px;
+    padding: 2rem;
+  }
+
+  // Medium screens (992px - 1199px)
+  @media (min-width: 992px) and (max-width: 1199px) {
+    max-width: 1140px;
+    padding: 1.5rem;
+  }
+
+  // Small screens (768px - 991px)
+  @media (min-width: 768px) and (max-width: 991px) {
+    max-width: 960px;
+    padding: 1rem;
+  }
+
+  .admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #e9ecef;
+    flex-wrap: wrap;
+    gap: 1rem;
+
+    h2 {
+      margin: 0;
+      color: #495057;
+      font-weight: 600;
+      font-size: clamp(1.5rem, 3vw, 2rem);
+      flex: 1;
+      min-width: 250px;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 1rem;
+      flex-shrink: 0;
+    }
+
+    // Mobile header
+    @media (max-width: 576px) {
+      flex-direction: column;
+      align-items: stretch;
+      text-align: center;
+
+      .header-actions {
+        justify-content: center;
+      }
+    }
+  }
+
+  .admin-content {
+    display: grid;
+    gap: 2rem;
+    grid-template-columns: 1fr;
+
+    // 2-column layout for larger screens
+    @media (min-width: 992px) {
+      grid-template-columns: 1fr 1fr;
+      gap: 2.5rem;
+    }
+
+    // 3:2 ratio for extra large screens
+    @media (min-width: 1400px) {
+      grid-template-columns: 3fr 2fr;
+      gap: 3rem;
+    }
+
+    .admin-images-column {
+      order: 2;
+
+      @media (min-width: 992px) {
+        order: 1;
+      }
+
+      ::ng-deep .images-card {
+        .p-card {
+          height: 100%;
+
+          .p-card-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem 2rem;
+            border-radius: 0.5rem 0.5rem 0 0;
+
+            h3 {
+              margin: 0;
+              font-size: 1.25rem;
+              font-weight: 600;
+            }
+          }
+
+          .p-card-content {
+            padding: 1.5rem;
+          }
+        }
+      }
+
+      .current-product-gallery {
+        margin-bottom: 2rem;
+
+        ::ng-deep p-galleria {
+          .p-galleria {
+            border-radius: 0.5rem;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+            .p-galleria-item {
+              background: #f8f9fa;
+            }
+          }
+        }
+      }
+
+      .current-images-grid {
+        h4 {
+          color: #495057;
+          font-size: 1.1rem;
+          margin-bottom: 1rem;
+          padding-bottom: 0.5rem;
+          border-bottom: 1px solid #dee2e6;
+        }
+
+        .images-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+          gap: 1rem;
+          max-height: 400px;
+          overflow-y: auto;
+          padding: 0.5rem;
+
+          @media (min-width: 1200px) {
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+          }
+
+          .image-item {
+            position: relative;
+            background: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+            &:hover {
+              transform: translateY(-2px);
+              box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+            }
+
+            .image-preview {
+              width: 100%;
+              height: 120px;
+              object-fit: cover;
+              border-radius: 0.5rem 0.5rem 0 0;
+            }
+
+            .image-info {
+              padding: 0.75rem;
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              background: white;
+
+              .image-id {
+                font-size: 0.75rem;
+                color: #6c757d;
+                font-weight: 500;
+              }
+
+              button {
+                opacity: 0.7;
+                transition: opacity 0.2s ease;
+
+                &:hover {
+                  opacity: 1;
+                }
+              }
+            }
+          }
+        }
+      }
+
+      .empty-images {
+        text-align: center;
+        padding: 3rem 1rem;
+        color: #6c757d;
+
+        p {
+          margin-top: 1rem;
+          font-size: 1.1rem;
+        }
+      }
+    }
+
+    .admin-form-column {
+      order: 1;
+
+      @media (min-width: 992px) {
+        order: 2;
+      }
+
+      ::ng-deep .edit-form-card {
+        .p-card {
+          height: 100%;
+
+          .p-card-header {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            padding: 1.5rem 2rem;
+            border-radius: 0.5rem 0.5rem 0 0;
+
+            h3 {
+              margin: 0;
+              font-size: 1.25rem;
+              font-weight: 600;
+            }
+          }
+
+          .p-card-content {
+            padding: 1.5rem;
+          }
+
+          .p-card-footer {
+            padding: 1.5rem 2rem;
+            background-color: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+          }
+        }
+      }
+
+      .edit-form {
+        .field {
+          margin-bottom: 1.5rem;
+
+          label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #495057;
+            font-size: clamp(0.875rem, 2vw, 1rem);
+          }
+
+          // Input responsiveness
+          input[type="text"],
+          textarea {
+            width: 100%;
+            font-size: clamp(0.875rem, 2vw, 1rem);
+          }
+
+          // Dropdown adjustments
+          p-dropdown {
+            width: 100%;
+            
+            ::ng-deep .p-dropdown {
+              width: 100%;
+              min-width: 0;
+            }
+          }
+
+          // Input number responsiveness
+          p-inputNumber {
+            width: 100%;
+            
+            ::ng-deep .p-inputnumber {
+              width: 100%;
+              
+              .p-inputtext {
+                width: 100%;
+                font-size: clamp(0.875rem, 2vw, 1rem);
+              }
+            }
+          }
+
+          .upload-section {
+            .upload-hint {
+              display: block;
+              margin-top: 0.5rem;
+              color: #6c757d;
+              font-style: italic;
+              font-size: clamp(0.75rem, 1.5vw, 0.875rem);
+            }
+
+            // File upload button responsiveness
+            ::ng-deep p-fileUpload {
+              .p-fileupload-choose {
+                width: 100%;
+                justify-content: center;
+                padding: 0.75rem 1rem;
+                font-size: clamp(0.875rem, 2vw, 1rem);
+                background: linear-gradient(45deg, #007bff, #0056b3);
+                border: none;
+                border-radius: 0.375rem;
+                transition: all 0.2s ease;
+
+                &:hover {
+                  transform: translateY(-1px);
+                  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+                }
+              }
+            }
+          }
+
+          .new-files-preview {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-top: 1rem;
+            padding: 1rem;
+            background-color: #f8f9fa;
+            border-radius: 0.5rem;
+            border: 1px solid #dee2e6;
+            max-height: 300px;
+            overflow-y: auto;
+
+            .new-file-item {
+              display: flex;
+              align-items: center;
+              gap: 1rem;
+              padding: 0.75rem;
+              background-color: white;
+              border-radius: 0.375rem;
+              box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+              transition: transform 0.2s ease;
+
+              &:hover {
+                transform: translateX(4px);
+              }
+
+              .file-preview {
+                flex-shrink: 0;
+
+                .preview-image {
+                  width: 60px;
+                  height: 60px;
+                  object-fit: cover;
+                  border-radius: 0.375rem;
+                  border: 2px solid #dee2e6;
+                }
+              }
+
+              .file-info {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                gap: 0.25rem;
+
+                .file-name {
+                  font-weight: 500;
+                  color: #495057;
+                  font-size: clamp(0.8rem, 2vw, 0.9rem);
+                  word-break: break-word;
+                }
+
+                .file-size {
+                  color: #6c757d;
+                  font-size: clamp(0.75rem, 1.5vw, 0.875rem);
+                }
+              }
+
+              button {
+                flex-shrink: 0;
+                opacity: 0.7;
+                transition: opacity 0.2s ease;
+
+                &:hover {
+                  opacity: 1;
+                }
+              }
+            }
+          }
+        }
+
+        // Grid system adjustments
+        .grid {
+          margin: 0 -0.5rem;
+
+          @media (max-width: 767px) {
+            margin: 0;
+          }
+
+          .col-12,
+          .col-md-6,
+          .col-md-4 {
+            padding: 0 0.5rem;
+
+            @media (max-width: 767px) {
+              padding: 0;
+              margin-bottom: 1rem;
+            }
+          }
+        }
+      }
+
+      .form-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+
+        button {
+          min-width: clamp(140px, 20vw, 200px);
+          padding: 0.875rem 1.5rem;
+          font-size: clamp(0.875rem, 2vw, 1rem);
+          font-weight: 500;
+          border-radius: 0.375rem;
+          
+          ::ng-deep .p-button-label {
+            font-size: inherit;
+          }
+        }
+
+        // Mobile actions
+        @media (max-width: 576px) {
+          flex-direction: column-reverse;
+          gap: 0.75rem;
+          
+          button {
+            width: 100%;
+            min-width: unset;
+          }
+        }
+
+        // Tablet actions
+        @media (min-width: 577px) and (max-width: 768px) {
+          justify-content: center;
+          
+          button {
+            flex: 1;
+            max-width: 220px;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Responsive design for upload-product component
+.upload-product-container {
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 1rem;
+
+  // Large screens (1200px and up)
+  @media (min-width: 1200px) {
+    max-width: 1140px;
+    padding: 2rem;
+  }
+
+  // Medium screens (992px - 1199px)
+  @media (min-width: 992px) and (max-width: 1199px) {
+    max-width: 960px;
+    padding: 1.5rem;
+  }
+
+  // Small screens (768px - 991px)
+  @media (min-width: 768px) and (max-width: 991px) {
+    max-width: 720px;
+    padding: 1rem;
+  }
+
+  .upload-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #e9ecef;
+    flex-wrap: wrap;
+    gap: 1rem;
+
+    h2 {
+      margin: 0;
+      color: #495057;
+      font-weight: 600;
+      font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 1rem;
+      flex-shrink: 0;
+    }
+
+    // Mobile header
+    @media (max-width: 576px) {
+      flex-direction: column;
+      align-items: stretch;
+      text-align: center;
+
+      .header-actions {
+        justify-content: center;
+      }
+    }
+  }
+
+  .upload-form {
+    .field {
+      margin-bottom: 1.5rem;
+
+      label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: #495057;
+        font-size: clamp(0.875rem, 2vw, 1rem);
+      }
+
+      // Input responsiveness
+      input[type="text"],
+      textarea {
+        width: 100%;
+        font-size: clamp(0.875rem, 2vw, 1rem);
+      }
+
+      // Dropdown adjustments
+      p-dropdown {
+        width: 100%;
+        
+        ::ng-deep .p-dropdown {
+          width: 100%;
+          min-width: 0;
+        }
+      }
+
+      // Input number responsiveness
+      p-inputNumber {
+        width: 100%;
+        
+        ::ng-deep .p-inputnumber {
+          width: 100%;
+          
+          .p-inputtext {
+            width: 100%;
+            font-size: clamp(0.875rem, 2vw, 1rem);
+          }
+        }
+      }
+
+      .upload-section {
+        .upload-hint {
+          display: block;
+          margin-top: 0.5rem;
+          color: #6c757d;
+          font-style: italic;
+          font-size: clamp(0.75rem, 1.5vw, 0.875rem);
+        }
+
+        // File upload button responsiveness
+        ::ng-deep p-fileUpload {
+          .p-fileupload-choose {
+            width: 100%;
+            justify-content: center;
+            padding: 0.75rem 1rem;
+            font-size: clamp(0.875rem, 2vw, 1rem);
+          }
+        }
+      }
+
+      .file-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        margin-top: 1rem;
+        padding: 1rem;
+        background-color: #f8f9fa;
+        border-radius: 0.375rem;
+        border: 1px solid #dee2e6;
+        max-height: 200px;
+        overflow-y: auto;
+
+        .file-item {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          padding: 0.5rem;
+          background-color: white;
+          border-radius: 0.25rem;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+          min-height: 48px;
+
+          i {
+            color: #007bff;
+            font-size: clamp(1rem, 2.5vw, 1.2rem);
+            flex-shrink: 0;
+          }
+
+          .file-name {
+            flex: 1;
+            font-weight: 500;
+            color: #495057;
+            font-size: clamp(0.8rem, 2vw, 0.9rem);
+            word-break: break-word;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+          }
+
+          .file-size {
+            color: #6c757d;
+            font-size: clamp(0.75rem, 1.5vw, 0.875rem);
+            flex-shrink: 0;
+            white-space: nowrap;
+          }
+        }
+      }
+
+      .current-images {
+        display: grid;
+        gap: 1rem;
+        margin-top: 1rem;
+        padding: 1rem;
+        background-color: #f8f9fa;
+        border-radius: 0.375rem;
+        border: 1px solid #dee2e6;
+        max-height: 400px;
+        overflow-y: auto;
+
+        // Responsive grid columns
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+
+        @media (min-width: 576px) {
+          grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        }
+
+        @media (min-width: 768px) {
+          grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        }
+
+        @media (min-width: 992px) {
+          grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        }
+
+        .current-image-item {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          padding: 0.75rem;
+          background-color: white;
+          border-radius: 0.375rem;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+          transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+          &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+          }
+
+          .current-image-preview {
+            width: 100%;
+            height: clamp(80px, 15vw, 120px);
+            object-fit: cover;
+            border-radius: 0.25rem;
+            margin-bottom: 0.5rem;
+            border: 1px solid #dee2e6;
+          }
+
+          .image-id {
+            font-size: clamp(0.7rem, 1.5vw, 0.75rem);
+            color: #6c757d;
+            font-weight: 500;
+            text-align: center;
+            word-break: break-all;
+          }
+        }
+      }
+    }
+
+    // Grid system adjustments
+    .grid {
+      margin: 0 -0.5rem;
+
+      @media (max-width: 767px) {
+        margin: 0;
+      }
+
+      .col-12,
+      .col-md-6,
+      .col-md-4 {
+        padding: 0 0.5rem;
+
+        @media (max-width: 767px) {
+          padding: 0;
+          margin-bottom: 1rem;
+        }
+      }
+    }
+  }
+
+  .form-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e9ecef;
+    flex-wrap: wrap;
+
+    button {
+      min-width: clamp(120px, 20vw, 180px);
+      padding: 0.75rem 1rem;
+      font-size: clamp(0.875rem, 2vw, 1rem);
+      
+      ::ng-deep .p-button-label {
+        font-size: inherit;
+      }
+    }
+
+    // Mobile actions
+    @media (max-width: 576px) {
+      flex-direction: column-reverse;
+      gap: 0.75rem;
+      
+      button {
+        width: 100%;
+        min-width: unset;
+      }
+    }
+
+    // Tablet actions
+    @media (min-width: 577px) and (max-width: 768px) {
+      justify-content: center;
+      
+      button {
+        flex: 1;
+        max-width: 200px;
+      }
+    }
+  }
+
+  // Card responsiveness
+  ::ng-deep p-card {
+    .p-card {
+      margin: 0;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      border-radius: 0.5rem;
+      overflow: hidden;
+
+      .p-card-body {
+        padding: clamp(1rem, 3vw, 2rem);
+      }
+
+      .p-card-footer {
+        padding: clamp(1rem, 3vw, 2rem);
+        background-color: #f8f9fa;
+        border-top: 1px solid #e9ecef;
+      }
+    }
+  }
+}
+
+// Extra small devices (portrait phones, less than 576px)
+@media (max-width: 575px) {
+  .upload-product-container {
+    padding: 0.5rem;
+
+    .upload-form {
+      .field {
+        margin-bottom: 1rem;
+
+        .current-images {
+          grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+          gap: 0.5rem;
+          padding: 0.75rem;
+        }
+
+        .file-list {
+          padding: 0.75rem;
+          
+          .file-item {
+            padding: 0.375rem;
+            gap: 0.5rem;
+            min-height: 44px;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Very large screens (1400px and up)
+@media (min-width: 1400px) {
+  .upload-product-container {
+    max-width: 1320px;
+    
+    .upload-form .field .current-images {
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    }
+  }
+}
+
+// Customer view optimization
+.container.detail {
+  max-width: 100%;
+  padding: 0 1rem;
+
+  @media (min-width: 576px) {
+    padding: 0 1.5rem;
+  }
+
+  @media (min-width: 768px) {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  @media (min-width: 992px) {
+    max-width: 960px;
+  }
+
+  @media (min-width: 1200px) {
+    max-width: 1140px;
+  }
+
+  @media (min-width: 1400px) {
+    max-width: 1320px;
+  }
+
+  .intro-section {
+    margin-bottom: 1.5rem;
+    
+    h4 {
+      font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+      margin-bottom: 0.75rem;
+      word-wrap: break-word;
+    }
+  }
+
+  .detail-shoe {
+    margin-left: 0 !important;
+    
+    .col-md-6 {
+      padding: 0 0.75rem;
+      margin-bottom: 1.5rem;
+
+      @media (min-width: 768px) {
+        margin-bottom: 0;
+      }
+    }
+
+    // Gallery optimization
+    #carouselExample {
+      margin-left: 0 !important;
+      
+      ::ng-deep p-galleria {
+        .p-galleria-content {
+          border-radius: 0.5rem;
+          overflow: hidden;
+        }
+
+        .p-galleria-item {
+          img {
+            max-height: 400px;
+            object-fit: contain;
+            
+            @media (max-width: 768px) {
+              max-height: 300px;
+            }
+          }
+        }
+
+        .p-galleria-thumbnail-container {
+          .p-galleria-thumbnail-items {
+            .p-galleria-thumbnail-item {
+              margin: 0.25rem;
+              
+              img {
+                border-radius: 0.25rem;
+                transition: transform 0.2s ease;
+                
+                &:hover {
+                  transform: scale(1.05);
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // Product details optimization
+    .details {
+      padding: 0 0.75rem;
+
+      h2 {
+        font-size: clamp(1.25rem, 3vw, 1.75rem);
+        line-height: 1.3;
+        margin: 1rem 0;
+      }
+
+      p {
+        font-size: clamp(0.875rem, 2vw, 1rem);
+        line-height: 1.5;
+        margin: 0.75rem 0;
+        
+        &.position-absolute {
+          position: static !important;
+          
+          @media (min-width: 768px) {
+            position: absolute !important;
+          }
+        }
+      }
+
+      .price-wrapper {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        align-items: baseline;
+
+        h2 {
+          font-size: clamp(1.25rem, 3.5vw, 2rem);
+          margin: 0.5rem 0;
+        }
+
+        .old-price {
+          font-size: clamp(1rem, 2.5vw, 1.5rem);
+          text-decoration: line-through;
+          opacity: 0.7;
+        }
+      }
+
+      .about {
+        font-size: clamp(0.875rem, 2vw, 1rem) !important;
+        line-height: 1.6;
+        text-align: justify;
+      }
+
+      // Size selection optimization
+      .sizes {
+        margin-top: 1.5rem;
+
+        h6 {
+          font-size: clamp(0.875rem, 2vw, 1rem);
+          margin-bottom: 1rem;
+          margin-left: 0 !important;
+        }
+
+        .radio {
+          display: inline-block;
+          margin: 0.25rem;
+          
+          span {
+            display: inline-block;
+            padding: 0.5rem 0.75rem;
+            border: 2px solid #dee2e6;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: clamp(0.875rem, 2vw, 1rem);
+            min-width: 44px;
+            text-align: center;
+          }
+
+          input {
+            display: none;
+
+            &:checked + span {
+              background-color: #007bff;
+              color: white;
+              border-color: #007bff;
+            }
+          }
+
+          &:hover span {
+            border-color: #007bff;
+            transform: translateY(-1px);
+          }
+        }
+      }
+
+      // Product actions optimization
+      .product-details {
+        margin-top: 1.5rem;
+
+        h5 {
+          font-size: clamp(1rem, 2.5vw, 1.25rem);
+          margin-bottom: 1rem;
+        }
+
+        .product-quantity {
+          margin-bottom: 1.5rem;
+
+          .border-wrapper {
+            max-width: 200px;
+            
+            ::ng-deep p-inputNumber {
+              .p-inputnumber {
+                width: 100%;
+                
+                .p-inputnumber-input {
+                  text-align: center;
+                  font-size: clamp(0.875rem, 2vw, 1rem);
+                }
+
+                .p-inputnumber-button {
+                  width: 44px;
+                  height: 44px;
+                  
+                  .p-button-icon {
+                    font-size: 0.875rem;
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        .product-actions {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.75rem;
+          align-items: center;
+
+          button {
+            flex: 1;
+            min-width: 150px;
+            padding: 0.75rem 1rem;
+            font-size: clamp(0.875rem, 2vw, 1.125rem);
+            border-radius: 0.375rem;
+            font-weight: 500;
+            
+            @media (max-width: 576px) {
+              width: 100%;
+              flex: none;
+            }
+          }
+
+          i.pi-heart {
+            font-size: clamp(1.25rem, 3vw, 1.5rem);
+            color: #6c757d;
+            cursor: pointer;
+            transition: color 0.2s ease;
+            padding: 0.5rem;
+            
+            &:hover {
+              color: #dc3545;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Related products optimization
+  .suggest {
+    margin: 3rem 0 2rem;
+
+    h3 {
+      font-size: clamp(1.25rem, 3vw, 2rem);
+      margin-bottom: 2rem;
+    }
+
+    .container-lg {
+      padding: 0;
+    }
+
+    .row {
+      margin: 0 -0.5rem;
+
+      .col-8,
+      .col-lg-3 {
+        padding: 0 0.5rem;
+        margin-bottom: 1.5rem;
+        cursor: pointer;
+
+        @media (min-width: 992px) {
+          margin-bottom: 0;
+        }
+
+        .card {
+          transition: transform 0.2s ease, box-shadow 0.2s ease;
+          border-radius: 0.5rem;
+          overflow: hidden;
+
+          &:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+          }
+
+          .card-body {
+            padding: 1rem;
+
+            img {
+              width: 100%;
+              height: 200px;
+              object-fit: cover;
+              border-radius: 0.375rem;
+            }
+          }
+
+          .card-footer {
+            padding: 1rem;
+
+            .lead {
+              font-size: clamp(0.9rem, 2vw, 1.1rem);
+              margin-bottom: 0.5rem;
+              line-height: 1.4;
+            }
+
+            p {
+              font-size: clamp(0.875rem, 2vw, 1rem);
+              margin: 0;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// Mobile-specific optimizations
+@media (max-width: 767px) {
+  .container.detail {
+    .detail-shoe {
+      .col-md-6:first-child {
+        order: 1;
+      }
+
+      .col-md-6:last-child {
+        order: 2;
+      }
+    }
+
+    .suggest {
+      .row .col-8 {
+        max-width: 50%;
+        flex: 0 0 50%;
+      }
+    }
+  }
+}
+
+// Tablet optimizations
+@media (min-width: 768px) and (max-width: 991px) {
+  .container.detail {
+    .suggest {
+      .row .col-lg-3 {
+        max-width: 33.333333%;
+        flex: 0 0 33.333333%;
+      }
+    }
+  }
+}

@@ -1,32 +1,138 @@
-<div class="container category-manage-admin">
+<div class="category-manage-container">
     <p-toast></p-toast>
     <p-confirmDialog></p-confirmDialog>
-    <div class="row add-category-wrapper">
-        <div class="col col-lg-4 offset-lg-2">
-            <p-button (click)="visible = true" label="Thêm danh mục"></p-button>
+
+    <div class="category-header">
+        <h2>Quản lý danh mục</h2>
+        <div class="header-actions">
+            <div class="header-search-container" (click)="showSearchDialog = true" pTooltip="Tìm kiếm danh mục" tooltipPosition="bottom">
+                <span class="p-input-icon-left">
+                    <i class="pi pi-search"></i>
+                    <input type="text" pInputText placeholder="Tìm kiếm danh mục..." readonly class="p-inputtext-sm">
+                </span>
+            </div>
+            <button pButton pRipple 
+                    type="button" 
+                    label="Thêm danh mục" 
+                    icon="pi pi-plus"
+                    class="p-button-success"
+                    (click)="openAddDialog()">
+            </button>
         </div>
     </div>
-    <p-dialog [modal]="true" header="Thêm danh mục" [(visible)]="visible" [style]="{ width: '500px' }" [draggable]="false" [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }">
-        <input [(ngModel)]="categoryName" type="text" pInputText />
-        <ng-template pTemplate="footer">
-            <p-button icon="pi pi-check" (click)="addCategory()" label="Thêm" pAutoFocus [autofocus]="true"></p-button>
-        </ng-template>
-    </p-dialog>
-    @for (item of categoriesOptions; track item) {
-        <div class="row">
-            <div class="col col-lg-4 offset-lg-2">
-                <div class="category-wrapper">
-                    <label class="font-bold" [for]="item.name">Tên danh mục</label>
-                    <input [id]="item.name" type="text" pInputText [(ngModel)]="item.name" />
-                </div>
-            </div>
-            <div class="col col-lg-4 offset-lg-2 d-flex align-items-center">
-                <div class="button-wrapper">
-                    <p-button (click)="updateCategory(item.id, item.name)" class="update-button" label="Cập nhật danh mục"></p-button>
-                    <p-button (click)="confirmDelete(item.id)" label="Xóa danh mục" severity="danger"></p-button>
-                </div>
+
+    <p-dialog header="Tìm kiếm danh mục" [(visible)]="showSearchDialog" [modal]="true" [style]="{width: '40vw', 'max-width': '450px', 'min-width': '350px'}" [draggable]="false" [resizable]="false">
+        <div class="p-fluid" style="margin-top: 1rem;">
+            <div class="field">
+                <label for="searchTerm">Tìm kiếm</label>
+                <span class="p-input-icon-left">
+                    <i class="pi pi-search"></i>
+                    <input type="text" pInputText id="searchTerm" [(ngModel)]="searchTerm" placeholder="Nhập tên danh mục">
+                </span>
             </div>
         </div>
-    }
+        <ng-template pTemplate="footer">
+            <button pButton pRipple type="button" label="Xóa lọc" icon="pi pi-times" class="p-button-text" (click)="resetSearch(); showSearchDialog = false"></button>
+            <button pButton pRipple type="button" label="Áp dụng" icon="pi pi-check" class="p-button-raised" (click)="showSearchDialog = false"></button>
+        </ng-template>
+    </p-dialog>
 
+    <p-card styleClass="category-table-card">
+        <div class="category-table">
+            <p-table [value]="filteredCategories" 
+                    [loading]="loading"
+                    [paginator]="true"
+                    [rows]="15"
+                    [rowsPerPageOptions]="[15, 30, 50]" 
+                    [showCurrentPageReport]="true" 
+                    currentPageReportTemplate="Hiển thị {first} đến {last} của {totalRecords} danh mục"
+                    styleClass="p-datatable-striped"
+                    [scrollable]="true"
+                    scrollHeight="flex"
+                    responsiveLayout="scroll">
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th style="width:10%">ID</th>
+                        <th style="width:50%">Tên danh mục</th>
+                        <th style="width:25%">Ngày tạo</th>
+                        <th style="width:15%">Thao tác</th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-category let-editing="editing" let-ri="rowIndex">
+                    <tr>
+                        <td data-label="ID">#{{ category.id }}</td>
+                        <td data-label="Tên danh mục">
+                            <span *ngIf="!editing" class="category-name">{{ category.name }}</span>
+                            <input *ngIf="editing" 
+                                   type="text" 
+                                   pInputText 
+                                   [(ngModel)]="category.name" 
+                                   class="p-inputtext-sm"
+                                   style="width: 100%">
+                        </td>
+                        <td data-label="Ngày tạo">{{ category.createdAt | date:'dd/MM/yyyy' }}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button *ngIf="!editing"
+                                        pButton 
+                                        pRipple 
+                                        type="button" 
+                                        icon="pi pi-pencil"
+                                        class="p-button-rounded p-button-text p-button-info"
+                                        pTooltip="Chỉnh sửa" 
+                                        (click)="editCategory(ri)">
+                                </button>
+                                <button *ngIf="editing"
+                                        pButton 
+                                        pRipple 
+                                        type="button" 
+                                        icon="pi pi-check"
+                                        class="p-button-rounded p-button-text p-button-success"
+                                        pTooltip="Lưu" 
+                                        (click)="saveCategory(category, ri)">
+                                </button>
+                                <button *ngIf="editing"
+                                        pButton 
+                                        pRipple 
+                                        type="button" 
+                                        icon="pi pi-times"
+                                        class="p-button-rounded p-button-text p-button-secondary"
+                                        pTooltip="Hủy" 
+                                        (click)="cancelEdit(ri)">
+                                </button>
+                                <button *ngIf="!editing"
+                                        pButton 
+                                        pRipple 
+                                        type="button" 
+                                        icon="pi pi-trash"
+                                        class="p-button-rounded p-button-text p-button-danger"
+                                        pTooltip="Xóa" 
+                                        (click)="confirmDelete(category.id)">
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="emptymessage">
+                    <tr>
+                        <td colspan="4" class="text-center py-5">Không có danh mục nào</td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+    </p-card>
+
+    <!-- Add Category Dialog -->
+    <p-dialog header="Thêm danh mục mới" [(visible)]="visible" [modal]="true" [style]="{width: '450px', 'max-width': '90vw'}" [draggable]="false" [resizable]="false">
+        <div class="p-fluid">
+            <div class="field">
+                <label for="newCategoryName">Tên danh mục</label>
+                <input type="text" pInputText id="newCategoryName" [(ngModel)]="categoryName" placeholder="Nhập tên danh mục" autofocus>
+            </div>
+        </div>
+        <ng-template pTemplate="footer">
+            <button pButton pRipple type="button" label="Hủy" icon="pi pi-times" class="p-button-text" (click)="closeAddDialog()"></button>
+            <button pButton pRipple type="button" label="Thêm" icon="pi pi-check" class="p-button-raised" (click)="addCategory()"></button>
+        </ng-template>
+    </p-dialog>
 </div>

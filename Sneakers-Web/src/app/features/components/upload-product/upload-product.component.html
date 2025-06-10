@@ -1,49 +1,140 @@
-<div class="container upload-product-admin">
+<div class="upload-product-container">
     <p-toast></p-toast>
-    <div class="row">
-      <div class="col-8 col-lg-8 offset-lg-2">
-        <form class="form-group" [formGroup]="productForm">
-          <div class="wrapper">
-            <label class="font-bold" for="productName">Tên sản phẩm</label>
-            <input id="productName" type="text" pInputText formControlName="productName"/>
-          </div>
-          <div class="wrapper">
-            <label class="font-bold" for="price">Giá</label>
-            <p-inputNumber inputId="price" formControlName="price"></p-inputNumber>
-          </div>
-          <div class="wrapper">
-            <label class="font-bold" for="discount">Giảm giá (%)</label>
-            <p-inputNumber inputId="discount" formControlName="discount"></p-inputNumber>
-          </div>
-          <div class="wrapper">
-            <label class="font-bold" for="quantity">Số lượng</label>
-            <p-inputNumber inputId="quantity" formControlName="quantity"></p-inputNumber>
-          </div>
-          <div class="wrapper dropdown-wrapper">
-            <p-dropdown [options]="categoriesOptions" placeholder="Danh mục"
-              (onChange)="onCategoryChange($event)"></p-dropdown> 
-          </div>
-          <div class="wrapper upload-wrapper">
-            <label class="font-bold">Tải lên ảnh</label>
-            <p-fileUpload mode="basic" [auto]="true" [multiple]="true" chooseLabel="Choose" name="myFile[]" url="https://www.primefaces.org/cdn/api/upload.php" accept="image/*" (onUpload)="onUpload($event)"></p-fileUpload>
-          </div>
-          <div class="wrapper">
-            <ul>
-              @for (item of myFiles; track item) {
-                <li class="font-bold">{{item.name}} -- {{(item.size / 1024).toFixed(0)}}KB</li>
-              }
-            </ul>
-          </div>
-          <div class="wrapper">
-            <label class="font-bold" for="description">Mô tả</label>
-            <textarea id="description" rows="5" cols="100" pInputTextarea formControlName="description"></textarea>
-          </div>
-        </form>
-        <div class="button-wrapper">
-          <p-button (click)="uploadProduct()" class="upload-button" label="Thêm mới sản phẩm"></p-button>
-        </div>
-        
-      </div>
 
+    <div class="upload-header">
+        <h2>Thêm sản phẩm mới</h2>
+        <div class="header-actions">
+            <button pButton pRipple 
+                    type="button" 
+                    label="Quay lại" 
+                    icon="pi pi-arrow-left"
+                    class="p-button-outlined"
+                    routerLink="/admin/products">
+            </button>
+        </div>
     </div>
-  </div>
+
+    <p-card styleClass="upload-form-card">
+        <div class="upload-form">
+            <form class="p-fluid" [formGroup]="productForm">
+                <div class="grid">
+                    <div class="col-12 md:col-6">
+                        <div class="field">
+                            <label for="productName">Tên sản phẩm</label>
+                            <input id="productName" 
+                                   type="text" 
+                                   pInputText 
+                                   formControlName="productName"
+                                   placeholder="Nhập tên sản phẩm"/>
+                        </div>
+                    </div>
+                    <div class="col-12 md:col-6">
+                        <div class="field">
+                            <label for="category">Danh mục</label>
+                            <p-dropdown id="category"
+                                        [options]="categoriesOptions" 
+                                        placeholder="Chọn danh mục"
+                                        optionLabel="label"
+                                        optionValue="value"
+                                        (onChange)="onCategoryChange($event)">
+                            </p-dropdown>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid">
+                    <div class="col-12 md:col-4">
+                        <div class="field">
+                            <label for="price">Giá (VNĐ)</label>
+                            <p-inputNumber id="price" 
+                                           formControlName="price"
+                                           mode="currency"
+                                           currency="VND"
+                                           locale="vi-VN"
+                                           placeholder="0">
+                            </p-inputNumber>
+                        </div>
+                    </div>
+                    <div class="col-12 md:col-4">
+                        <div class="field">
+                            <label for="discount">Giảm giá (%)</label>
+                            <p-inputNumber id="discount" 
+                                           formControlName="discount"
+                                           [min]="0"
+                                           [max]="100"
+                                           placeholder="0">
+                            </p-inputNumber>
+                        </div>
+                    </div>
+                    <div class="col-12 md:col-4">
+                        <div class="field">
+                            <label for="quantity">Số lượng</label>
+                            <p-inputNumber id="quantity" 
+                                           formControlName="quantity"
+                                           [min]="0"
+                                           placeholder="0">
+                            </p-inputNumber>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label for="description">Mô tả sản phẩm</label>
+                    <textarea id="description" 
+                              rows="4" 
+                              pInputTextarea 
+                              formControlName="description"
+                              placeholder="Nhập mô tả chi tiết về sản phẩm...">
+                    </textarea>
+                </div>
+
+                <div class="field">
+                    <label>Hình ảnh sản phẩm</label>
+                    <div class="upload-section">
+                        <p-fileUpload mode="basic" 
+                                      [auto]="false" 
+                                      [multiple]="true" 
+                                      chooseLabel="Chọn ảnh" 
+                                      name="myFile[]" 
+                                      accept="image/*" 
+                                      (onSelect)="onFileSelect($event)"
+                                      class="upload-btn">
+                        </p-fileUpload>
+                        <small class="upload-hint">Chọn nhiều ảnh để hiển thị sản phẩm tốt hơn. Định dạng: JPG, PNG, GIF</small>
+                    </div>
+                </div>
+
+                <div class="field" *ngIf="myFiles && myFiles.length > 0">
+                    <label>Danh sách ảnh đã chọn</label>
+                    <div class="file-list">
+                        <div *ngFor="let file of myFiles" class="file-item">
+                            <i class="pi pi-file-image"></i>
+                            <span class="file-name">{{ file.name }}</span>
+                            <span class="file-size">{{ (file.size / 1024).toFixed(0) }}KB</span>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <ng-template pTemplate="footer">
+            <div class="form-actions">
+                <button pButton pRipple 
+                        type="button" 
+                        label="Hủy" 
+                        icon="pi pi-times" 
+                        class="p-button-text"
+                        routerLink="/admin/products">
+                </button>
+                <button pButton pRipple 
+                        type="button" 
+                        label="Thêm sản phẩm" 
+                        icon="pi pi-check" 
+                        class="p-button-raised"
+                        (click)="uploadProduct()"
+                        [disabled]="!productForm.valid">
+                </button>
+            </div>
+        </ng-template>
+    </p-card>
+</div>

@@ -63,7 +63,7 @@
           <td>{{ request.customer_name || 'N/A' }}</td>
           <td pTooltip="{{request.reason}}" tooltipPosition="top">{{ request.reason | slice:0:50 }}{{ request.reason && request.reason.length > 50 ? '...' : '' }}</td>
           <td>{{ request.refund_amount | currency:'VND' }}</td>
-          <td>{{ request.requested_at | date:'dd/MM/yy HH:mm' }}</td>
+          <td>{{ formatDate(request.requested_at) }}</td>
           <td>
             <p-tag [value]="request.status" [severity]="getStatusSeverity(request.status)"></p-tag>
           </td>
