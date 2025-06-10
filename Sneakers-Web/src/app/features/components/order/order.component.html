@@ -1,128 +1,154 @@
-<div class="order-page">
-    <p-toast></p-toast>
-    <div class="container">
-        <p-blockUI [blocked]="blockedUi">
-            <p-progressSpinner ariaLabel="loading"></p-progressSpinner>
-        </p-blockUI>
-        <div class="row">
-            <div class="col-6 col-lg-6">
-                <form class="order-page-form d-flex" [formGroup]="inforShipForm">
-                    <div class="d-flex input-form-container">
-                        <label class="font-bold" for="name">Tên đầy đủ</label>
-                        <input id="name" type="text" pInputText formControlName="fullName"/>
-                    </div>
-                    <div class="d-flex input-form-container">
-                        <label class="font-bold" for="name">Địa chỉ nhận hàng</label>
-                        <input id="name" type="text" pInputText formControlName="address"/>
-                    </div>
-                    <div class="d-flex input-form-container">
-                        <label class="font-bold" for="name">Số điện thoại</label>
-                        <input id="name" type="text" pInputText formControlName="phoneNumber"/>
-                    </div>
-                    <div class="d-flex input-form-container">
-                        <label class="font-bold" for="name">Địa chỉ email</label>
-                        <input id="name" type="text" pInputText formControlName="email"/>
-                    </div>
-                    <div class="d-flex input-form-container">
-                        <label class="font-bold">Ghi chú đơn hàng</label>
-                        <textarea rows="5" cols="30" pInputTextarea formControlName="note"></textarea>
-                    </div>
-                </form>
+<p-toast></p-toast>
+<p-blockUI [blocked]="blockedUi">
+  <p-progressSpinner ariaLabel="loading"></p-progressSpinner>
+</p-blockUI>
+
+<div class="order-wrapper">
+  <div class="order-content">
+    <!-- Left Column: Order Summary -->
+    <div class="order-summary-section">
+      <div class="summary-card">
+        <h2 class="section-title">Tóm tắt đơn hàng</h2>
+        
+        <!-- Product List -->
+        <div class="product-list">
+          @for (product of productToOrder; track product) {
+          <div class="product-item">
+            <img [src]="apiImage + product.products.thumbnail" [alt]="product.products.name" class="product-image">
+            <div class="product-details">
+              <h4 class="product-name">{{product.products.name}}</h4>
+              <p class="product-meta">Size: {{product.size}} | Số lượng: {{product.quantity}}</p>
             </div>
-            <div class="col-5 col-lg-5 offset-lg-1 order-info-container d-flex">
-                <h5>ĐƠN HÀNG CỦA BẠN</h5>
-                <table>
-                    <thead>
-                        <tr>
-                            <td class="font-bold">SẢN PHẨM</td>
-                            <td class="col-right font-bold">TỔNG</td>
-                        </tr>
-                    </thead>
-                   <tbody>
-                        @for (product of productToOrder; track product) {
-                            <tr>
-                                <td>
-                                    <div class="productNameAndQuantity font-bold">{{product.products.name}}</div>
-                                    <div class="productSize">Size: {{product.size}} | Số lượng: {{product.quantity}}</div>
-                                </td>
-                                <td class="col-right">{{product.products.price * product.quantity | currency:'VND':'symbol':'1.0-0'}}</td>
-                            </tr>
-                        }
-                        <tr>
-                            <td class="font-bold">Tổng phụ</td>
-                            <td class="col-right">{{totalCost | currency:'VND':'symbol':'1.0-0'}}</td>
-                        </tr>
-                        <tr>
-                            <td class="font-bold">Mã giảm giá</td>
-                            <td class="col-right">
-                                @if (!isVoucherApplied) {
-                                    <div class="voucher-input-group d-flex align-items-center">
-                                        <input type="text" [(ngModel)]="voucherCode" pInputText placeholder="Nhập mã" style="width: 120px; margin-right: 5px;">
-                                        <button pButton type="button" label="Áp dụng" (click)="applyVoucher()" class="p-button-sm"></button>
-                                    </div>
-                                } @else {
-                                    <div class="applied-voucher d-flex align-items-center">
-                                        <span class="voucher-info">{{appliedVoucherName}} (-{{discountAmount | currency:'VND':'symbol':'1.0-0'}})</span>
-                                        <button pButton type="button" icon="pi pi-times" (click)="removeVoucher()" class="p-button-text p-button-sm"></button>
-                                    </div>
-                                }
-                            </td>
-                        </tr>
-                        @if (isVoucherApplied) {
-                            <tr>
-                                <td class="font-bold">Giảm giá</td>
-                                <td class="col-right text-danger">-{{discountAmount | currency:'VND':'symbol':'1.0-0'}}</td>
-                            </tr>
-                        }
-                        <tr>
-                            <td class="font-bold">Giao hàng</td>
-                            <td class="col-right">{{methodShippingValue.price | currency:'VND':'symbol':'1.0-0'}}</td>
-                        </tr>
-                        <tr>
-                            <td class="font-bold">Phương thức giao hàng</td>
-                            <td class="col-right">
-                                <p-dropdown [options]="methodShipping" [(ngModel)]="methodShippingValue" optionLabel="name" [showClear]="false" placeholder="Chọn phương thức giao hàng"></p-dropdown>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="font-bold">Tổng</td>
-                            <td class="col-right font-bold text-primary">{{finalCost + methodShippingValue.price | currency:'VND':'symbol':'1.0-0'}}</td>
-                        </tr>
-                   </tbody>
-                </table>
-                <ul class="payMethod-list">
-                    @for (item of payMethod; track item) {
-                        <li class="payMethod-item">
-                            <p-radioButton name="item" [value]="item" [(ngModel)]="selectedPayMethod" [inputId]="item.key"></p-radioButton>
-                            <label [for]="item.key" class="ml-2">{{item.name}}</label>
-                        </li>
-                    }
-                </ul>
-                <button (click)="order()" class="order-button">
-                    {{ selectedPayMethod.key === 'Stripe' ? 'Tiến hành thanh toán' : 'Đặt hàng' }}
-                </button>
-            </div> 
+            <div class="product-price">
+              {{product.products.price * product.quantity | currency:'VND':'symbol':'1.0-0'}}
+            </div>
+          </div>
+          }
         </div>
+
+        <!-- Voucher Section -->
+        <div class="voucher-section">
+          <div class="voucher-input">
+            <input type="text" pInputText placeholder="Mã giảm giá" [(ngModel)]="voucherCode" [disabled]="isVoucherApplied" class="voucher-field">
+            <p-button [label]="isVoucherApplied ? 'Đã áp dụng' : 'Áp dụng'" (click)="applyVoucher()" [disabled]="isVoucherApplied" class="voucher-btn"></p-button>
+          </div>
+          @if (isVoucherApplied) {
+          <div class="applied-voucher">
+            <span class="voucher-text">Áp dụng mã: <strong>{{appliedVoucherName}}</strong></span>
+            <p-button icon="pi pi-times" styleClass="p-button-text p-button-sm" (click)="removeVoucher()" pTooltip="Hủy voucher"></p-button>
+          </div>
+          }
+        </div>
+
+        <!-- Order Total -->
+        <div class="order-total">
+          <div class="total-line">
+            <span>Tạm tính:</span>
+            <span>{{totalCost | currency:'VND':'symbol':'1.0-0'}}</span>
+          </div>
+          <div class="total-line">
+            <span>Phí vận chuyển:</span>
+            <span>{{methodShippingValue.price | currency:'VND':'symbol':'1.0-0'}}</span>
+          </div>
+          @if (isVoucherApplied) {
+          <div class="total-line discount">
+            <span>Giảm giá:</span>
+            <span>-{{discountAmount | currency:'VND':'symbol':'1.0-0'}}</span>
+          </div>
+          }
+          <div class="total-line final">
+            <span>Tổng cộng:</span>
+            <span>{{finalCost + methodShippingValue.price | currency:'VND':'symbol':'1.0-0'}}</span>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <!-- Stripe Payment Dialog -->
-    <p-dialog 
-        header="Thanh toán bằng thẻ" 
-        [(visible)]="showStripeDialog" 
-        [modal]="true" 
-        [style]="{ width: '600px' }"
-        [closable]="false"
-        [draggable]="false"
-        [resizable]="false">
+    <!-- Right Column: Customer Information -->
+    <div class="customer-info-section">
+      <!-- Payment Information -->
+      <div class="info-card">
+        <h2 class="section-title">Thông tin thanh toán</h2>
+        <form [formGroup]="inforShipForm" class="payment-form">
+          <div class="form-row">
+            <div class="form-group full-width">
+              <label for="fullName">Họ và tên</label>
+              <input id="fullName" type="text" pInputText formControlName="fullName">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group full-width">
+              <label for="address">Địa chỉ</label>
+              <input id="address" type="text" pInputText formControlName="address">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="phoneNumber">Số điện thoại</label>
+              <input id="phoneNumber" type="text" pInputText formControlName="phoneNumber">
+            </div>
+            <div class="form-group">
+              <label for="email">Email</label>
+              <input id="email" type="text" pInputText formControlName="email">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group full-width">
+              <label for="note">Ghi chú</label>
+              <textarea id="note" pInputTextarea formControlName="note" rows="3"></textarea>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <!-- Shipping Method -->
+      <div class="info-card">
+        <h2 class="section-title">Phương thức vận chuyển</h2>
+        <p-dropdown [options]="methodShipping" [(ngModel)]="methodShippingValue" optionLabel="name" [showClear]="false" class="shipping-dropdown"></p-dropdown>
+      </div>
+
+      <!-- Payment Method -->
+      <div class="info-card">
+        <h2 class="section-title">Phương thức thanh toán</h2>
+        <div class="payment-methods">
+          @for (item of payMethod; track item) {
+          <div class="payment-option">
+            <p-radioButton name="paymentMethod" [value]="item" [(ngModel)]="selectedPayMethod" [inputId]="item.key"></p-radioButton>
+            <img [src]="item.logo" [alt]="item.name" class="payment-logo">
+            <label [for]="item.key">{{item.name}}</label>
+          </div>
+          }
+        </div>
         
-        <app-stripe-payment
-            [paymentAmount]="finalCost"
-            [orderId]="orderId"
-            [customerName]="inforShipForm.value.fullName"
-            [customerEmail]="inforShipForm.value.email"
-            (paymentSuccess)="onStripePaymentSuccess($event)"
-            (paymentError)="onStripePaymentError($event)"
-            (paymentCancel)="onStripePaymentCancel()">
-        </app-stripe-payment>
-    </p-dialog>
+        <p-button 
+            (click)="order()" 
+            [label]="selectedPayMethod.key === 'Stripe' ? 'Tiến hành thanh toán' : 'Đặt hàng'" 
+            class="order-btn"
+            icon="pi pi-check"
+            [loading]="blockedUi">
+        </p-button>
+      </div>
+    </div>
+  </div>
 </div>
+
+<!-- Stripe Payment Dialog -->
+<p-dialog 
+    header="Thanh toán bằng thẻ" 
+    [(visible)]="showStripeDialog" 
+    [modal]="true" 
+    [style]="{ width: '500px' }"
+    [closable]="false"
+    [draggable]="false"
+    [resizable]="false">
+    
+    <app-stripe-payment
+        [paymentAmount]="finalCost + methodShippingValue.price"
+        [orderId]="orderId"
+        [customerName]="inforShipForm.value.fullName!"
+        [customerEmail]="inforShipForm.value.email!"
+        (paymentSuccess)="onStripePaymentSuccess($event)"
+        (paymentError)="onStripePaymentError($event)"
+        (paymentCancel)="onStripePaymentCancel()">
+    </app-stripe-payment>
+</p-dialog>

@@ -1,0 +1,11 @@
+<svg width="100" height="32" viewBox="0 0 100 32" xmlns="http://www.w3.org/2000/svg">
+  <rect width="100" height="32" rx="4" fill="#6772E5"/>
+  <!-- Visa logo part -->
+  <rect x="5" y="8" width="40" height="16" rx="2" fill="#1A1F71"/>
+  <text x="25" y="18" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="8" font-weight="bold">VISA</text>
+  <!-- MasterCard logo part -->
+  <rect x="55" y="8" width="40" height="16" rx="2" fill="#EB001B"/>
+  <circle cx="70" cy="16" r="4" fill="#FF5F00"/>
+  <circle cx="75" cy="16" r="4" fill="#FFB366"/>
+  <text x="85" y="18" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="6" font-weight="bold">MC</text>
+</svg> 

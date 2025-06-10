@@ -23,6 +23,10 @@ import { VoucherApplicationResponseDto } from '../../../core/dtos/voucherApplica
 import { ButtonModule } from 'primeng/button';
 import { StripePaymentComponent } from '../stripe-payment/stripe-payment.component';
 import { DialogModule } from 'primeng/dialog';
+import { CardModule } from 'primeng/card';
+import { DividerModule } from 'primeng/divider';
+import { TooltipModule } from 'primeng/tooltip';
+import { environment } from '../../../../environments/environment.development';
 
 @Component({
   selector: 'app-order',
@@ -41,7 +45,10 @@ import { DialogModule } from 'primeng/dialog';
     AsyncPipe,
     ButtonModule,
     StripePaymentComponent,
-    DialogModule
+    DialogModule,
+    CardModule,
+    DividerModule,
+    TooltipModule
   ],
   providers: [
     ToastService,
@@ -60,6 +67,7 @@ export class OrderComponent extends BaseComponent implements OnInit,AfterViewIni
   public voucherCode: string = '';
   public isVoucherApplied: boolean = false;
   public appliedVoucherName: string = '';
+  public apiImage: string = environment.apiImage;
   
   private productOrderLocalStorage: ProductsInCartDto[] = [];
   public blockedUi: boolean = false;
@@ -71,15 +79,16 @@ export class OrderComponent extends BaseComponent implements OnInit,AfterViewIni
     price: number
   }[];
   public methodShippingValue!: {name: string, code: string,price: number};
-  public selectedPayMethod!: {name: string, key: string};
+  public selectedPayMethod!: {name: string, key: string, logo: string};
 
   payMethod: {
     name: string,
-    key: string
+    key: string,
+    logo: string
   }[] = [
-    { name: 'Thanh toán khi nhận hàng', key: 'Cash' },
-    { name: 'Chuyển khoản ngân hàng', key: 'Banking' },
-    { name: 'Thanh toán bằng thẻ Visa/Mastercard', key: 'Stripe' },
+    { name: 'Thanh toán khi nhận hàng', key: 'Cash', logo: 'assets/images/payment-icons/cash.svg' },
+    { name: 'Chuyển khoản ngân hàng', key: 'Banking', logo: 'assets/images/payment-icons/bank.svg' },
+    { name: 'Thanh toán bằng thẻ Visa/Mastercard', key: 'Stripe', logo: 'assets/images/payment-icons/stripe.svg' },
   ];
 
   // Stripe payment properties
