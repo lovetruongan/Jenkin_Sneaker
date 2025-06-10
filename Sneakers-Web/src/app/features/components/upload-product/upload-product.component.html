@@ -90,29 +90,20 @@
 
                 <div class="field">
                     <label>Hình ảnh sản phẩm</label>
-                    <div class="upload-section">
-                        <p-fileUpload mode="basic" 
-                                      [auto]="false" 
-                                      [multiple]="true" 
-                                      chooseLabel="Chọn ảnh" 
-                                      name="myFile[]" 
-                                      accept="image/*" 
-                                      (onSelect)="onFileSelect($event)"
-                                      class="upload-btn">
-                        </p-fileUpload>
-                        <small class="upload-hint">Chọn nhiều ảnh để hiển thị sản phẩm tốt hơn. Định dạng: JPG, PNG, GIF</small>
-                    </div>
-                </div>
-
-                <div class="field" *ngIf="myFiles && myFiles.length > 0">
-                    <label>Danh sách ảnh đã chọn</label>
-                    <div class="file-list">
-                        <div *ngFor="let file of myFiles" class="file-item">
-                            <i class="pi pi-file-image"></i>
-                            <span class="file-name">{{ file.name }}</span>
-                            <span class="file-size">{{ (file.size / 1024).toFixed(0) }}KB</span>
-                        </div>
-                    </div>
+                    <p-fileUpload #fileUpload
+                                  mode="advanced" 
+                                  name="files[]"
+                                  [multiple]="true" 
+                                  accept="image/*" 
+                                  [maxFileSize]="1000000"
+                                  chooseLabel="Chọn ảnh"
+                                  [showUploadButton]="false"
+                                  cancelButtonLabel="Hủy">
+                        <ng-template pTemplate="content">
+                            <!-- We use the default file list provided by the component -->
+                        </ng-template>
+                    </p-fileUpload>
+                    <small class="upload-hint">Chọn một hoặc nhiều ảnh để thêm. Tối đa 1MB mỗi ảnh.</small>
                 </div>
             </form>
         </div>
@@ -131,7 +122,7 @@
                         label="Thêm sản phẩm" 
                         icon="pi pi-check" 
                         class="p-button-raised"
-                        (click)="uploadProduct()"
+                        (click)="uploadProduct(fileUpload)"
                         [disabled]="!productForm.valid">
                 </button>
             </div>

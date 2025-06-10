@@ -1,1156 +1,650 @@
-// Admin Edit Layout - 2 Column Design
-.admin-edit-container {
-  max-width: 100%;
-  margin: 0 auto;
-  padding: 1rem;
-
-  // Large screens (1200px and up)
-  @media (min-width: 1200px) {
-    max-width: 1400px;
-    padding: 2rem;
-  }
-
-  // Medium screens (992px - 1199px)
-  @media (min-width: 992px) and (max-width: 1199px) {
-    max-width: 1140px;
-    padding: 1.5rem;
-  }
-
-  // Small screens (768px - 991px)
-  @media (min-width: 768px) and (max-width: 991px) {
-    max-width: 960px;
-    padding: 1rem;
-  }
-
-  .admin-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 2rem;
-    padding-bottom: 1rem;
-    border-bottom: 2px solid #e9ecef;
-    flex-wrap: wrap;
-    gap: 1rem;
-
-    h2 {
-      margin: 0;
-      color: #495057;
-      font-weight: 600;
-      font-size: clamp(1.5rem, 3vw, 2rem);
-      flex: 1;
-      min-width: 250px;
-    }
-
-    .header-actions {
-      display: flex;
-      gap: 1rem;
-      flex-shrink: 0;
-    }
-
-    // Mobile header
-    @media (max-width: 576px) {
-      flex-direction: column;
-      align-items: stretch;
-      text-align: center;
-
-      .header-actions {
-        justify-content: center;
-      }
-    }
-  }
-
-  .admin-content {
-    display: grid;
-    gap: 2rem;
-    grid-template-columns: 1fr;
-
-    // 2-column layout for larger screens
-    @media (min-width: 992px) {
-      grid-template-columns: 1fr 1fr;
-      gap: 2.5rem;
-    }
-
-    // 3:2 ratio for extra large screens
-    @media (min-width: 1400px) {
-      grid-template-columns: 3fr 2fr;
-      gap: 3rem;
-    }
-
-    .admin-images-column {
-      order: 2;
-
-      @media (min-width: 992px) {
-        order: 1;
-      }
-
-      ::ng-deep .images-card {
-        .p-card {
-          height: 100%;
-
-          .p-card-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 1.5rem 2rem;
-            border-radius: 0.5rem 0.5rem 0 0;
-
-            h3 {
-              margin: 0;
-              font-size: 1.25rem;
-              font-weight: 600;
+// Product Detail Page - Modern Design
+.product-detail-page {
+    min-height: 100vh;
+    background: #f8f9fa;
+  
+    // Breadcrumb Section
+    .breadcrumb-section {
+      background: #fff;
+      padding: 1rem 0;
+      border-bottom: 1px solid #e9ecef;
+  
+      .breadcrumb {
+        margin: 0;
+        background: none;
+        padding: 0;
+  
+        .breadcrumb-item {
+          color: #6c757d;
+          font-size: 0.875rem;
+  
+          a {
+            color: #007bff;
+            text-decoration: none;
+            transition: color 0.3s ease;
+  
+            &:hover {
+              color: #0056b3;
             }
           }
-
-          .p-card-content {
-            padding: 1.5rem;
+  
+          &.active {
+            color: #495057;
+            font-weight: 500;
+          }
+  
+          &:not(:last-child)::after {
+            content: '>';
+            margin: 0 0.5rem;
+            color: #6c757d;
           }
         }
       }
-
-      .current-product-gallery {
-        margin-bottom: 2rem;
-
+    }
+  
+    // Product Detail Container
+    .product-detail-container {
+      padding: 3rem 0;
+      background: #fff;
+  
+      .container {
+        max-width: 1200px;
+      }
+  
+      // Product Gallery
+      .product-gallery {
         ::ng-deep p-galleria {
           .p-galleria {
-            border-radius: 0.5rem;
+            background: #fff;
+            border-radius: 15px;
             overflow: hidden;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-
-            .p-galleria-item {
-              background: #f8f9fa;
-            }
-          }
-        }
-      }
-
-      .current-images-grid {
-        h4 {
-          color: #495057;
-          font-size: 1.1rem;
-          margin-bottom: 1rem;
-          padding-bottom: 0.5rem;
-          border-bottom: 1px solid #dee2e6;
-        }
-
-        .images-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-          gap: 1rem;
-          max-height: 400px;
-          overflow-y: auto;
-          padding: 0.5rem;
-
-          @media (min-width: 1200px) {
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-          }
-
-          .image-item {
-            position: relative;
-            background: white;
-            border-radius: 0.5rem;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-
-            &:hover {
-              transform: translateY(-2px);
-              box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
-            }
-
-            .image-preview {
-              width: 100%;
-              height: 120px;
-              object-fit: cover;
-              border-radius: 0.5rem 0.5rem 0 0;
-            }
-
-            .image-info {
-              padding: 0.75rem;
-              display: flex;
-              justify-content: space-between;
-              align-items: center;
-              background: white;
-
-              .image-id {
-                font-size: 0.75rem;
-                color: #6c757d;
-                font-weight: 500;
-              }
-
-              button {
-                opacity: 0.7;
-                transition: opacity 0.2s ease;
-
-                &:hover {
-                  opacity: 1;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  
+            .p-galleria-content {
+              .p-galleria-item-wrapper {
+                .p-galleria-item-container {
+                  .p-galleria-item {
+                    .gallery-item {
+                      display: flex;
+                      justify-content: center;
+                      align-items: center;
+                      height: 400px;
+                      background: #f8f9fa;
+  
+                      img {
+                        max-width: 100%;
+                        max-height: 100%;
+                        object-fit: contain;
+                        border-radius: 10px;
+                      }
+                    }
+                  }
                 }
               }
-            }
-          }
-        }
-      }
-
-      .empty-images {
-        text-align: center;
-        padding: 3rem 1rem;
-        color: #6c757d;
-
-        p {
-          margin-top: 1rem;
-          font-size: 1.1rem;
-        }
-      }
-    }
-
-    .admin-form-column {
-      order: 1;
-
-      @media (min-width: 992px) {
-        order: 2;
-      }
-
-      ::ng-deep .edit-form-card {
-        .p-card {
-          height: 100%;
-
-          .p-card-header {
-            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-            color: white;
-            padding: 1.5rem 2rem;
-            border-radius: 0.5rem 0.5rem 0 0;
-
-            h3 {
-              margin: 0;
-              font-size: 1.25rem;
-              font-weight: 600;
-            }
-          }
-
-          .p-card-content {
-            padding: 1.5rem;
-          }
-
-          .p-card-footer {
-            padding: 1.5rem 2rem;
-            background-color: #f8f9fa;
-            border-top: 1px solid #e9ecef;
-          }
-        }
-      }
-
-      .edit-form {
-        .field {
-          margin-bottom: 1.5rem;
-
-          label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-            color: #495057;
-            font-size: clamp(0.875rem, 2vw, 1rem);
-          }
-
-          // Input responsiveness
-          input[type="text"],
-          textarea {
-            width: 100%;
-            font-size: clamp(0.875rem, 2vw, 1rem);
-          }
-
-          // Dropdown adjustments
-          p-dropdown {
-            width: 100%;
-            
-            ::ng-deep .p-dropdown {
-              width: 100%;
-              min-width: 0;
-            }
-          }
-
-          // Input number responsiveness
-          p-inputNumber {
-            width: 100%;
-            
-            ::ng-deep .p-inputnumber {
-              width: 100%;
-              
-              .p-inputtext {
-                width: 100%;
-                font-size: clamp(0.875rem, 2vw, 1rem);
-              }
-            }
-          }
-
-          .upload-section {
-            .upload-hint {
-              display: block;
-              margin-top: 0.5rem;
-              color: #6c757d;
-              font-style: italic;
-              font-size: clamp(0.75rem, 1.5vw, 0.875rem);
-            }
-
-            // File upload button responsiveness
-            ::ng-deep p-fileUpload {
-              .p-fileupload-choose {
-                width: 100%;
-                justify-content: center;
-                padding: 0.75rem 1rem;
-                font-size: clamp(0.875rem, 2vw, 1rem);
-                background: linear-gradient(45deg, #007bff, #0056b3);
-                border: none;
-                border-radius: 0.375rem;
-                transition: all 0.2s ease;
-
-                &:hover {
-                  transform: translateY(-1px);
-                  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
-                }
-              }
-            }
-          }
-
-          .new-files-preview {
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-            margin-top: 1rem;
-            padding: 1rem;
-            background-color: #f8f9fa;
-            border-radius: 0.5rem;
-            border: 1px solid #dee2e6;
-            max-height: 300px;
-            overflow-y: auto;
-
-            .new-file-item {
-              display: flex;
-              align-items: center;
-              gap: 1rem;
-              padding: 0.75rem;
-              background-color: white;
-              border-radius: 0.375rem;
-              box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-              transition: transform 0.2s ease;
-
-              &:hover {
-                transform: translateX(4px);
-              }
-
-              .file-preview {
-                flex-shrink: 0;
-
-                .preview-image {
-                  width: 60px;
-                  height: 60px;
-                  object-fit: cover;
-                  border-radius: 0.375rem;
-                  border: 2px solid #dee2e6;
-                }
-              }
-
-              .file-info {
-                flex: 1;
-                display: flex;
-                flex-direction: column;
-                gap: 0.25rem;
-
-                .file-name {
-                  font-weight: 500;
-                  color: #495057;
-                  font-size: clamp(0.8rem, 2vw, 0.9rem);
-                  word-break: break-word;
-                }
-
-                .file-size {
-                  color: #6c757d;
-                  font-size: clamp(0.75rem, 1.5vw, 0.875rem);
-                }
-              }
-
-              button {
-                flex-shrink: 0;
-                opacity: 0.7;
-                transition: opacity 0.2s ease;
-
-                &:hover {
-                  opacity: 1;
-                }
-              }
-            }
-          }
-        }
-
-        // Grid system adjustments
-        .grid {
-          margin: 0 -0.5rem;
-
-          @media (max-width: 767px) {
-            margin: 0;
-          }
-
-          .col-12,
-          .col-md-6,
-          .col-md-4 {
-            padding: 0 0.5rem;
-
-            @media (max-width: 767px) {
-              padding: 0;
-              margin-bottom: 1rem;
-            }
-          }
-        }
-      }
-
-      .form-actions {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 1rem;
-        flex-wrap: wrap;
-
-        button {
-          min-width: clamp(140px, 20vw, 200px);
-          padding: 0.875rem 1.5rem;
-          font-size: clamp(0.875rem, 2vw, 1rem);
-          font-weight: 500;
-          border-radius: 0.375rem;
-          
-          ::ng-deep .p-button-label {
-            font-size: inherit;
-          }
-        }
-
-        // Mobile actions
-        @media (max-width: 576px) {
-          flex-direction: column-reverse;
-          gap: 0.75rem;
-          
-          button {
-            width: 100%;
-            min-width: unset;
-          }
-        }
-
-        // Tablet actions
-        @media (min-width: 577px) and (max-width: 768px) {
-          justify-content: center;
-          
-          button {
-            flex: 1;
-            max-width: 220px;
-          }
-        }
-      }
-    }
-  }
-}
-
-// Responsive design for upload-product component
-.upload-product-container {
-  max-width: 100%;
-  margin: 0 auto;
-  padding: 1rem;
-
-  // Large screens (1200px and up)
-  @media (min-width: 1200px) {
-    max-width: 1140px;
-    padding: 2rem;
-  }
-
-  // Medium screens (992px - 1199px)
-  @media (min-width: 992px) and (max-width: 1199px) {
-    max-width: 960px;
-    padding: 1.5rem;
-  }
-
-  // Small screens (768px - 991px)
-  @media (min-width: 768px) and (max-width: 991px) {
-    max-width: 720px;
-    padding: 1rem;
-  }
-
-  .upload-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 2rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid #e9ecef;
-    flex-wrap: wrap;
-    gap: 1rem;
-
-    h2 {
-      margin: 0;
-      color: #495057;
-      font-weight: 600;
-      font-size: clamp(1.25rem, 2.5vw, 1.75rem);
-      flex: 1;
-      min-width: 200px;
-    }
-
-    .header-actions {
-      display: flex;
-      gap: 1rem;
-      flex-shrink: 0;
-    }
-
-    // Mobile header
-    @media (max-width: 576px) {
-      flex-direction: column;
-      align-items: stretch;
-      text-align: center;
-
-      .header-actions {
-        justify-content: center;
-      }
-    }
-  }
-
-  .upload-form {
-    .field {
-      margin-bottom: 1.5rem;
-
-      label {
-        display: block;
-        margin-bottom: 0.5rem;
-        font-weight: 600;
-        color: #495057;
-        font-size: clamp(0.875rem, 2vw, 1rem);
-      }
-
-      // Input responsiveness
-      input[type="text"],
-      textarea {
-        width: 100%;
-        font-size: clamp(0.875rem, 2vw, 1rem);
-      }
-
-      // Dropdown adjustments
-      p-dropdown {
-        width: 100%;
-        
-        ::ng-deep .p-dropdown {
-          width: 100%;
-          min-width: 0;
-        }
-      }
-
-      // Input number responsiveness
-      p-inputNumber {
-        width: 100%;
-        
-        ::ng-deep .p-inputnumber {
-          width: 100%;
-          
-          .p-inputtext {
-            width: 100%;
-            font-size: clamp(0.875rem, 2vw, 1rem);
-          }
-        }
-      }
-
-      .upload-section {
-        .upload-hint {
-          display: block;
-          margin-top: 0.5rem;
-          color: #6c757d;
-          font-style: italic;
-          font-size: clamp(0.75rem, 1.5vw, 0.875rem);
-        }
-
-        // File upload button responsiveness
-        ::ng-deep p-fileUpload {
-          .p-fileupload-choose {
-            width: 100%;
-            justify-content: center;
-            padding: 0.75rem 1rem;
-            font-size: clamp(0.875rem, 2vw, 1rem);
-          }
-        }
-      }
-
-      .file-list {
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
-        margin-top: 1rem;
-        padding: 1rem;
-        background-color: #f8f9fa;
-        border-radius: 0.375rem;
-        border: 1px solid #dee2e6;
-        max-height: 200px;
-        overflow-y: auto;
-
-        .file-item {
-          display: flex;
-          align-items: center;
-          gap: 0.75rem;
-          padding: 0.5rem;
-          background-color: white;
-          border-radius: 0.25rem;
-          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-          min-height: 48px;
-
-          i {
-            color: #007bff;
-            font-size: clamp(1rem, 2.5vw, 1.2rem);
-            flex-shrink: 0;
-          }
-
-          .file-name {
-            flex: 1;
-            font-weight: 500;
-            color: #495057;
-            font-size: clamp(0.8rem, 2vw, 0.9rem);
-            word-break: break-word;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-          }
-
-          .file-size {
-            color: #6c757d;
-            font-size: clamp(0.75rem, 1.5vw, 0.875rem);
-            flex-shrink: 0;
-            white-space: nowrap;
-          }
-        }
-      }
-
-      .current-images {
-        display: grid;
-        gap: 1rem;
-        margin-top: 1rem;
-        padding: 1rem;
-        background-color: #f8f9fa;
-        border-radius: 0.375rem;
-        border: 1px solid #dee2e6;
-        max-height: 400px;
-        overflow-y: auto;
-
-        // Responsive grid columns
-        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-
-        @media (min-width: 576px) {
-          grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-        }
-
-        @media (min-width: 768px) {
-          grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-        }
-
-        @media (min-width: 992px) {
-          grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-        }
-
-        .current-image-item {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          padding: 0.75rem;
-          background-color: white;
-          border-radius: 0.375rem;
-          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-          transition: transform 0.2s ease, box-shadow 0.2s ease;
-
-          &:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-          }
-
-          .current-image-preview {
-            width: 100%;
-            height: clamp(80px, 15vw, 120px);
-            object-fit: cover;
-            border-radius: 0.25rem;
-            margin-bottom: 0.5rem;
-            border: 1px solid #dee2e6;
-          }
-
-          .image-id {
-            font-size: clamp(0.7rem, 1.5vw, 0.75rem);
-            color: #6c757d;
-            font-weight: 500;
-            text-align: center;
-            word-break: break-all;
-          }
-        }
-      }
-    }
-
-    // Grid system adjustments
-    .grid {
-      margin: 0 -0.5rem;
-
-      @media (max-width: 767px) {
-        margin: 0;
-      }
-
-      .col-12,
-      .col-md-6,
-      .col-md-4 {
-        padding: 0 0.5rem;
-
-        @media (max-width: 767px) {
-          padding: 0;
-          margin-bottom: 1rem;
-        }
-      }
-    }
-  }
-
-  .form-actions {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 1rem;
-    margin-top: 2rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid #e9ecef;
-    flex-wrap: wrap;
-
-    button {
-      min-width: clamp(120px, 20vw, 180px);
-      padding: 0.75rem 1rem;
-      font-size: clamp(0.875rem, 2vw, 1rem);
-      
-      ::ng-deep .p-button-label {
-        font-size: inherit;
-      }
-    }
-
-    // Mobile actions
-    @media (max-width: 576px) {
-      flex-direction: column-reverse;
-      gap: 0.75rem;
-      
-      button {
-        width: 100%;
-        min-width: unset;
-      }
-    }
-
-    // Tablet actions
-    @media (min-width: 577px) and (max-width: 768px) {
-      justify-content: center;
-      
-      button {
-        flex: 1;
-        max-width: 200px;
-      }
-    }
-  }
-
-  // Card responsiveness
-  ::ng-deep p-card {
-    .p-card {
-      margin: 0;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-      border-radius: 0.5rem;
-      overflow: hidden;
-
-      .p-card-body {
-        padding: clamp(1rem, 3vw, 2rem);
-      }
-
-      .p-card-footer {
-        padding: clamp(1rem, 3vw, 2rem);
-        background-color: #f8f9fa;
-        border-top: 1px solid #e9ecef;
-      }
-    }
-  }
-}
-
-// Extra small devices (portrait phones, less than 576px)
-@media (max-width: 575px) {
-  .upload-product-container {
-    padding: 0.5rem;
-
-    .upload-form {
-      .field {
-        margin-bottom: 1rem;
-
-        .current-images {
-          grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-          gap: 0.5rem;
-          padding: 0.75rem;
-        }
-
-        .file-list {
-          padding: 0.75rem;
-          
-          .file-item {
-            padding: 0.375rem;
-            gap: 0.5rem;
-            min-height: 44px;
-          }
-        }
-      }
-    }
-  }
-}
-
-// Very large screens (1400px and up)
-@media (min-width: 1400px) {
-  .upload-product-container {
-    max-width: 1320px;
-    
-    .upload-form .field .current-images {
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    }
-  }
-}
-
-// Customer view optimization
-.container.detail {
-  max-width: 100%;
-  padding: 0 1rem;
-
-  @media (min-width: 576px) {
-    padding: 0 1.5rem;
-  }
-
-  @media (min-width: 768px) {
-    max-width: 720px;
-    margin: 0 auto;
-  }
-
-  @media (min-width: 992px) {
-    max-width: 960px;
-  }
-
-  @media (min-width: 1200px) {
-    max-width: 1140px;
-  }
-
-  @media (min-width: 1400px) {
-    max-width: 1320px;
-  }
-
-  .intro-section {
-    margin-bottom: 1.5rem;
-    
-    h4 {
-      font-size: clamp(1.1rem, 2.5vw, 1.5rem);
-      margin-bottom: 0.75rem;
-      word-wrap: break-word;
-    }
-  }
-
-  .detail-shoe {
-    margin-left: 0 !important;
-    
-    .col-md-6 {
-      padding: 0 0.75rem;
-      margin-bottom: 1.5rem;
-
-      @media (min-width: 768px) {
-        margin-bottom: 0;
-      }
-    }
-
-    // Gallery optimization
-    #carouselExample {
-      margin-left: 0 !important;
-      
-      ::ng-deep p-galleria {
-        .p-galleria-content {
-          border-radius: 0.5rem;
-          overflow: hidden;
-        }
-
-        .p-galleria-item {
-          img {
-            max-height: 400px;
-            object-fit: contain;
-            
-            @media (max-width: 768px) {
-              max-height: 300px;
-            }
-          }
-        }
-
-        .p-galleria-thumbnail-container {
-          .p-galleria-thumbnail-items {
-            .p-galleria-thumbnail-item {
-              margin: 0.25rem;
-              
-              img {
-                border-radius: 0.25rem;
-                transition: transform 0.2s ease;
-                
-                &:hover {
-                  transform: scale(1.05);
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-
-    // Product details optimization
-    .details {
-      padding: 0 0.75rem;
-
-      h2 {
-        font-size: clamp(1.25rem, 3vw, 1.75rem);
-        line-height: 1.3;
-        margin: 1rem 0;
-      }
-
-      p {
-        font-size: clamp(0.875rem, 2vw, 1rem);
-        line-height: 1.5;
-        margin: 0.75rem 0;
-        
-        &.position-absolute {
-          position: static !important;
-          
-          @media (min-width: 768px) {
-            position: absolute !important;
-          }
-        }
-      }
-
-      .price-wrapper {
-        flex-wrap: wrap;
-        gap: 0.5rem;
-        align-items: baseline;
-
-        h2 {
-          font-size: clamp(1.25rem, 3.5vw, 2rem);
-          margin: 0.5rem 0;
-        }
-
-        .old-price {
-          font-size: clamp(1rem, 2.5vw, 1.5rem);
-          text-decoration: line-through;
-          opacity: 0.7;
-        }
-      }
-
-      .about {
-        font-size: clamp(0.875rem, 2vw, 1rem) !important;
-        line-height: 1.6;
-        text-align: justify;
-      }
-
-      // Size selection optimization
-      .sizes {
-        margin-top: 1.5rem;
-
-        h6 {
-          font-size: clamp(0.875rem, 2vw, 1rem);
-          margin-bottom: 1rem;
-          margin-left: 0 !important;
-        }
-
-        .radio {
-          display: inline-block;
-          margin: 0.25rem;
-          
-          span {
-            display: inline-block;
-            padding: 0.5rem 0.75rem;
-            border: 2px solid #dee2e6;
-            border-radius: 0.375rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            font-size: clamp(0.875rem, 2vw, 1rem);
-            min-width: 44px;
-            text-align: center;
-          }
-
-          input {
-            display: none;
-
-            &:checked + span {
-              background-color: #007bff;
-              color: white;
-              border-color: #007bff;
-            }
-          }
-
-          &:hover span {
-            border-color: #007bff;
-            transform: translateY(-1px);
-          }
-        }
-      }
-
-      // Product actions optimization
-      .product-details {
-        margin-top: 1.5rem;
-
-        h5 {
-          font-size: clamp(1rem, 2.5vw, 1.25rem);
-          margin-bottom: 1rem;
-        }
-
-        .product-quantity {
-          margin-bottom: 1.5rem;
-
-          .border-wrapper {
-            max-width: 200px;
-            
-            ::ng-deep p-inputNumber {
-              .p-inputnumber {
-                width: 100%;
-                
-                .p-inputnumber-input {
-                  text-align: center;
-                  font-size: clamp(0.875rem, 2vw, 1rem);
-                }
-
-                .p-inputnumber-button {
-                  width: 44px;
-                  height: 44px;
-                  
-                  .p-button-icon {
-                    font-size: 0.875rem;
+  
+              .p-galleria-thumbnail-wrapper {
+                .p-galleria-thumbnail-container {
+                  .p-galleria-thumbnail-items-container {
+                    .p-galleria-thumbnail-items {
+                      .p-galleria-thumbnail-item {
+                        margin: 0.5rem;
+                        border-radius: 8px;
+                        overflow: hidden;
+                        cursor: pointer;
+                        transition: transform 0.3s ease;
+  
+                        &:hover {
+                          transform: scale(1.05);
+                        }
+  
+                        .gallery-thumbnail {
+                          img {
+                            width: 60px;
+                            height: 60px;
+                            object-fit: cover;
+                          }
+                        }
+                      }
+  
+                      .p-galleria-thumbnail-item-current {
+                        border: 2px solid #007bff;
+                      }
+                    }
                   }
                 }
               }
             }
           }
         }
-
-        .product-actions {
+      }
+  
+      // Product Information
+      .product-info {
+        padding-left: 2rem;
+  
+        @media (max-width: 768px) {
+          padding-left: 0;
+          margin-top: 2rem;
+        }
+  
+        .product-badge {
+          display: inline-block;
+          background: linear-gradient(45deg, #dc3545, #c82333);
+          color: white;
+          padding: 0.5rem 1rem;
+          border-radius: 20px;
+          font-size: 0.875rem;
+          font-weight: 600;
+          margin-bottom: 1.5rem;
+          box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+        }
+  
+        .product-title {
+          font-size: 2.5rem;
+          font-weight: 700;
+          color: #333;
+          margin-bottom: 1rem;
+          line-height: 1.2;
+        }
+  
+        .product-meta {
+          display: flex;
+          align-items: center;
+          flex-wrap: wrap;
+          gap: 0.5rem 1.5rem;
+          margin-bottom: 1.5rem;
+          color: #6c757d;
+          font-size: 0.9rem;
+  
+          .meta-item {
+            &.in-stock {
+              color: #28a745;
+              font-weight: 600;
+            }
+  
+            &.out-of-stock {
+              color: #dc3545;
+              font-weight: 600;
+            }
+          }
+        }
+  
+        .product-price {
+          margin-bottom: 1.5rem;
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+  
+          .current-price {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #dc3545;
+          }
+  
+          .original-price {
+            font-size: 1.2rem;
+            color: #6c757d;
+            text-decoration: line-through;
+          }
+        }
+  
+        .product-description {
+          margin-bottom: 2rem;
+          color: #495057;
+          line-height: 1.7;
+        }
+  
+        .selection-title {
+          color: #333;
+          font-size: 1.1rem;
+          margin-bottom: 1rem;
+          font-weight: 600;
+        }
+  
+        .size-selection,
+        .quantity-selection {
+          margin-bottom: 2rem;
+        }
+  
+        .size-options {
           display: flex;
           flex-wrap: wrap;
           gap: 0.75rem;
+  
+          .size-option {
+            cursor: pointer;
+  
+            input[type="radio"] {
+              display: none;
+            }
+  
+            .size-button {
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              width: 45px;
+              height: 45px;
+              border: 1px solid #dee2e6;
+              border-radius: 8px;
+              font-weight: 500;
+              transition: all 0.3s ease;
+  
+              &:hover {
+                border-color: #007bff;
+              }
+            }
+  
+            &.selected .size-button {
+              background-color: #007bff;
+              color: white;
+              border-color: #007bff;
+              transform: scale(1.05);
+              box-shadow: 0 4px 12px rgba(0, 123, 255, 0.2);
+            }
+          }
+        }
+  
+        .quantity-selection {
+          ::ng-deep .p-inputnumber {
+            .p-inputnumber-input {
+              width: 70px;
+              text-align: center;
+              font-size: 1.1rem;
+              font-weight: 600;
+            }
+  
+            .p-button {
+              background: #e9ecef;
+              border: 1px solid #dee2e6;
+              color: #495057;
+  
+              &:hover {
+                background: #007bff;
+                border-color: #007bff;
+                color: white;
+              }
+            }
+          }
+        }
+  
+        .product-actions {
+          display: flex;
+          gap: 1rem;
+          margin-bottom: 2rem;
+  
+          .add-to-cart-btn,
+          .buy-now-btn {
+            flex-grow: 1;
+          }
+  
+          ::ng-deep .p-button {
+            font-size: 1rem;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+  
+            &:hover {
+              transform: translateY(-2px);
+              box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+            }
+          }
+        }
+  
+        .product-features {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+          gap: 1.5rem;
+          padding: 1.5rem;
+          background: #f8f9fa;
+          border-radius: 10px;
+  
+          .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.9rem;
+            color: #495057;
+  
+            i {
+              font-size: 1.5rem;
+              color: #007bff;
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  // Extra Info Section (Related Products & Reviews)
+  .extra-info-section {
+    padding: 3rem 0;
+    background: #f8f9fa;
+  
+    .container {
+      max-width: 1200px;
+    }
+  
+    ::ng-deep .p-tabview {
+      .p-tabview-nav {
+        border-bottom: 2px solid #dee2e6;
+  
+        .p-tabview-nav-link {
+          background: transparent;
+          border: none;
+          color: #6c757d;
+          font-size: 1.1rem;
+          font-weight: 600;
+          padding: 1rem 1.5rem;
+          transition: color 0.3s, border-color 0.3s;
+  
+          &:not(.p-disabled):focus {
+            box-shadow: none;
+          }
+  
+          &:not(.p-disabled):hover {
+            color: #007bff;
+          }
+        }
+  
+        .p-tabview-ink-bar {
+          background-color: #007bff;
+          height: 2px;
+        }
+      }
+  
+      .p-tabview-panels {
+        background: #fff;
+        padding: 2rem;
+        border: 1px solid #dee2e6;
+        border-top: none;
+        border-radius: 0 0 10px 10px;
+      }
+    }
+  
+    .related-product-card {
+      background: #fff;
+      border-radius: 10px;
+      overflow: hidden;
+      text-align: center;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+      transition: all 0.3s ease;
+      cursor: pointer;
+  
+      &:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+      }
+  
+      .product-image {
+        position: relative;
+        height: 200px;
+        overflow: hidden;
+  
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+  
+        .discount-badge {
+          position: absolute;
+          top: 10px;
+          right: 10px;
+          background-color: #dc3545;
+          color: white;
+          padding: 0.25rem 0.5rem;
+          border-radius: 5px;
+          font-size: 0.8rem;
+          font-weight: 600;
+        }
+      }
+  
+      .product-content {
+        padding: 1rem;
+  
+        .product-name {
+          font-size: 1rem;
+          font-weight: 600;
+          color: #333;
+          margin-bottom: 0.5rem;
+          height: 40px; // Ensure consistent height
+          overflow: hidden;
+          text-overflow: ellipsis;
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+        }
+  
+        .product-price {
+          .current-price {
+            color: #dc3545;
+            font-weight: 700;
+            margin-right: 0.5rem;
+          }
+          .original-price {
+            color: #6c757d;
+            text-decoration: line-through;
+            font-size: 0.9rem;
+          }
+        }
+      }
+    }
+  
+    .reviews-content {
+      min-height: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #6c757d;
+    }
+  }
+  
+  // Admin Edit View
+  .admin-edit-container {
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 1rem;
+  
+    @media (min-width: 1200px) {
+      max-width: 1400px;
+      padding: 2rem;
+    }
+  
+    .admin-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid #e9ecef;
+  
+      h2 {
+        margin: 0;
+        color: #495057;
+        font-weight: 600;
+      }
+    }
+
+    .admin-content {
+      display: flex;
+      flex-wrap: wrap; // Allow wrapping on small screens
+      gap: 2rem; // Space between columns
+
+      .admin-images-column {
+        flex: 1 1 40%; // Flex-grow, flex-shrink, basis
+        min-width: 350px;
+      }
+
+      .admin-form-column {
+        flex: 1 1 55%; // Flex-grow, flex-shrink, basis
+        min-width: 400px;
+      }
+    }
+
+    .images-card, .edit-form-card {
+      height: 100%;
+    }
+
+    // Styles for components within the admin form
+    .current-images-grid {
+      margin-top: 2rem;
+    }
+
+    .images-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      gap: 1rem;
+
+      .image-item {
+        position: relative;
+        border: 1px solid #e9ecef;
+        border-radius: 6px;
+        overflow: hidden;
+
+        .image-preview {
+          width: 100%;
+          height: 100px;
+          object-fit: cover;
+          display: block;
+        }
+
+        .image-info {
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          background: rgba(0,0,0,0.5);
+          color: white;
+          padding: 0.25rem;
+          font-size: 0.75rem;
+          display: flex;
+          justify-content: space-between;
           align-items: center;
 
-          button {
-            flex: 1;
-            min-width: 150px;
-            padding: 0.75rem 1rem;
-            font-size: clamp(0.875rem, 2vw, 1.125rem);
-            border-radius: 0.375rem;
-            font-weight: 500;
-            
-            @media (max-width: 576px) {
-              width: 100%;
-              flex: none;
-            }
-          }
-
-          i.pi-heart {
-            font-size: clamp(1.25rem, 3vw, 1.5rem);
-            color: #6c757d;
-            cursor: pointer;
-            transition: color 0.2s ease;
-            padding: 0.5rem;
-            
-            &:hover {
-              color: #dc3545;
-            }
+          .p-button {
+            width: 1.5rem;
+            height: 1.5rem;
           }
         }
       }
     }
-  }
 
-  // Related products optimization
-  .suggest {
-    margin: 3rem 0 2rem;
-
-    h3 {
-      font-size: clamp(1.25rem, 3vw, 2rem);
-      margin-bottom: 2rem;
+    .empty-images {
+      text-align: center;
+      padding: 3rem;
+      border: 2px dashed #dce4e9;
+      border-radius: 6px;
     }
 
-    .container-lg {
-      padding: 0;
-    }
-
-    .row {
-      margin: 0 -0.5rem;
-
-      .col-8,
-      .col-lg-3 {
-        padding: 0 0.5rem;
-        margin-bottom: 1.5rem;
-        cursor: pointer;
-
-        @media (min-width: 992px) {
-          margin-bottom: 0;
+    .upload-section {
+      .upload-btn {
+        width: 100%;
+        
+        button {
+          width: 100%;
         }
+      }
+      .upload-hint {
+        margin-top: 0.5rem;
+        display: block;
+        color: #6c757d;
+      }
+    }
 
-        .card {
-          transition: transform 0.2s ease, box-shadow 0.2s ease;
-          border-radius: 0.5rem;
+    .new-files-preview {
+      margin-top: 1rem;
+      border: 1px solid #e9ecef;
+      padding: 1rem;
+      border-radius: 6px;
+      max-height: 250px;
+      overflow-y: auto;
+    }
+
+    .new-file-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      &:not(:last-child){
+        margin-bottom: 1rem;
+      }
+
+      .file-preview {
+        flex-shrink: 0;
+        .preview-image {
+          width: 50px;
+          height: 50px;
+          object-fit: cover;
+          border-radius: 4px;
+        }
+      }
+
+      .file-info {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        width: 100%;
+        
+        .file-name {
+          flex-grow: 1;
+          white-space: nowrap;
           overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        .file-size {
+          flex-shrink: 0;
+          font-size: 0.8rem;
+          color: #6c757d;
+        }
+      }
+    }
 
-          &:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    .form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+  }
+  
+  // Responsive Design
+  @media (max-width: 768px) {
+    .product-detail-page {
+      .product-detail-container {
+        padding: 2rem 0;
+  
+        .product-info {
+          .product-title {
+            font-size: 1.75rem;
           }
-
-          .card-body {
-            padding: 1rem;
-
-            img {
-              width: 100%;
-              height: 200px;
-              object-fit: cover;
-              border-radius: 0.375rem;
+  
+          .product-price {
+            .current-price {
+              font-size: 2rem;
+            }
+  
+            .original-price {
+              font-size: 1.25rem;
             }
           }
-
-          .card-footer {
-            padding: 1rem;
-
-            .lead {
-              font-size: clamp(0.9rem, 2vw, 1.1rem);
-              margin-bottom: 0.5rem;
-              line-height: 1.4;
-            }
-
-            p {
-              font-size: clamp(0.875rem, 2vw, 1rem);
-              margin: 0;
-            }
+        }
+      }
+  
+      .related-products-section {
+        padding: 2rem 0;
+  
+        .section-header {
+          margin-bottom: 2rem;
+  
+          .section-title {
+            font-size: 2rem;
+          }
+        }
+  
+        .related-product-card {
+          .product-image {
+            height: 200px;
           }
         }
       }
     }
   }
-}
-
-// Mobile-specific optimizations
-@media (max-width: 767px) {
-  .container.detail {
-    .detail-shoe {
-      .col-md-6:first-child {
-        order: 1;
-      }
-
-      .col-md-6:last-child {
-        order: 2;
-      }
-    }
-
-    .suggest {
-      .row .col-8 {
-        max-width: 50%;
-        flex: 0 0 50%;
-      }
-    }
-  }
-}
-
-// Tablet optimizations
-@media (min-width: 768px) and (max-width: 991px) {
-  .container.detail {
-    .suggest {
-      .row .col-lg-3 {
-        max-width: 33.333333%;
-        flex: 0 0 33.333333%;
-      }
-    }
-  }
-}

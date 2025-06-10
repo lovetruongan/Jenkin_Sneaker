@@ -58,22 +58,24 @@
                         <th style="width:15%">Thao tác</th>
                     </tr>
                 </ng-template>
-                <ng-template pTemplate="body" let-category let-editing="editing" let-ri="rowIndex">
+                <ng-template pTemplate="body" let-category let-ri="rowIndex">
                     <tr>
                         <td data-label="ID">#{{ category.id }}</td>
                         <td data-label="Tên danh mục">
-                            <span *ngIf="!editing" class="category-name">{{ category.name }}</span>
-                            <input *ngIf="editing" 
+                            <span *ngIf="!category.editing" class="category-name">{{ category.name }}</span>
+                            <input *ngIf="category.editing" 
                                    type="text" 
                                    pInputText 
                                    [(ngModel)]="category.name" 
                                    class="p-inputtext-sm"
+                                   (keydown.enter)="saveCategory(category, ri)"
+                                   (keydown.escape)="cancelEdit(ri)"
                                    style="width: 100%">
                         </td>
                         <td data-label="Ngày tạo">{{ category.createdAt | date:'dd/MM/yyyy' }}</td>
                         <td>
                             <div class="action-buttons">
-                                <button *ngIf="!editing"
+                                <button *ngIf="!category.editing"
                                         pButton 
                                         pRipple 
                                         type="button" 
@@ -82,7 +84,7 @@
                                         pTooltip="Chỉnh sửa" 
                                         (click)="editCategory(ri)">
                                 </button>
-                                <button *ngIf="editing"
+                                <button *ngIf="category.editing"
                                         pButton 
                                         pRipple 
                                         type="button" 
@@ -91,7 +93,7 @@
                                         pTooltip="Lưu" 
                                         (click)="saveCategory(category, ri)">
                                 </button>
-                                <button *ngIf="editing"
+                                <button *ngIf="category.editing"
                                         pButton 
                                         pRipple 
                                         type="button" 
@@ -100,7 +102,7 @@
                                         pTooltip="Hủy" 
                                         (click)="cancelEdit(ri)">
                                 </button>
-                                <button *ngIf="!editing"
+                                <button *ngIf="!category.editing"
                                         pButton 
                                         pRipple 
                                         type="button" 

@@ -19,7 +19,7 @@ import { UserDto } from '../../../core/dtos/user.dto';
 import { UserService } from '../../../core/services/user.service';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputTextareaModule } from 'primeng/inputtextarea';
-import { FileUploadModule } from 'primeng/fileupload';
+import { FileUpload, FileUploadModule } from 'primeng/fileupload';
 import { ButtonModule } from 'primeng/button';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { LoadingService } from '../../../core/services/loading.service';
@@ -27,6 +27,9 @@ import { DropdownModule } from 'primeng/dropdown';
 import { CardModule } from 'primeng/card';
 import { CategoriesService } from '../../../core/services/categories.service';
 import { CategoriesDto } from '../../../core/dtos/categories.dto';
+import { RouterModule } from '@angular/router';
+import { TabViewModule } from 'primeng/tabview';
+import { ProductUploadReq } from '../../../core/requestType/UploadProducts';
 
 
 @Component({
@@ -45,7 +48,9 @@ import { CategoriesDto } from '../../../core/dtos/categories.dto';
     ButtonModule,
     ConfirmDialogModule,
     DropdownModule,
-    CardModule
+    CardModule,
+    RouterModule,
+    TabViewModule
   ],
   providers: [
     MessageService,
@@ -68,7 +73,6 @@ export class DetailProductComponent extends BaseComponent implements OnInit,Afte
   public sizes : number[] = [36,37,38,39,40,41,42,43,44];
   public size : number = this.sizes[0];
   public apiImage: string = environment.apiImage;
-  public myFiles: File[] = [];
   public categoriesOptions: MenuItem[] = [];
   private categoryId!: string;
   public categoryNameOfProduct!: string;
@@ -205,15 +209,31 @@ export class DetailProductComponent extends BaseComponent implements OnInit,Afte
     ).subscribe();
   }
 
+  buyNow() {
+    if (!this.token) {
+      this.toastService.fail('Bạn phải đăng nhập để thực hiện chức năng này!');
+      this.router.navigate(['/login']);
+      return;
+    }
+
+    // Create temporary cart item data for immediate checkout
+    const cartItems = [{
+      id: Math.random(), // temporary id
+      quantity: this.quantity,
+      size: this.size,
+      products: this.mainProduct
+    }];
+
+    // Store in localStorage and navigate to order page
+    localStorage.setItem("productOrder", JSON.stringify(cartItems));
+    this.router.navigate(['/order']);
+  }
+
   goToDetail(id: number){
     window.location.href = `/detailProduct/${id}`;
   }
 
-  onFileSelect(event: any){
-    this.myFiles = Array.from(event.files);
-  }
-
-  onCategoryChange(event: any){
+  onCategoryChange(event: any) {
     this.categoryId = event.value;
   }
 
@@ -227,120 +247,105 @@ export class DetailProductComponent extends BaseComponent implements OnInit,Afte
         rejectButtonStyleClass: "p-button-text",
         acceptButtonStyleClass: "p-button-danger",
         accept: () => {
-          this.loadingService.setLoading(true);
-          
-          this.productService.deleteProduct(this.id).pipe(
-            tap((res: any) => {
-              // Backend returns a simple string message, so any response means success
-              console.log('Delete response:', res);
-              this.loadingService.setLoading(false);
-              this.toastService.success('Xóa sản phẩm thành công!');
-              
-              // Navigate to products list
-              this.router.navigate(["/allProduct"]);
-            }),
-            catchError((err) => {
-              console.error('Delete error:', err);
-              this.loadingService.setLoading(false);
-              if (err.status === 200 || err.status === 0) {
-                // Sometimes Angular treats successful string responses as errors
-                this.toastService.success('Xóa sản phẩm thành công!');
-                
-                // Navigate to products list
-                this.router.navigate(["/allProduct"]);
-              } else {
-                this.toastService.fail(`Xóa sản phẩm thất bại: ${err.error?.message || err.message || 'Lỗi không xác định'}`);
-              }
-              return of(null);
-            }),
-            finalize(() => {
-              this.loadingService.setLoading(false);
-            }),
-            takeUntil(this.destroyed$)
-          ).subscribe();
-        }
+            this.deleteProduct();
+        },
     });
   }
 
+  deleteProduct(){
+    this.productService.deleteProduct(this.mainProduct.id.toString()).pipe(
+      tap(() => {
+        this.toastService.success("Xóa sản phẩm thành công");
+        this.router.navigate(["/all-product"]);
+      }),
+      catchError((err) => {
+        // Attempt to parse the error response
+        let errorMessage = "Xóa sản phẩm thất bại. Có thể sản phẩm này đã được đặt hàng.";
+        if (err && err.error) {
+          try {
+            // If the error response is JSON with a 'message' property
+            const errorResponse = JSON.parse(err.error);
+            if (errorResponse.message) {
+              errorMessage = errorResponse.message;
+            }
+          } catch (e) {
+            // If the error response is just a string
+            if (typeof err.error === 'string') {
+              errorMessage = err.error;
+            }
+          }
+        }
+        this.toastService.fail(errorMessage);
+        return of(err);
+      })
+    ).subscribe()
+  }
+
   goBack(){
-    // Navigate back to all products
-    this.router.navigate(["/allProduct"]);
+    this.router.navigate(["/"]);
   }
 
   trackByImageId(index: number, image: any): number {
     return image.id;
   }
 
-  getFilePreview(file: File): string {
-    return URL.createObjectURL(file);
-  }
-
-  removeFile(index: number): void {
-    this.myFiles.splice(index, 1);
-  }
-
   deleteImage(imageId: number): void {
-    // Implement delete image functionality
     this.confirmationService.confirm({
-      message: 'Bạn có chắc chắn muốn xóa ảnh này?',
+      message: 'Bạn có chắc chắn muốn xóa ảnh này? Chức năng này chỉ xóa ảnh khỏi giao diện, bạn cần Cập nhật sản phẩm để lưu thay đổi.',
       header: 'Xác nhận xóa ảnh',
       icon: 'pi pi-exclamation-triangle',
-      acceptIcon: "none",
-      rejectIcon: "none",
-      rejectButtonStyleClass: "p-button-text",
       accept: () => {
-        // Call API to delete image
-        // After successful deletion, update the images array
+        // Since there is no dedicated backend endpoint, we just remove it from the view.
         this.images = this.images.filter(img => img.id !== imageId);
-        this.toastService.success('Xóa ảnh thành công');
-      },
-      reject: () => {
-        // User cancelled
+        this.toastService.success('Đã xóa ảnh khỏi danh sách. Nhấn "Cập nhật sản phẩm" để lưu thay đổi.');
       }
     });
   }
 
-  updateProductAdmin(){
-    const formData = new FormData();
-    this.myFiles.forEach(file => {
-      formData.append('files', file, file.name);
-    });
-    
-    if (this.productForm.valid){
-      this.productService.updateProduct({
-        name: this.productForm.value.productName,
-        price: this.productForm.value.price,
-        description: this.productForm.value.description,
-        discount: this.productForm.value.discount,
-        category_id: parseInt(this.categoryId),
-        quantity: this.productForm.value.quantity
-      }, parseInt(this.id)).pipe(
-        switchMap(() => {
-          if (this.myFiles.length > 0) {
-            return this.productService.uploadImageProduct(formData, parseInt(this.id)).pipe(
-              tap((res : {message: string}) => {
-                this.toastService.success(res.message);
-                this.myFiles = [];
-                // Reload product data to show updated images
-                this.ngOnInit();
-              }),
-              catchError((err) => {
-                this.toastService.fail(err.error.message);
-                return of(err);
-              })
-            )
-          } else {
-            this.toastService.success("Cập nhật sản phẩm thành công");
-            return of(null);
-          }
-        }),
-        catchError((err) => {
-          this.toastService.fail(err.error.message);
-          return of(err);
-        })
-      ).subscribe()
-    } else {
-      this.toastService.fail("Vui lòng điền đầy đủ thông tin")
+  updateProductAdmin(fileUpload: FileUpload) {
+    if (this.productForm.invalid) {
+      this.toastService.fail("Vui lòng điền đầy đủ thông tin sản phẩm.");
+      return;
     }
+
+    const updatedProductData: ProductUploadReq = {
+      name: this.productForm.value.productName,
+      price: this.productForm.value.price,
+      description: this.productForm.value.description,
+      category_id: parseInt(this.categoryId, 10),
+      discount: this.productForm.value.discount,
+      quantity: this.productForm.value.quantity,
+    };
+
+    this.productService.updateProduct(updatedProductData, this.mainProduct.id).pipe(
+      tap(() => {
+        if (fileUpload.files.length > 0) {
+          const formData = new FormData();
+          fileUpload.files.forEach(file => {
+            formData.append('files', file);
+          });
+          
+          this.productService.uploadImageProduct(formData, this.mainProduct.id).pipe(
+            tap(() => {
+              this.toastService.success('Cập nhật sản phẩm và tải lên ảnh thành công!');
+              fileUpload.clear();
+              this.ngOnInit(); // Refresh component data
+            }),
+            catchError((err) => {
+              this.toastService.fail(`Tải lên ảnh thất bại: ${err.error?.message || 'Lỗi không xác định'}`);
+              return of(err);
+            })
+          ).subscribe();
+        } else {
+          this.toastService.success('Cập nhật sản phẩm thành công!');
+          this.ngOnInit(); // Refresh component data
+        }
+      }),
+      catchError((err) => {
+        const errorMessage = err.error?.message || 'Cập nhật sản phẩm thất bại. Vui lòng thử lại.';
+        this.toastService.fail(errorMessage);
+        return of(err);
+      })
+    ).subscribe();
   }
 }

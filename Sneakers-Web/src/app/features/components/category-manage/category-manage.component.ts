@@ -150,17 +150,20 @@ export class CategoryManageComponent extends BaseComponent implements OnInit {
     }
 
     this.categoriesService.updateCategory({name: category.name.trim()}, category.id).pipe(
-      tap((res: {categories: CategoriesDto[], message: string}) => {
-        this.categoriesOptions = res.categories.map(cat => ({
-          ...cat,
-          editing: false
-        }));
-        this.toastService.success(res.message);
+      tap((res: string) => {
+        // Find the category in the array and update its name
+        const updatedCategory = this.categoriesOptions.find(cat => cat.id === category.id);
+        if (updatedCategory) {
+          updatedCategory.name = category.name.trim();
+          updatedCategory.editing = false;
+        }
+        this.toastService.success(res || 'Cập nhật thành công');
       }),
       catchError((err) => {
-        this.toastService.fail(err.error?.message || 'Cập nhật thất bại');
+        this.toastService.fail(err.error?.message || err.error || 'Cập nhật thất bại');
         // Restore original name
         category.name = category.originalName || category.name;
+        category.editing = false;
         return of(err);
       })
     ).subscribe();
@@ -189,16 +192,14 @@ export class CategoryManageComponent extends BaseComponent implements OnInit {
     }
 
     this.categoriesService.postCategory({name: this.categoryName.trim()}).pipe(
-      tap((res: {categories: CategoriesDto[], message: string}) => {
-        this.categoriesOptions = res.categories.map(cat => ({
-          ...cat,
-          editing: false
-        }));
-        this.toastService.success(res.message);
+      tap((res: string) => {
+        // After successfully adding, reload all categories to get the new one with its ID
+        this.loadCategories();
+        this.toastService.success(res || 'Thêm danh mục thành công');
         this.closeAddDialog();
       }),
       catchError((err) => {
-        this.toastService.fail(err.error?.message || 'Thêm danh mục thất bại');
+        this.toastService.fail(err.error?.message || err.error || 'Thêm danh mục thất bại');
         return of(err);
       })
     ).subscribe();
@@ -214,15 +215,13 @@ export class CategoryManageComponent extends BaseComponent implements OnInit {
       rejectButtonStyleClass: "p-button-text",
       accept: () => {
         this.categoriesService.deleteCategory(id).pipe(
-          tap((res: {categories: CategoriesDto[], message: string}) => {
-            this.categoriesOptions = res.categories.map(cat => ({
-              ...cat,
-              editing: false
-            }));
-            this.toastService.success(res.message);
+          tap((res: string) => {
+            // On success, remove the category from the local array
+            this.categoriesOptions = this.categoriesOptions.filter(cat => cat.id !== id);
+            this.toastService.success(res || 'Xóa danh mục thành công');
           }),
           catchError((err) => {
-            this.toastService.fail(err.error?.message || 'Xóa danh mục thất bại');
+            this.toastService.fail(err.error?.message || err.error || err || 'Xóa danh mục thất bại');
             return of(err);
           })
         ).subscribe();
@@ -238,15 +237,12 @@ export class CategoryManageComponent extends BaseComponent implements OnInit {
       return;
     }
     this.categoriesService.updateCategory({name: name}, id).pipe(
-      tap((res: {categories: CategoriesDto[], message: string}) => {
-        this.categoriesOptions = res.categories.map(cat => ({
-          ...cat,
-          editing: false
-        }));
-        this.toastService.success(res.message);
+      tap((res: string) => {
+        this.loadCategories();
+        this.toastService.success(res || "Cập nhật thành công");
       }),
       catchError((err) => {
-        this.toastService.fail(err.error?.message || 'Cập nhật thất bại');
+        this.toastService.fail(err.error?.message || err.error || 'Cập nhật thất bại');
         return of(err);
       })
     ).subscribe();
