@@ -1,48 +1,89 @@
-<div class="history-order">
-    <div class="container">
-        <div class="row history-order-header">
-            <div class="col-2 font-bold">Mã đơn hàng</div>
-            <div class="col-3 font-bold">Đơn hàng</div>
-            <div class="col-2 font-bold">Trạng thái</div>
-            <div class="col-2 font-bold">Ngày đặt</div>
-            <div class="col-2 font-bold">Tổng tiền</div>
-            <div class="col-1 font-bold">Thao tác</div>
-        </div>
-        @for(order of historyOrder; track order){
-            <div class="row">
-                <div class="col-2 d-flex align-items-center">{{order.id}}</div>
-                <div class="col-3 d-flex align-items-center history-order-main-info">
-                    <img class="history-order-image" [src]="apiImage + order.thumbnail" alt="Giày">
-                    <div>
-                        <p class="font-bold">{{order.product_name}}</p>
-                        @if(order.total_products > 1){
-                            <p>Còn {{order.total_products - 1}} sản phẩm <a [routerLink]="['/order-detail/', order.id]">Xem thêm</a></p>
-                        }
-                    </div>
-                </div>
-                <div class="col-2 d-flex align-items-center">
-                    <div [ngSwitch]="order.status">  
-                        <p *ngSwitchCase="'pending'">Đang chờ</p>
-                        <p *ngSwitchCase="'success'">Đã giao hàng</p>
-                        <p *ngSwitchCase="'cancelled'">Đã hủy</p>
-                        <p *ngSwitchCase="'processing'">Đang xử lý</p>
-                        <p *ngSwitchCase="'delivered'">Đã được giao</p>
-                        <p *ngSwitchCase="'shipped'">Đang được giao</p>
-                    </div>
-                </div>
-                <div class="col-2 d-flex align-items-center">{{order.order_date | date: 'dd/MM/yyyy'}}</div>
-                <div class="col-2 d-flex align-items-center">{{order.total_money | currency:'VND':'symbol':'1.0-0'}}</div>
-                <div class="col-1 d-flex align-items-center flex-column">
-                    <button (click)="viewOrderDetail(order.id)" class="history-order-view-detail mb-2">
-                        Xem chi tiết
-                    </button>
-                    @if(canReturnOrder(order)) {
-                        <button (click)="requestReturn(order.id)" class="history-order-return-btn">
-                            Trả hàng
-                        </button>
-                    }
-                </div>
-            </div>
-        }
+<div class="order-history-page">
+  <!-- Header -->
+  <div class="page-header">
+    <h1 class="page-title">
+      <i class="pi pi-history"></i> Lịch sử đơn hàng
+    </h1>
+    <p class="page-subtitle">Theo dõi và quản lý các đơn hàng đã đặt của bạn</p>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-container">
+    <div class="search-field">
+      <span class="p-input-icon-left">
+        <i class="pi pi-search"></i>
+        <input pInputText type="text" [(ngModel)]="searchTerm" (input)="onSearchChange()" placeholder="Tìm theo mã ĐH, tên sản phẩm..." class="search-input" />
+      </span>
     </div>
+    <div class="status-filter">
+      <p-dropdown [options]="statusOptions" [(ngModel)]="selectedStatus" (onChange)="onStatusChange()" placeholder="Lọc trạng thái" [showClear]="true" styleClass="status-dropdown"></p-dropdown>
+    </div>
+    <p-button icon="pi pi-filter-slash" styleClass="p-button-text" (click)="clearFilters()" pTooltip="Xóa bộ lọc"></p-button>
+  </div>
+
+  <!-- Orders List -->
+  <div class="orders-list-container">
+    @if(loading) {
+      <div class="loading-state">
+        <p-progressSpinner strokeWidth="4" animationDuration=".5s"></p-progressSpinner>
+        <span>Đang tải đơn hàng...</span>
+      </div>
+    } @else if(filteredOrders.length === 0) {
+      <div class="empty-state">
+        <i class="pi pi-inbox"></i>
+        <h3>{{ historyOrder.length === 0 ? 'Bạn chưa có đơn hàng nào' : 'Không tìm thấy đơn hàng' }}</h3>
+        <p>{{ historyOrder.length === 0 ? 'Hãy bắt đầu mua sắm để xem lịch sử đơn hàng của bạn tại đây.' : 'Vui lòng thử lại với bộ lọc khác.' }}</p>
+      </div>
+    } @else {
+      <div class="orders-list">
+        @for (order of filteredOrders; track order.id) {
+          <div class="order-card" (click)="viewOrderDetail(order.id)">
+            <!-- Order Header -->
+            <div class="order-header">
+              <div class="order-id-section">
+                <span class="order-id">Đơn hàng #{{order.id}}</span>
+                <p-tag [value]="getStatusLabel(order.status)" [severity]="getStatusSeverity(order.status)" styleClass="status-tag"></p-tag>
+              </div>
+              <div class="order-date">{{ order.order_date | date: 'dd/MM/yyyy HH:mm' }}</div>
+            </div>
+
+            <!-- Order Body -->
+            <div class="order-body">
+              <div class="product-image">
+                <img [src]="apiImage + order.thumbnail" [alt]="order.product_name" onerror="this.src='/assets/images/placeholder.jpg'" />
+              </div>
+              <div class="product-info">
+                <p class="product-name">{{ order.product_name }}</p>
+                @if (order.total_products > 1) {
+                  <span class="more-products-badge">+ {{ order.total_products - 1 }} sản phẩm khác</span>
+                }
+                <p class="buyer-info">Người nhận: {{ order.buyer_name }}</p>
+              </div>
+              <div class="order-total">
+                <span class="total-label">Tổng cộng</span>
+                <span class="total-amount">{{ order.total_money | currency: 'VND' : 'symbol' }}</span>
+              </div>
+            </div>
+
+            <!-- Order Actions (visible on hover) -->
+            <div class="order-actions">
+              <p-button icon="pi pi-eye" styleClass="p-button-rounded p-button-text" pTooltip="Xem chi tiết"></p-button>
+              @if (canReturnOrder(order)) {
+                <p-button icon="pi pi-replay" styleClass="p-button-rounded p-button-text p-button-success" (click)="$event.stopPropagation(); requestReturn(order.id)" pTooltip="Yêu cầu trả hàng"></p-button>
+              }
+            </div>
+          </div>
+        }
+      </div>
+      
+      <!-- Paginator -->
+      <p-paginator
+        [rows]="10"
+        [totalRecords]="filteredOrders.length"
+        (onPageChange)="paginate($event)"
+        #p
+        [rowsPerPageOptions]="[10, 20, 30]"
+      ></p-paginator>
+    }
+  </div>
 </div>

@@ -206,9 +206,17 @@ export class CategoryManageComponent extends BaseComponent implements OnInit {
   }
   
   confirmDelete(id: number): void {
+    // Get category name for better error messages
+    const category = this.categoriesOptions.find(cat => cat.id === id);
+    const categoryName = category?.name || 'danh mục này';
+    
     this.confirmationService.confirm({
-      message: 'Bạn chắc chắn muốn xóa danh mục này? Hành động này không thể hoàn tác.',
-      header: 'Xác nhận xóa',
+      message: `Bạn chắc chắn muốn xóa danh mục "${categoryName}"?
+      
+⚠️ Lưu ý: Nếu danh mục này đang được sử dụng bởi các sản phẩm, việc xóa sẽ thất bại. Vui lòng xóa tất cả sản phẩm trong danh mục trước.
+
+Hành động này không thể hoàn tác.`,
+      header: 'Xác nhận xóa danh mục',
       icon: 'pi pi-exclamation-triangle',
       acceptIcon: "none",
       rejectIcon: "none",
@@ -221,7 +229,24 @@ export class CategoryManageComponent extends BaseComponent implements OnInit {
             this.toastService.success(res || 'Xóa danh mục thành công');
           }),
           catchError((err) => {
-            this.toastService.fail(err.error?.message || err.error || err || 'Xóa danh mục thất bại');
+            console.error('Delete category error:', err);
+            
+            // Handle specific error cases
+            let errorMessage = 'Xóa danh mục thất bại';
+            
+            if (err.status === 500) {
+              errorMessage = `Không thể xóa danh mục "${categoryName}" vì đang được sử dụng bởi các sản phẩm. Vui lòng xóa tất cả sản phẩm trong danh mục này trước.`;
+            } else if (err.status === 404) {
+              errorMessage = 'Danh mục không tồn tại';
+            } else if (err.status === 403) {
+              errorMessage = 'Bạn không có quyền xóa danh mục này';
+            } else if (err.error?.message) {
+              errorMessage = err.error.message;
+            } else if (typeof err.error === 'string') {
+              errorMessage = err.error;
+            }
+            
+            this.toastService.fail(errorMessage);
             return of(err);
           })
         ).subscribe();
