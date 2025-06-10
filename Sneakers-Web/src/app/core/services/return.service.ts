@@ -16,15 +16,17 @@ export interface AdminReturnAction {
 
 export interface ReturnRequestResponse {
   id: number;
-  orderId: number;
-  userId: number;
-  customerName: string;
+  order_id: number;
+  user_id: number;
+  customer_name: string;
   reason: string;
   status: string;
-  refundAmount: number;
-  adminNotes: string;
-  requestedAt: string; // ISO date string
-  updatedAt: string; // ISO date string
+  refund_amount: number;
+  admin_notes: string;
+  requested_at: string; // ISO date string
+  updated_at: string; // ISO date string
+  order_status: string; // Status of the actual order
+  payment_method: string; // Payment method used
 }
 
 @Injectable({
@@ -70,5 +72,9 @@ export class ReturnService {
 
   rejectReturnRequest(id: number, actionData: AdminReturnAction): Observable<ReturnRequestResponse> {
     return this.http.put<ReturnRequestResponse>(`${this.apiUrl}/admin/${id}/reject`, actionData, { headers: this.getHeaders() });
+  }
+
+  completeRefund(id: number, actionData: AdminReturnAction): Observable<ReturnRequestResponse> {
+    return this.http.put<ReturnRequestResponse>(`${this.apiUrl}/admin/${id}/complete-refund`, actionData, { headers: this.getHeaders() });
   }
 }

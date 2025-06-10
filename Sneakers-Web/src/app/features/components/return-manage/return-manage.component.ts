@@ -64,7 +64,7 @@ export class ReturnManageComponent implements OnInit {
     this.isLoading = true;
     this.returnService.getAllReturnRequestsForAdmin().subscribe({
       next: (data: ReturnRequestResponse[]) => {
-        this.allRequests = data.sort((a, b) => new Date(b.requestedAt).getTime() - new Date(a.requestedAt).getTime());
+        this.allRequests = data.sort((a, b) => new Date(b.requested_at).getTime() - new Date(a.requested_at).getTime());
         this.calculateStats();
         this.isLoading = false;
       },
@@ -101,13 +101,25 @@ export class ReturnManageComponent implements OnInit {
 
     this.isSubmitting = true;
     const actionData: AdminReturnAction = { admin_notes: this.adminNotes };
-    const actionObservable = this.currentAction === 'approve'
-      ? this.returnService.approveReturnRequest(this.currentRequest.id, actionData)
-      : this.returnService.rejectReturnRequest(this.currentRequest.id, actionData);
+    
+    let actionObservable;
+    let successMessage = '';
+    
+    if (this.currentRequest.status === 'AWAITING_REFUND') {
+      // Complete manual refund
+      actionObservable = this.returnService.completeRefund(this.currentRequest.id, actionData);
+      successMessage = 'Manual refund completed successfully! Order status updated to canceled.';
+    } else if (this.currentAction === 'approve') {
+      actionObservable = this.returnService.approveReturnRequest(this.currentRequest.id, actionData);
+      successMessage = 'Request approved successfully! Order status updated accordingly.';
+    } else {
+      actionObservable = this.returnService.rejectReturnRequest(this.currentRequest.id, actionData);
+      successMessage = 'Request rejected successfully!';
+    }
 
     actionObservable.subscribe({
       next: (updatedRequest) => {
-        this.toastService.success(`Request ${this.currentAction}d successfully!`);
+        this.toastService.success(successMessage);
         this.displayActionDialog = false;
         this.isSubmitting = false;
         
@@ -120,7 +132,7 @@ export class ReturnManageComponent implements OnInit {
       },
       error: (err: any) => {
         this.isSubmitting = false;
-        this.toastService.fail(`Failed to ${this.currentAction} request. ` + (err.error?.message || ''));
+        this.toastService.fail(`Failed to process request. ` + (err.error?.message || ''));
       }
     });
   }
@@ -135,5 +147,62 @@ export class ReturnManageComponent implements OnInit {
       case 'REFUNDED': return 'success';
       default: return undefined;
     }
+  }
+
+  getOrderStatusDisplay(status: string): string {
+    switch (status?.toLowerCase()) {
+      case 'canceled': return 'Đã hủy';
+      case 'awaiting_refund': return 'Chờ hoàn tiền';
+      case 'delivered': return 'Đã giao';
+      case 'shipped': return 'Đang giao';
+      case 'confirmed': return 'Đã xác nhận';
+      case 'pending': return 'Đang xử lý';
+      default: return status || 'Không xác định';
+    }
+  }
+
+  getOrderStatusSeverity(status: string): 'success' | 'info' | 'warning' | 'danger' | undefined {
+    switch (status?.toLowerCase()) {
+      case 'canceled': return 'danger';
+      case 'awaiting_refund': return 'warning';
+      case 'delivered': return 'success';
+      case 'shipped': return 'info';
+      case 'confirmed': return 'info';
+      case 'pending': return 'warning';
+      default: return undefined;
+    }
+  }
+
+  showCompleteRefundDialog(request: ReturnRequestResponse): void {
+    this.currentRequest = request;
+    this.currentAction = 'approve'; // We'll use this for complete refund
+    this.adminNotes = '';
+    this.displayActionDialog = true;
+  }
+
+  getDialogHeader(): string {
+    if (this.currentRequest?.status === 'AWAITING_REFUND') {
+      return 'Xác nhận hoàn tiền thủ công';
+    }
+    return this.currentAction === 'approve' ? 'Chấp thuận yêu cầu' : 'Từ chối yêu cầu';
+  }
+
+  getDialogMessage(): string {
+    if (this.currentRequest?.status === 'AWAITING_REFUND') {
+      return `Bạn đã hoàn tiền thủ công cho đơn hàng <strong>#${this.currentRequest.order_id}</strong>? 
+              Hành động này sẽ chuyển trạng thái đơn hàng thành <strong>ĐÃ HỦY</strong>.`;
+    }
+    
+    const action = this.currentAction === 'approve' ? 'CHẤP THUẬN' : 'TỪ CHỐI';
+    let additionalInfo = '';
+    
+    if (this.currentAction === 'approve') {
+      const isStripe = this.currentRequest?.payment_method === 'Thanh toán thẻ thành công';
+      additionalInfo = isStripe 
+        ? ' Hệ thống sẽ tự động hoàn tiền qua Stripe và chuyển trạng thái đơn hàng thành <strong>ĐÃ HỦY</strong>.'
+        : ' Trạng thái đơn hàng sẽ chuyển thành <strong>CHỜ HOÀN TIỀN</strong> để admin xử lý thủ công.';
+    }
+    
+    return `Bạn có chắc muốn <strong>${action}</strong> yêu cầu trả hàng cho đơn hàng <strong>#${this.currentRequest?.order_id}</strong>?${additionalInfo}`;
   }
 } 

@@ -45,7 +45,7 @@ export class MyReturnsComponent extends BaseComponent implements OnInit {
     this.isLoading = true;
     this.returnService.getMyReturnRequests().subscribe({
       next: (data) => {
-        this.myRequests = data.sort((a, b) => new Date(b.requestedAt).getTime() - new Date(a.requestedAt).getTime());
+        this.myRequests = data.sort((a, b) => new Date(b.requested_at).getTime() - new Date(a.requested_at).getTime());
         this.isLoading = false;
       },
       error: (err) => {

@@ -20,9 +20,11 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ReturnService implements IReturnService {
 
     private final ReturnRequestRepository returnRequestRepository;
@@ -87,7 +89,7 @@ public class ReturnService implements IReturnService {
             stripeService.refund(order.getPaymentIntentId());
             returnRequest.setAdminNotes("Refunded via Stripe. " + actionDTO.getAdminNotes());
             returnRequest.setStatus("REFUNDED");
-            order.setStatus("cancelled"); // Chuyển trạng thái đơn hàng thành đã hủy
+            order.setStatus("canceled"); // Chuyển trạng thái đơn hàng thành đã hủy
         } else {
             // For COD or Bank Transfer, mark for manual refund
             returnRequest.setAdminNotes("Manual refund required. " + actionDTO.getAdminNotes());
@@ -155,10 +157,10 @@ public class ReturnService implements IReturnService {
         
         Order order = returnRequest.getOrder();
         
-        // Mark as completed and update order status to cancelled
+        // Mark as completed and update order status to canceled
         returnRequest.setStatus("REFUNDED");
         returnRequest.setAdminNotes("Manual refund completed. " + actionDTO.getAdminNotes());
-        order.setStatus("cancelled"); // Chuyển trạng thái đơn hàng thành đã hủy
+        order.setStatus("canceled"); // Chuyển trạng thái đơn hàng thành đã hủy
         
         orderRepository.save(order);
         return returnRequestRepository.save(returnRequest);
