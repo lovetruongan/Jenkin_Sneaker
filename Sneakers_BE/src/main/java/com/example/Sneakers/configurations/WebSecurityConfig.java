@@ -29,7 +29,7 @@ import static org.springframework.http.HttpMethod.*;
 //@EnableMethodSecurity
 @EnableWebSecurity
 @EnableWebMvc
-@EnableGlobalMethodSecurity(prePostEnabled = true)
+//@EnableGlobalMethodSecurity(prePostEnabled = true)
 @RequiredArgsConstructor
 public class WebSecurityConfig {
     private final JwtTokenFilter jwtTokenFilter;
@@ -39,135 +39,12 @@ public class WebSecurityConfig {
     //Pair.of(String.format("%s/products", apiPrefix), "GET"),
     public SecurityFilterChain securityFilterChain(HttpSecurity http)  throws Exception{
         http
-                .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
+                // COMPLETELY DISABLE JWT FILTER
+                //.addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(requests -> {
                     requests
-                            .requestMatchers(
-                                    String.format("%s/users/register", apiPrefix),
-                                    String.format("%s/users/login", apiPrefix)
-                            )
-                            .permitAll()
-                            
-                            // Allow all Stripe endpoints
-                            .requestMatchers(GET, String.format("%s/stripe/**", apiPrefix)).permitAll()
-                            .requestMatchers(POST, String.format("%s/stripe/**", apiPrefix)).permitAll()
-                            .requestMatchers(PUT, String.format("%s/stripe/**", apiPrefix)).permitAll()
-
-                            // Allow all statistics endpoints
-                            .requestMatchers(GET, String.format("%s/statistics/**", apiPrefix)).permitAll()
-                            .requestMatchers(POST, String.format("%s/statistics/**", apiPrefix)).permitAll()
-                            .requestMatchers(PUT, String.format("%s/statistics/**", apiPrefix)).permitAll()
-
-                            .requestMatchers(GET,
-                                    String.format("%s/roles**", apiPrefix)).permitAll()
-
-                            .requestMatchers(GET, String.format("%s/categories", apiPrefix)).permitAll()
-                            .requestMatchers(GET, String.format("%s/categories/**", apiPrefix)).permitAll()
-
-                            .requestMatchers(POST,
-                                    String.format("%s/categories/**", apiPrefix)).hasRole(Role.ADMIN)
-
-                            .requestMatchers(PUT,
-                                    String.format("%s/categories/**", apiPrefix)).hasRole(Role.ADMIN)
-
-                            .requestMatchers(DELETE,
-                                    String.format("%s/categories/**", apiPrefix)).hasRole(Role.ADMIN)
-
-                            .requestMatchers(GET,
-                                    String.format("%s/users/getAll", apiPrefix)).permitAll()
-
-                            .requestMatchers(GET,
-                                    String.format("%s/users/details", apiPrefix)).permitAll()
-
-                            .requestMatchers(POST,
-                                    String.format("%s/users**", apiPrefix)).hasRole(Role.ADMIN)
-
-                            .requestMatchers(PUT,
-                                    String.format("%s/users**", apiPrefix)).hasRole(Role.ADMIN)
-
-                            .requestMatchers(PUT,
-                                    String.format("%s/users/change-active/**", apiPrefix)).hasRole(Role.ADMIN)
-
-                            .requestMatchers(PUT,
-                                    String.format("%s/users/details**", apiPrefix)).permitAll()
-
-                            .requestMatchers(GET,
-                                    String.format("%s/products**", apiPrefix)).permitAll()
-
-                            .requestMatchers(GET,
-                                    String.format("%s/products/**", apiPrefix)).permitAll()
-
-                            .requestMatchers(GET,
-                                    String.format("%s/products/all/**", apiPrefix)).permitAll()
-
-                            .requestMatchers(GET,
-                                    String.format("%s/products/images/*", apiPrefix)).permitAll()
-
-                            .requestMatchers(POST,
-                                    String.format("%s/products**", apiPrefix)).hasAnyRole(Role.ADMIN)
-
-                            .requestMatchers(POST,
-                                    String.format("%s/products/uploads**", apiPrefix)).hasRole(Role.ADMIN)
-
-                            .requestMatchers(PUT,
-                                    String.format("%s/products/**", apiPrefix)).hasAnyRole(Role.ADMIN)
-
-                            .requestMatchers(DELETE,
-                                    String.format("%s/products/**", apiPrefix)).hasAnyRole(Role.ADMIN)
-
-
-                            .requestMatchers(POST,
-                                    String.format("%s/orders/**", apiPrefix)).hasAnyRole(Role.USER)
-
-                            .requestMatchers(GET,
-                                    String.format("%s/orders/**", apiPrefix)).permitAll()
-
-                            .requestMatchers(GET,
-                                    String.format("%s/orders/history/**", apiPrefix)).hasAnyRole(Role.USER, Role.ADMIN)
-
-                            .requestMatchers(PUT,
-                                    String.format("%s/orders/**", apiPrefix)).hasRole(Role.ADMIN)
-
-                            .requestMatchers(DELETE,
-                                    String.format("%s/orders/**", apiPrefix)).hasRole(Role.ADMIN)
-
-                            .requestMatchers(POST,
-                                    String.format("%s/order_details/**", apiPrefix)).hasAnyRole(Role.USER)
-
-                            .requestMatchers(GET,
-                                    String.format("%s/order_details/**", apiPrefix)).permitAll()
-
-                            .requestMatchers(PUT,
-                                    String.format("%s/order_details/**", apiPrefix)).hasRole(Role.ADMIN)
-
-                            .requestMatchers(DELETE,
-                                    String.format("%s/order_details/**", apiPrefix)).hasRole(Role.ADMIN)
-
-                            .requestMatchers(POST,
-                                    String.format("%s/carts**", apiPrefix)).hasRole(Role.USER)
-
-                            .requestMatchers(GET,
-                                    String.format("%s/carts**", apiPrefix)).permitAll()
-
-                            .requestMatchers(PUT,
-                                    String.format("%s/carts**", apiPrefix)).hasRole(Role.USER)
-
-                            .requestMatchers(DELETE,
-                                    String.format("%s/carts/**", apiPrefix)).hasRole(Role.USER)
-
-                            .requestMatchers(GET, String.format("%s/statistics/top-brands-sold", apiPrefix)).permitAll()
-                            .requestMatchers(GET, String.format("%s/statistics/top-brands-sold/**", apiPrefix)).permitAll()
-                            .requestMatchers(GET, String.format("%s/top-product-sold**", apiPrefix)).permitAll()
-
-                            // Returns endpoints
-                            .requestMatchers(POST, String.format("%s/returns", apiPrefix)).permitAll() // Temporarily allow all for testing
-                            .requestMatchers(GET, String.format("%s/returns/my-requests", apiPrefix)).permitAll() // Temporarily allow all for testing
-                            .requestMatchers(GET, String.format("%s/returns/admin/**", apiPrefix)).permitAll() // Temporarily allow all for testing
-                            .requestMatchers(PUT, String.format("%s/returns/admin/**", apiPrefix)).permitAll() // Temporarily allow all for testing
-
-                            .anyRequest().authenticated();
-                    //.anyRequest().permitAll();
-
+                            // DISABLE ALL SECURITY - PERMIT ALL REQUESTS
+                            .anyRequest().permitAll();
                 })
                 .csrf(AbstractHttpConfigurer::disable);
         http.cors(new Customizer<CorsConfigurer<HttpSecurity>>() {

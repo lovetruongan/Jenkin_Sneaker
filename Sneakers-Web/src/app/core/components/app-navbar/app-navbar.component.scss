@@ -2,13 +2,16 @@
 
 .navbar {
   padding: 0.5rem 1rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: none;
   position: fixed;
-  top: $header-height;
+  top: 65px; // Exact header height
   left: 0;
   right: 0;
   z-index: 999;
-  background: $black-color;
+  background: #1a1a1a;
+  margin: 0;
+  border-top: none;
+  height: 60px;
 
   .navbar-nav {
     gap: 0.5rem;
@@ -47,7 +50,7 @@
           transform: translateX(-50%);
           width: 0;
           height: 2px;
-          background-color: $white-color;
+          background-color: #fff;
           transition: width 0.3s ease;
         }
 
@@ -145,13 +148,13 @@
       top: 100%;
       left: 0;
       right: 0;
-      background: $black-color;
+      background: #1a1a1a;
       padding: 0;
       z-index: 998;
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
 
       &.show {
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        border-top: 1px solid rgba(255, 255, 255, 0.2);
       }
 
       .navbar-nav {

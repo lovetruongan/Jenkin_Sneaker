@@ -72,7 +72,7 @@ export class OrderManageComponent extends BaseComponent implements OnInit {
   public totalRecords: number = 0;
   public pageSize: number = 15;
   public page: number = 0;
-  public sortField: string = 'orderDate';
+  public sortField: string = 'id';
   public sortOrder: number = -1; // -1 for desc, 1 for asc
   public showSearchDialog: boolean = false;
 
@@ -131,7 +131,7 @@ export class OrderManageComponent extends BaseComponent implements OnInit {
       return;
     }
 
-    let sortField = 'orderDate';
+    let sortField = this.sortField;
     let sortOrder = this.sortOrder;
 
     if (event) {
@@ -139,9 +139,13 @@ export class OrderManageComponent extends BaseComponent implements OnInit {
         this.page = event.first / event.rows;
         this.pageSize = event.rows;
       }
+      if (event.sortField) {
+        sortField = event.sortField;
+        this.sortField = sortField;
+      }
       if (event.sortOrder) {
         sortOrder = event.sortOrder;
-        this.sortOrder = sortOrder; // Cập nhật lại state
+        this.sortOrder = sortOrder;
       }
     }
     
@@ -185,7 +189,7 @@ export class OrderManageComponent extends BaseComponent implements OnInit {
       dateRange: []
     });
     this.page = 0;
-    this.sortField = 'orderDate';
+    this.sortField = 'id';
     this.sortOrder = -1;
     this.loadOrders();
   }

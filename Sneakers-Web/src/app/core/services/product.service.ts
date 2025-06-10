@@ -13,14 +13,24 @@ import { ProductUploadReq } from '../requestType/UploadProducts';
 })
 export class ProductService {
   private apiUrl: string = environment.apiUrl;
-  private token !: string | null;
 
   constructor(
     private httpClient: HttpClient
-  ) {
-    if (typeof localStorage !== 'undefined') {
-      this.token = localStorage.getItem('token');
-    }
+  ) {}
+
+  private getAuthHeaders(): HttpHeaders {
+    const token = localStorage.getItem('token');
+    return new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    });
+  }
+
+  private getFileUploadHeaders(): HttpHeaders {
+    const token = localStorage.getItem('token');
+    return new HttpHeaders({
+      Authorization: `Bearer ${token}`
+    });
   }
 
   getAllProduct() {
@@ -37,19 +47,13 @@ export class ProductService {
 
   addProductToCart(product: ProductToCartDto) {
     return this.httpClient.post(`${this.apiUrl}/carts`, product, {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${this.token}`
-      })
+      headers: this.getAuthHeaders()
     });
   }
 
   removeProductFromCart(id: number){
     return this.httpClient.post(`${this.apiUrl}/carts/${id}`, {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${this.token}`
-      })
+      headers: this.getAuthHeaders()
     });
   }
 
@@ -59,65 +63,48 @@ export class ProductService {
 
   getProductFromCart(){
     return this.httpClient.get<ProductFromCartDto>(`${this.apiUrl}/carts`, {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${this.token}`
-      })
+      headers: this.getAuthHeaders()
     });
   }
 
   updateProductFromCart(idCart: number, product: ProductToCartDto){
     return this.httpClient.put(`${this.apiUrl}/carts/${idCart}`, product, {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${this.token}`
-      })
+      headers: this.getAuthHeaders()
     });
   }
 
   deleteProductFromCart(id: number){
     return this.httpClient.delete(`${this.apiUrl}/carts/${id}`, {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${this.token}`
-      })
+      headers: this.getAuthHeaders()
     });
   }
 
   getRelatedProduct(id: string){
     return this.httpClient.get<AllProductDto>(`${this.apiUrl}/products/related/${id}`)
   }
+  
   deleteProduct(id: string){
     return this.httpClient.delete(`${this.apiUrl}/products/${id}`, {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${this.token}`
-      }),
+      headers: this.getAuthHeaders(),
       responseType: 'text'
     })
   }
 
   uploadProduct(product: ProductUploadReq){
     return this.httpClient.post<{productId: number, message: string}>(`${this.apiUrl}/products`, product, {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${this.token}`
-      })
+      headers: this.getAuthHeaders()
     })
   }
 
   uploadImageProduct(files : FormData,id: number){
     return this.httpClient.post<{message: string}>(`${this.apiUrl}/products/uploads/${id}`, files, {
-      headers: new HttpHeaders({
-        Authorization: `Bearer ${this.token}`
-      })
+      headers: this.getFileUploadHeaders()
     })
   }
+  
   updateProduct(product: ProductUploadReq, id: number){
     return this.httpClient.put<{message: string}>(`${this.apiUrl}/products/${id}`, product, {
-      headers: new HttpHeaders({
-        Authorization: `Bearer ${this.token}`
-      })
+      headers: this.getAuthHeaders()
     })
   }
 }

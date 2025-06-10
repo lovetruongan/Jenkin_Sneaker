@@ -1,80 +1,117 @@
-<div class="container-fluid">
-  <div class="row">
-    <div class="col-lg-4 col-md-3 col-sm-4 col-6 offset-lg-1 offset-md-1 offset-sm-1">
-      @if(token == null){
-      <div class="header-login-container">
-        <a class="header-nav-login" [routerLink]="['/auth-login']">Đăng nhập</a>
-        <span class="ml-2 mr-2" style="margin-left: 5px; margin-right: 5px; ">|</span>
-        <a class="header-nav-login" [routerLink]="['/register']">Đăng kí</a>
+<header class="modern-header">
+  <div class="header-container">
+    <!-- Left Section: Logo + Brand Name -->
+    <div class="header-left">
+      <div class="brand-section">
+        <img src="../../../../assets/images/logo.jpg" alt="Logo" class="logo-img">
+        <h1 class="brand-name">
+          <a [routerLink]="['/']">SNEAKER STORE</a>
+        </h1>
       </div>
-      }
-      @else {
-      <div class="header-avtar-container">
-        <div (click)="menu.toggle($event)" class="avatar-name-wrapper">
-          <div class="header-avtar-icon">
-            <span class="pi pi-user"></span>
-          </div>
-        <div class="header-avtar-name">
-          <p class="userName">{{userName}}</p>
+    </div>
+
+    <!-- Right Section: Search, User & Cart -->
+    <div class="header-right">
+      <!-- Search -->
+      <div class="search-container">
+        <div class="search-input-wrapper">
+          <input 
+            [(ngModel)]="searchValue" 
+            (input)="onSearchInput($event)"
+            (keydown.enter)="sendContentSearch()"
+            (focus)="showSuggestions = true"
+            (blur)="hideSuggestions()"
+            type="text" 
+            placeholder="Tìm kiếm sản phẩm..." 
+            class="search-input"
+          />
+          <button (click)="sendContentSearch()" class="search-btn">
+            <i class="pi pi-search"></i>
+          </button>
         </div>
-      </div>
-        <p-menu #menu [model]="itemsMenuAvatar" [popup]="true"></p-menu>
-      </div>
-      }
-    </div>
-
-    <div class="col-lg-2 col-md-2 col-sm-2 col-6 text-center">
-      <div class="app-logo-header justify-content-center">
-        <a href="#"><img src="../../../../assets/images/logo.jpg" alt="" class="img-fluid"></a>
-        <!-- <a href="">My logo</a> -->
-      </div>
-    </div>
-
-    <div class="col-lg-3 col-md-4 col-sm-5 col-12 header-right">
-      <div class="header-search-container">
-        <i (click)="op.toggle($event)" class="pi pi-search"></i>
-        <p-overlayPanel #op>
-          <span class="p-input-icon-right">
-            <i (click)="sendContentSearch()" class="pi pi-search"></i>
-            <input (keydown.enter)="sendContentSearch()" [(ngModel)]="searchValue" ngDefaultControl type="text" pInputText />
-          </span>
-        </p-overlayPanel>
-        <div class="line-right"></div>
-      </div>
-    </div>
-    @if(roleId == 1 || !roleId){
-      <div class="col-lg-2 col-md-2 col-sm-1 col-6 text-right header-cart-container-wrapper">
-        <div class="header-cart-container" [routerLink]="['/shoppingCart']">
-          <p class="header-cart-text">Giỏ hàng</p>
-          <div class="header-cart-icon">
-            <div class="header-cart-icon--bag">
-              <p-badge [value]="quantityInCart.toString()"></p-badge>
+        
+        <!-- Search Suggestions -->
+        <div class="search-suggestions" *ngIf="showSuggestions && searchSuggestions.length > 0">
+          <div 
+            class="suggestion-item" 
+            *ngFor="let product of searchSuggestions"
+            (mousedown)="selectProduct(product)"
+          >
+            <img [src]="apiImage + product.thumbnail" [alt]="product.name" class="suggestion-image">
+            <div class="suggestion-info">
+              <div class="suggestion-name">{{ product.name }}</div>
+              <div class="suggestion-price">{{ product.price | currency:'VND':'symbol':'1.0-0' }}</div>
             </div>
           </div>
         </div>
-        <div class="previewCart">
-          <p-toast></p-toast>
-          <h5 class="previewCart__heading">Giỏ hàng</h5>
-          <ul class="wrapper-product-list">
-            @for (item of products;track item){
-              <li [routerLink]="['/shoppingCart']" class="wrapper-product-item flex flex-wrap p-2 align-items-center gap-3">
-                <p-button (click)="deleteProduct($event,item.id)" icon="pi pi-times" severity="danger" [outlined]="true"></p-button>
-                <div class="wrapper__image">
-                    <img [src]="apiImage + item.products.thumbnail" [alt]="item.products.name" class="w-4rem shadow-2 flex-shrink-0 border-round" />
-                    <div class="wrapper-info">
-                        <span>Size: {{ item.size }}</span>
-                        <span class="font-bold text-900">{{ item.products.price | currency:'VND':'symbol':'1.0-0'}}</span>
-                        <span>x{{ item.quantity }}</span>
+        
+        <div class="search-suggestions" *ngIf="showSuggestions && searchValue.length > 0 && searchSuggestions.length === 0">
+          <div class="no-results">Không tìm thấy sản phẩm nào</div>
+        </div>
+      </div>
+
+      <!-- User Section -->
+      @if(token == null) {
+        <div class="auth-links">
+          <a [routerLink]="['/auth-login']" class="auth-link">Đăng nhập</a>
+          <span class="divider">|</span>
+          <a [routerLink]="['/register']" class="auth-link">Đăng ký</a>
+        </div>
+      } @else {
+        <div class="user-menu" (click)="menu.toggle($event)">
+          <div class="user-avatar">
+            <i class="pi pi-user"></i>
+          </div>
+          <span class="user-name">{{userName}}</span>
+          <i class="pi pi-chevron-down"></i>
+        </div>
+        <p-menu #menu [model]="itemsMenuAvatar" [popup]="true"></p-menu>
+      }
+
+      <!-- Cart Section (only for customers) -->
+      @if(roleId == 1 || !roleId) {
+        <div class="cart-section" 
+             (mouseenter)="showCartPreview = true" 
+             (mouseleave)="showCartPreview = false">
+          <div class="cart-link" [routerLink]="['/shoppingCart']">
+            <div class="cart-icon-wrapper">
+              <i class="pi pi-shopping-cart"></i>
+              <p-badge [value]="quantityInCart.toString()" severity="danger"></p-badge>
+            </div>
+            <span class="cart-text">Giỏ hàng</span>
+          </div>
+
+          <!-- Cart Preview Popup -->
+          <div class="cart-preview" [class.show]="showCartPreview" *ngIf="products && products.length > 0">
+            <h5 class="cart-preview-title">Giỏ hàng của bạn</h5>
+            <div class="cart-items">
+              @for (item of products; track item) {
+                <div class="cart-item">
+                  <button 
+                    (click)="deleteProduct($event, item.id)" 
+                    class="remove-btn"
+                    title="Xóa sản phẩm">
+                    <i class="pi pi-times"></i>
+                  </button>
+                  <img [src]="apiImage + item.products.thumbnail" [alt]="item.products.name" class="item-image" />
+                  <div class="item-info">
+                    <span class="item-name">{{ item.products.name }}</span>
+                    <div class="item-details">
+                      <span>Size: {{ item.size }}</span>
+                      <span class="item-price">{{ item.products.price | currency:'VND':'symbol':'1.0-0'}}</span>
+                      <span>x{{ item.quantity }}</span>
                     </div>
                   </div>
-                  <div class="flex-1 flex flex-column gap-2">
-                      <span class="font-bold">{{ item.products.name }}</span>
-                  </div>
-                </li>
+                </div>
               }
-            </ul>
+            </div>
+            <div class="cart-footer">
+              <button [routerLink]="['/shoppingCart']" class="view-cart-btn">Xem giỏ hàng</button>
+            </div>
           </div>
-      </div>
-    }
+        </div>
+      }
+    </div>
   </div>
-</div>
+  <p-toast></p-toast>
+</header>

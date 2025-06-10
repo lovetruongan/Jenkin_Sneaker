@@ -202,16 +202,23 @@ public class OrderService implements IOrderService {
 
         // Lưu danh sách OrderDetail vào cơ sở dữ liệu
         orderDetailRepository.saveAll(orderDetails);
-        // Gửi mail thông báo cho người dùng
-        Email email = new Email();
-        String to = order.getEmail();
-        String subject = "Đặt hàng thành công từ Sneaker Store - Đơn hàng #" + order.getId();
-        String content = BuilderEmailContent.buildOrderEmailContent(order);
-        boolean sendMail = email.sendEmail(to, subject, content);
-
-        if (!sendMail) {
-            throw new Exception("Cannot send email");
+        
+        // Gửi mail thông báo cho người dùng (không throw exception nếu thất bại)
+        try {
+            Email email = new Email();
+            String to = order.getEmail();
+            String subject = "Đặt hàng thành công từ Sneaker Store - Đơn hàng #" + order.getId();
+            String content = BuilderEmailContent.buildOrderEmailContent(order);
+            boolean sendMail = email.sendEmail(to, subject, content);
+            
+            if (!sendMail) {
+                System.err.println("Warning: Failed to send order confirmation email to " + to);
+            }
+        } catch (Exception emailException) {
+            // Log email error but don't fail the order creation
+            System.err.println("Warning: Exception while sending email: " + emailException.getMessage());
         }
+        
         return OrderIdResponse.fromOrder(order);
     }
 

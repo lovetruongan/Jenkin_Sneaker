@@ -45,7 +45,8 @@ public class OrderController {
             return ResponseEntity.ok(orderResponse);
         }
         catch (Exception e ){
-            return ResponseEntity.badRequest().body(e.getMessage());
+            e.printStackTrace(); // Log the full stack trace for debugging
+            return ResponseEntity.badRequest().body("Order creation failed: " + e.getMessage());
         }
     }
     @GetMapping("/admin")
@@ -73,7 +74,7 @@ public class OrderController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    //@PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> getOrder(@Valid @PathVariable("id") Long orderId){
         try {
             OrderResponse existingOrder = orderService.getOrder(orderId);

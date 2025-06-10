@@ -66,11 +66,14 @@
                     [scrollable]="true"
                     scrollHeight="flex"
                     responsiveLayout="scroll"
-                    [sortField]="'order_date'"
+                    [sortField]="'id'"
                     [sortOrder]="-1">
                 <ng-template pTemplate="header">
                     <tr>
-                        <th style="width:8%">Mã ĐH</th>
+                        <th pSortableColumn="id" style="width:8%">
+                            Mã ĐH
+                            <p-sortIcon field="id"></p-sortIcon>
+                        </th>
                         <th style="width:15%">Người mua</th>
                         <th style="width:15%">Email / SĐT</th>
                         <th style="width:15%">Phương thức TT</th>

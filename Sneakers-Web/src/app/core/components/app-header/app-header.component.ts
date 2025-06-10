@@ -7,7 +7,7 @@ import { AvatarModule } from 'primeng/avatar';
 import { MenuItem } from 'primeng/api';
 import { MenuModule } from 'primeng/menu';
 import { UserService } from '../../services/user.service';
-import { catchError, filter, of, switchMap, takeUntil, tap } from 'rxjs';
+import { catchError, debounceTime, distinctUntilChanged, filter, of, switchMap, takeUntil, tap } from 'rxjs';
 import { MessageService } from 'primeng/api';
 import { ToastService } from '../../services/toast.service';
 import { DetailProductService } from '../../services/detail-product.service';
@@ -24,6 +24,9 @@ import { ToastModule } from 'primeng/toast';
 import { CommonService } from '../../services/common.service';
 import { environment } from '../../../../environments/environment.development';
 import { UserDto } from '../../dtos/user.dto';
+import { Subject } from 'rxjs';
+import { ProductDto } from '../../dtos/product.dto';
+import { AllProductDto } from '../../dtos/AllProduct.dto';
 
 @Component({
   selector: 'app-app-header',
@@ -58,7 +61,13 @@ export class AppHeaderComponent extends BaseComponent implements AfterViewInit,O
   public quantityInCart: number = 0;
   public products: ProductsInCartDto[] = [];
   public showPreview: boolean = false;
+  public showCartPreview: boolean = false;
   public apiImage: string = environment.apiImage;
+
+  // Search suggestions properties
+  public searchSuggestions: ProductDto[] = [];
+  public showSuggestions: boolean = false;
+  private searchSubject = new Subject<string>();
 
   constructor(
     private userService : UserService,
@@ -74,6 +83,26 @@ export class AppHeaderComponent extends BaseComponent implements AfterViewInit,O
       this.token = localStorage.getItem('token');
       this.roleId = parseInt(JSON.parse(localStorage.getItem("userInfor") || '{"role_id": "0"}').role_id || '0');
     }
+
+    // Setup search suggestions with debounce
+    this.searchSubject.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      switchMap(searchTerm => {
+        if (searchTerm.trim().length >= 2) {
+          return this.productService.searchProduct(searchTerm).pipe(
+            tap(result => {
+              // Extract products array from AllProductDto
+              this.searchSuggestions = result.products ? result.products.slice(0, 5) : [];
+            }),
+            switchMap(() => of(this.searchSuggestions)),
+            catchError(() => of([]))
+          );
+        }
+        return of([]);
+      }),
+      takeUntil(this.destroyed$)
+    ).subscribe();
   }
 
   ngOnInit(): void {
@@ -147,6 +176,35 @@ export class AppHeaderComponent extends BaseComponent implements AfterViewInit,O
 
   sendContentSearch(){
     this.detailProductService.setContent(this.searchValue);
+    this.hideSuggestions();
+  }
+
+  // Search suggestions methods
+  onSearchInput(event: Event): void {
+    const target = event.target as HTMLInputElement;
+    const value = target.value;
+    this.searchValue = value;
+    
+    if (value.trim().length >= 2) {
+      this.searchSubject.next(value);
+      this.showSuggestions = true;
+    } else {
+      this.searchSuggestions = [];
+      this.showSuggestions = false;
+    }
+  }
+
+  selectProduct(product: ProductDto): void {
+    this.router.navigate(['/detailProduct', product.id]);
+    this.searchValue = '';
+    this.hideSuggestions();
+  }
+
+  hideSuggestions(): void {
+    setTimeout(() => {
+      this.showSuggestions = false;
+      this.searchSuggestions = [];
+    }, 150);
   }
 
   deleteProduct(event: any, id: number){

@@ -98,11 +98,11 @@ export class OrderComponent extends BaseComponent implements OnInit,AfterViewIni
   ) {
     super();
     this.inforShipForm = this.fb.group({
-      fullName: [, Validators.required],
-      address: [, Validators.required],
-      phoneNumber :[, Validators.required],
-      email: [],
-      note:[]
+      fullName: ['', Validators.required],
+      address: ['', Validators.required],
+      phoneNumber: ['', [Validators.required, Validators.minLength(5)]],
+      email: ['', [Validators.email]],
+      note: ['']
     })
   }
   ngOnInit(): void {
@@ -194,16 +194,26 @@ export class OrderComponent extends BaseComponent implements OnInit,AfterViewIni
   private processStripeOrder(): void {
     // Create order first, then show Stripe payment dialog
     this.blockUi();
+    
+    // Get user info from localStorage (optional, as backend uses token)
+    const userInfor = JSON.parse(localStorage.getItem("userInfor") || '{}');
+    const userId = userInfor.id;
+
     const orderData = {
+      ...(userId && { user_id: Number(userId) }),
       fullname: this.inforShipForm.value.fullName,
       email: this.inforShipForm.value.email,
       phone_number: this.inforShipForm.value.phoneNumber,
       address: this.inforShipForm.value.address,
-      note: this.inforShipForm.value.note,
+      note: this.inforShipForm.value.note || '',
       shipping_method: this.methodShippingValue.name,
       payment_method: 'Pending Stripe Payment',
-      cart_items: this.productOrder,
-      total_money: this.totalCost,
+      cart_items: this.productOrder.map(item => ({
+        product_id: Number(item.product_id),
+        quantity: Number(item.quantity),
+        size: Number(item.size)
+      })),
+      total_money: Math.round(this.finalCost),
       ...(this.isVoucherApplied && { voucher_code: this.voucherCode })
     };
 
@@ -218,7 +228,8 @@ export class OrderComponent extends BaseComponent implements OnInit,AfterViewIni
       }),
       catchError((err) => {
         this.blockUi();
-        this.toastService.fail("Không thể tạo đơn hàng");
+        console.error('Order creation error:', err);
+        this.toastService.fail("Không thể tạo đơn hàng: " + (err.error?.message || err.message));
         return of(err);
       }),
       takeUntil(this.destroyed$)
@@ -227,16 +238,26 @@ export class OrderComponent extends BaseComponent implements OnInit,AfterViewIni
 
   private processRegularOrder(): void {
     this.blockUi();
+    
+    // Get user info from localStorage (optional, as backend uses token)
+    const userInfor = JSON.parse(localStorage.getItem("userInfor") || '{}');
+    const userId = userInfor.id;
+
     const orderData = {
+      ...(userId && { user_id: Number(userId) }),
       fullname: this.inforShipForm.value.fullName,
       email: this.inforShipForm.value.email,
       phone_number: this.inforShipForm.value.phoneNumber,
       address: this.inforShipForm.value.address,
-      note: this.inforShipForm.value.note,
+      note: this.inforShipForm.value.note || '',
       shipping_method: this.methodShippingValue.name,
       payment_method: this.selectedPayMethod.name,
-      cart_items: this.productOrder,
-      total_money: this.totalCost,
+      cart_items: this.productOrder.map(item => ({
+        product_id: Number(item.product_id),
+        quantity: Number(item.quantity),
+        size: Number(item.size)
+      })),
+      total_money: Math.round(this.finalCost),
       ...(this.isVoucherApplied && { voucher_code: this.voucherCode })
     };
 
@@ -258,7 +279,8 @@ export class OrderComponent extends BaseComponent implements OnInit,AfterViewIni
       }),
       catchError((err) => {
         this.blockUi();
-        this.toastService.fail("Đặt hàng không thành công");
+        console.error('Order creation error:', err);
+        this.toastService.fail("Đặt hàng không thành công: " + (err.error?.message || err.message));
         return of(err);
       }),
       takeUntil(this.destroyed$)

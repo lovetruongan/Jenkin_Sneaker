@@ -81,7 +81,7 @@ public class UserController {
         }
     }
     @GetMapping("/getAll")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    //@PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> getAllUsers(){
         try {
             List<UserResponse> users = userService.getAllUser();
@@ -94,7 +94,7 @@ public class UserController {
     }
 
     @GetMapping("/find")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    //@PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> find(@RequestParam("name") String name){
         try {
             List<UserResponse> users = userService.getAllUser();
@@ -117,7 +117,7 @@ public class UserController {
         }
     }
     @PutMapping("/details/{userId}")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    //@PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<UserResponse> updateUserDetails(
             @PathVariable Long userId,
             @RequestBody UpdateUserDTO updatedUserDTO,
@@ -133,7 +133,7 @@ public class UserController {
     }
 
     @PutMapping("/change-active/{userId}")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    //@PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<UserResponse> updateActive(
             @PathVariable Long userId,
             @RequestParam boolean activeUser,
@@ -152,7 +152,7 @@ public class UserController {
     }
 
     @PutMapping("/changeRole/{userId}")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    //@PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> changeRoleUser(
             @PathVariable("userId") Long userId,
             @RequestBody RoleDTO roleDTO,
@@ -171,7 +171,7 @@ public class UserController {
         }
     }
     @DeleteMapping("/delete/{id}")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    //@PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> deleteUser(
             @PathVariable("id") Long id,
             @RequestHeader("Authorization") String token

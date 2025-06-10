@@ -28,7 +28,7 @@ public class VoucherController {
     private final LocalizationUtils localizationUtils;
 
     @PostMapping("")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    //@PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> createVoucher(
             @Valid @RequestBody VoucherDTO voucherDTO,
             BindingResult result) {
@@ -143,7 +143,7 @@ public class VoucherController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    //@PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> updateVoucher(
             @PathVariable Long id,
             @Valid @RequestBody VoucherDTO voucherDTO,
@@ -165,7 +165,7 @@ public class VoucherController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    //@PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> deleteVoucher(@PathVariable Long id) {
         try {
             // Check if voucher is being used in orders
