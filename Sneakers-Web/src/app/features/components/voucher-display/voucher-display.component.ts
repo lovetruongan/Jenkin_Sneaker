@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule, CurrencyPipe } from '@angular/common';
 import { VoucherService } from '../../../core/services/voucher.service';
 import { VoucherDto } from '../../../core/dtos/voucher.dto';
+import { HomepageVoucherDto } from '../../../core/dtos/homepageVoucher.dto';
 import { catchError, of, tap } from 'rxjs';
 import { RouterModule } from '@angular/router';
 import { ToastService } from '../../../core/services/toast.service';
@@ -17,7 +18,7 @@ import { MessageService } from 'primeng/api';
   providers: [ToastService, MessageService]
 })
 export class VoucherDisplayComponent implements OnInit {
-  vouchers: VoucherDto[] = [];
+  vouchers: HomepageVoucherDto[] = [];
   isLoading = true;
 
   constructor(
@@ -26,7 +27,7 @@ export class VoucherDisplayComponent implements OnInit {
     ) {}
 
   ngOnInit(): void {
-    this.voucherService.getAllVouchers(0, 5, 'valid').pipe(
+    this.voucherService.getHomepageVouchers(0, 5).pipe(
       tap(response => {
         if(response && response.vouchers) {
           this.vouchers = response.vouchers;
@@ -34,7 +35,7 @@ export class VoucherDisplayComponent implements OnInit {
         this.isLoading = false;
       }),
       catchError(error => {
-        console.error('Error fetching vouchers:', error);
+        console.error('Error fetching homepage vouchers:', error);
         this.isLoading = false;
         return of(null);
       })

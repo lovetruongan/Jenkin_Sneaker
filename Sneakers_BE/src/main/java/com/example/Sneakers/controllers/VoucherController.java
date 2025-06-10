@@ -207,4 +207,38 @@ public class VoucherController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+    @GetMapping("/homepage")
+    public ResponseEntity<?> getHomepageVouchers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int limit) {
+        try {
+            PageRequest pageRequest = PageRequest.of(
+                    page, limit,
+                    Sort.by("validTo").ascending()); // Sort by expiration date
+
+            Page<Voucher> voucherPage = voucherService.getValidVouchers(pageRequest);
+
+            if (voucherPage.getTotalElements() == 0) {
+                return ResponseEntity.ok(HomepageVoucherListResponse.builder()
+                        .vouchers(List.of())
+                        .totalPages(0)
+                        .message("Hiện tại chưa có voucher khuyến mãi")
+                        .build());
+            }
+
+            List<HomepageVoucherResponse> voucherResponses = voucherPage.getContent()
+                    .stream()
+                    .map(HomepageVoucherResponse::fromVoucher)
+                    .toList();
+
+            return ResponseEntity.ok(HomepageVoucherListResponse.builder()
+                    .vouchers(voucherResponses)
+                    .totalPages(voucherPage.getTotalPages())
+                    .message("Danh sách voucher khuyến mãi")
+                    .build());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 }

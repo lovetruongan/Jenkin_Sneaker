@@ -33,7 +33,7 @@ export class StripeService {
   private http = inject(HttpClient);
   private stripe: Stripe | null = null;
   private elements: StripeElements | null = null;
-  private cardElement: StripeCardElement | null = null;
+  private cardElementInstances: Map<string, StripeCardElement> = new Map();
 
   // State management
   private paymentStatusSubject = new BehaviorSubject<string>('idle');
@@ -69,7 +69,7 @@ export class StripeService {
   createCardElement(): StripeCardElement | null {
     if (!this.elements) return null;
 
-    this.cardElement = this.elements.create('card', {
+    const cardElement = this.elements.create('card', {
       style: {
         base: {
           fontSize: '16px',
@@ -81,7 +81,14 @@ export class StripeService {
       },
     });
 
-    return this.cardElement;
+    // Generate unique ID for this instance
+    const instanceId = 'card_' + Math.random().toString(36).substr(2, 9);
+    this.cardElementInstances.set(instanceId, cardElement);
+    
+    // Store the instance ID on the element for later reference
+    (cardElement as any)._instanceId = instanceId;
+
+    return cardElement;
   }
 
   createPaymentIntent(request: StripePaymentRequest): Observable<StripePaymentResponse> {
@@ -91,8 +98,8 @@ export class StripeService {
     );
   }
 
-  async confirmPayment(clientSecret: string, customerDetails: any): Promise<any> {
-    if (!this.stripe || !this.cardElement) {
+  async confirmPayment(clientSecret: string, customerDetails: any, cardElement: StripeCardElement): Promise<any> {
+    if (!this.stripe || !cardElement) {
       throw new Error('Stripe not initialized');
     }
 
@@ -100,7 +107,7 @@ export class StripeService {
 
     const result = await this.stripe.confirmCardPayment(clientSecret, {
       payment_method: {
-        card: this.cardElement,
+        card: cardElement,
         billing_details: {
           name: customerDetails.name,
           email: customerDetails.email,
@@ -132,10 +139,17 @@ export class StripeService {
     this.paymentStatusSubject.next('idle');
   }
 
-  destroyCardElement(): void {
-    if (this.cardElement) {
-      this.cardElement.destroy();
-      this.cardElement = null;
+  destroyCardElement(cardElement?: StripeCardElement): void {
+    if (cardElement) {
+      const instanceId = (cardElement as any)._instanceId;
+      if (instanceId && this.cardElementInstances.has(instanceId)) {
+        cardElement.destroy();
+        this.cardElementInstances.delete(instanceId);
+      }
+    } else {
+      // Destroy all instances if no specific element provided
+      this.cardElementInstances.forEach(element => element.destroy());
+      this.cardElementInstances.clear();
     }
   }
 } 

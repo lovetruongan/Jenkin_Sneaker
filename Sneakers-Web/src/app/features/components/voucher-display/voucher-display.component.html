@@ -22,7 +22,13 @@
             </span>
           </div>
         </div>
-        <p class="voucher-usage">Lượt sử dụng còn lại: <strong>{{ voucher.remaining_quantity }}</strong></p>
+        <div class="voucher-usage-info">
+          <p class="voucher-usage">Lượt sử dụng còn lại: <strong>{{ voucher.remaining_quantity }}</strong></p>
+          <p class="voucher-expiry" [ngClass]="{'expiring-soon': voucher.is_expiring_soon}">
+            <i class="pi pi-clock"></i>
+            {{ voucher.status_message }}
+          </p>
+        </div>
       </div>
       <div class="voucher-code">
         <span>Mã: <strong>{{ voucher.code }}</strong></span>

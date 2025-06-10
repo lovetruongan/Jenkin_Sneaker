@@ -4,6 +4,7 @@ import { environment } from '../../../environments/environment.development';
 import { VoucherDto } from '../dtos/voucher.dto';
 import { VoucherListDto } from '../dtos/voucherList.dto';
 import { ApplyVoucherDto, VoucherApplicationResponseDto } from '../dtos/voucherApplication.dto';
+import { HomepageVoucherListDto } from '../dtos/homepageVoucher.dto';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -94,6 +95,13 @@ export class VoucherService {
       `${this.apiUrl}/vouchers/apply`,
       applyDto,
       { headers: this.getHeaders() }
+    );
+  }
+
+  // Get vouchers for homepage with expiration date information
+  getHomepageVouchers(page: number = 0, limit: number = 5): Observable<HomepageVoucherListDto> {
+    return this.httpClient.get<HomepageVoucherListDto>(
+      `${this.apiUrl}/vouchers/homepage?page=${page}&limit=${limit}`
     );
   }
 } 

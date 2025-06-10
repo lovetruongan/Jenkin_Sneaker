@@ -180,7 +180,8 @@ export class StripePaymentComponent implements OnInit, AfterViewInit, OnDestroy 
               {
                 name: this.customerName,
                 email: this.customerEmail
-              }
+              },
+              this.cardElement
             );
 
             if (paymentResult.status === 'succeeded') {
@@ -239,7 +240,9 @@ export class StripePaymentComponent implements OnInit, AfterViewInit, OnDestroy 
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
-    this.stripeService.destroyCardElement();
+    if (this.cardElement) {
+      this.stripeService.destroyCardElement(this.cardElement);
+    }
   }
 } 
  
