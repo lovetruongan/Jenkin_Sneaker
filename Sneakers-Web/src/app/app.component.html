@@ -1,1 +1,11 @@
+<!-- p-toast phải nằm ở cấp cao nhất để hiển thị global -->
+<p-toast></p-toast>
+
+<!-- Router Outlet để render các trang -->
 <router-outlet></router-outlet>
+
+<!-- Modal tài khoản bị khóa, cũng nằm ở cấp cao nhất -->
+<app-account-blocked-modal 
+  [show]="isBlockedModalVisible" 
+  (close)="accountMonitor.hideBlockedModal()">
+</app-account-blocked-modal>

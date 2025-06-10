@@ -1,0 +1,134 @@
+@startuml System Class Diagram
+
+skinparam classAttributeIconSize 0
+skinparam backgroundColor white
+skinparam handwritten false
+skinparam defaultFontName Arial
+skinparam defaultFontSize 14
+skinparam roundcorner 20
+skinparam shadowing true
+
+' Frontend Classes
+package "Frontend" {
+  class BaseComponent {
+    # destroyed$: Subject
+    + ngOnDestroy(): void
+  }
+
+  class ProductService {
+    - apiUrl: string
+    + getProducts(): Observable<ProductDto[]>
+    + getProductById(id: string): Observable<ProductDto>
+    + getProductFromCart(): Observable<ProductFromCartDto>
+  }
+
+  class OrderService {
+    + createOrder(orderDTO: OrderDto): Observable<OrderIdResponse>
+    + getOrder(id: number): Observable<OrderResponse>
+    + getHistoryOrder(): Observable<HistoryOrderDto[]>
+    + getOrderInfor(id: number): Observable<InfoOrderDto>
+  }
+
+  class UserService {
+    + login(phoneNumber: string, password: string): Observable<string>
+    + register(userData: registerReq): Observable<registerDto>
+    + getUserDetails(): Observable<UserDto>
+    + updateUser(userId: number, userData: UpdateUserDto): Observable<UserDto>
+  }
+
+  class RecommendationService {
+    - purchasedProducts: Set<number>
+    - categoryFrequency: Map<number, number>
+    + getRecommendations(products: ProductDto[]): Observable<ProductDto[]>
+    - calculateRecommendations(products: ProductDto[]): Promise<ProductDto[]>
+  }
+}
+
+' Backend Classes
+package "Backend" {
+  interface IUserService {
+    + createUser(userDTO: UserDTO): User
+    + login(phoneNumber: string, password: string): String
+    + getUserDetailsFromToken(token: String): User
+    + updateUser(userId: Long, updatedUserDTO: UpdateUserDTO): User
+  }
+
+  interface IOrderService {
+    + createOrder(orderDTO: OrderDTO, token: String): OrderIdResponse
+    + getOrder(id: Long): OrderResponse
+    + updateOrderStatus(orderId: Long, status: String): Order
+    + getDashboardStats(): DashboardStatsDTO
+  }
+
+  interface ICategoryServices {
+    + createCategory(categoryDTO: CategoryDTO): Category
+    + getCategoryById(id: Long): Category
+    + getAllCategories(): List<Category>
+    + updateCategory(categoryId: Long, categoryDTO: CategoryDTO): Category
+  }
+
+  interface IVoucherService {
+    + createVoucher(voucherDTO: VoucherDTO): Voucher
+    + getVoucherByCode(code: String): Voucher
+    + applyVoucher(applyVoucherDTO: ApplyVoucherDTO): VoucherApplicationResponse
+    + useVoucher(voucherId: Long, orderId: Long, userId: Long, discountAmount: Long): void
+  }
+}
+
+' DTOs
+package "DTOs" {
+  class UserDto {
+    + id: number
+    + fullname: string
+    + phone_number: string
+    + email: string
+    + address: string
+    + date_of_birth: Date
+    + is_active: boolean
+    + role: Role
+  }
+
+  class ProductDto {
+    + id: number
+    + name: string
+    + price: number
+    + quantity: number
+    + category_id: number
+    + discount: number
+  }
+
+  class OrderDto {
+    + id: number
+    + user_id: number
+    + total_amount: number
+    + status: string
+    + order_details: OrderDetailDto[]
+  }
+
+  class VoucherDto {
+    + id: number
+    + code: string
+    + discount_amount: number
+    + start_date: Date
+    + end_date: Date
+    + is_active: boolean
+  }
+}
+
+' Relationships
+BaseComponent <|-- ProductService
+BaseComponent <|-- OrderService
+BaseComponent <|-- UserService
+BaseComponent <|-- RecommendationService
+
+ProductService --> ProductDto
+OrderService --> OrderDto
+UserService --> UserDto
+RecommendationService --> ProductDto
+
+IUserService ..> UserDto
+IOrderService ..> OrderDto
+ICategoryServices ..> CategoryDto
+IVoucherService ..> VoucherDto
+
+@enduml 

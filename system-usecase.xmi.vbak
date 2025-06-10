@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xmi:XMI xmi:version="2.1" xmlns:xmi="http://schema.omg.org/spec/XMI/2.1" xmlns:uml="http://www.eclipse.org/uml2/3.0.0/UML">
+  <uml:Model xmi:id="model" name="SneakersSystem">
+    <packagedElement xmi:type="uml:Package" xmi:id="rootPackage" name="SneakersSystem">
+      <!-- Actors -->
+      <packagedElement xmi:type="uml:Actor" xmi:id="customer" name="Khách hàng"/>
+      <packagedElement xmi:type="uml:Actor" xmi:id="admin" name="Quản trị viên"/>
+      <packagedElement xmi:type="uml:Actor" xmi:id="system" name="Hệ thống"/>
+
+      <!-- User Management Package -->
+      <packagedElement xmi:type="uml:Package" xmi:id="userManagement" name="Quản lý người dùng">
+        <packagedElement xmi:type="uml:UseCase" xmi:id="login" name="Đăng nhập"/>
+        <packagedElement xmi:type="uml:UseCase" xmi:id="register" name="Đăng ký"/>
+        <packagedElement xmi:type="uml:UseCase" xmi:id="manageProfile" name="Quản lý thông tin cá nhân"/>
+        <packagedElement xmi:type="uml:UseCase" xmi:id="manageUsers" name="Quản lý người dùng"/>
+        <packagedElement xmi:type="uml:UseCase" xmi:id="manageRoles" name="Phân quyền người dùng"/>
+      </packagedElement>
+
+      <!-- Product Management Package -->
+      <packagedElement xmi:type="uml:Package" xmi:id="productManagement" name="Quản lý sản phẩm">
+        <packagedElement xmi:type="uml:UseCase" xmi:id="viewProducts" name="Xem danh sách sản phẩm"/>
+        <packagedElement xmi:type="uml:UseCase" xmi:id="searchProducts" name="Tìm kiếm sản phẩm"/>
+        <packagedElement xmi:type="uml:UseCase" xmi:id="viewProductDetails" name="Xem chi tiết sản phẩm"/>
+        <packagedElement xmi:type="uml:UseCase" xmi:id="addProduct" name="Thêm sản phẩm mới"/>
+        <packagedElement xmi:type="uml:UseCase" xmi:id="updateProduct" name="Cập nhật sản phẩm"/>
+        <packagedElement xmi:type="uml:UseCase" xmi:id="deleteProduct" name="Xóa sản phẩm"/>
+        <packagedElement xmi:type="uml:UseCase" xmi:id="manageCategories" name="Quản lý danh mục"/>
+      </packagedElement>
+
+      <!-- Order Management Package -->
+      <packagedElement xmi:type="uml:Package" xmi:id="orderManagement" name="Quản lý đơn hàng">
+        <packagedElement xmi:type="uml:UseCase" xmi:id="createOrder" name="Tạo đơn hàng"/>
+        <packagedElement xmi:type="uml:UseCase" xmi:id="viewOrderHistory" name="Xem lịch sử đơn hàng"/>
+        <packagedElement xmi:type="uml:UseCase" xmi:id="cancelOrder" name="Hủy đơn hàng"/>
+        <packagedElement xmi:type="uml:UseCase" xmi:id="manageOrderStatus" name="Quản lý trạng thái đơn hàng"/>
+        <packagedElement xmi:type="uml:UseCase" xmi:id="requestReturn" name="Yêu cầu trả hàng"/>
+        <packagedElement xmi:type="uml:UseCase" xmi:id="processReturn" name="Xử lý yêu cầu trả hàng"/>
+      </packagedElement>
+
+      <!-- Shopping Cart Package -->
+      <packagedElement xmi:type="uml:Package" xmi:id="shoppingCart" name="Giỏ hàng và thanh toán">
+        <packagedElement xmi:type="uml:UseCase" xmi:id="addToCart" name="Thêm vào giỏ hàng"/>
+        <packagedElement xmi:type="uml:UseCase" xmi:id="viewCart" name="Xem giỏ hàng"/>
+        <packagedElement xmi:type="uml:UseCase" xmi:id="updateQuantity" name="Cập nhật số lượng"/>
+        <packagedElement xmi:type="uml:UseCase" xmi:id="removeFromCart" name="Xóa khỏi giỏ hàng"/>
+        <packagedElement xmi:type="uml:UseCase" xmi:id="applyVoucher" name="Áp dụng mã giảm giá"/>
+        <packagedElement xmi:type="uml:UseCase" xmi:id="checkout" name="Thanh toán"/>
+      </packagedElement>
+
+      <!-- Product Recommendation Package -->
+      <packagedElement xmi:type="uml:Package" xmi:id="recommendation" name="Gợi ý sản phẩm">
+        <packagedElement xmi:type="uml:UseCase" xmi:id="viewRecommendations" name="Xem sản phẩm gợi ý"/>
+        <packagedElement xmi:type="uml:UseCase" xmi:id="calculateScores" name="Tính toán điểm sản phẩm"/>
+        <packagedElement xmi:type="uml:UseCase" xmi:id="analyzeHistory" name="Phân tích lịch sử mua hàng"/>
+      </packagedElement>
+
+      <!-- Statistics Package -->
+      <packagedElement xmi:type="uml:Package" xmi:id="statistics" name="Thống kê và báo cáo">
+        <packagedElement xmi:type="uml:UseCase" xmi:id="viewRevenueStats" name="Xem thống kê doanh thu"/>
+        <packagedElement xmi:type="uml:UseCase" xmi:id="viewProductStats" name="Xem thống kê sản phẩm"/>
+        <packagedElement xmi:type="uml:UseCase" xmi:id="viewUserStats" name="Xem thống kê người dùng"/>
+      </packagedElement>
+
+      <!-- Relationships -->
+      <!-- Customer Associations -->
+      <packagedElement xmi:type="uml:Association" xmi:id="customer_login" name="uses">
+        <memberEnd xmi:idref="customer"/>
+        <memberEnd xmi:idref="login"/>
+      </packagedElement>
+      <!-- Add more associations for customer -->
+
+      <!-- Admin Associations -->
+      <packagedElement xmi:type="uml:Association" xmi:id="admin_manageUsers" name="uses">
+        <memberEnd xmi:idref="admin"/>
+        <memberEnd xmi:idref="manageUsers"/>
+      </packagedElement>
+      <!-- Add more associations for admin -->
+
+      <!-- System Associations -->
+      <packagedElement xmi:type="uml:Association" xmi:id="system_calculateScores" name="performs">
+        <memberEnd xmi:idref="system"/>
+        <memberEnd xmi:idref="calculateScores"/>
+      </packagedElement>
+      <!-- Add more associations for system -->
+
+      <!-- Include Relationships -->
+      <packagedElement xmi:type="uml:Include" xmi:id="createOrder_include_addToCart" name="includes">
+        <source xmi:idref="createOrder"/>
+        <target xmi:idref="addToCart"/>
+      </packagedElement>
+      <!-- Add more include relationships -->
+
+      <!-- Extend Relationships -->
+      <packagedElement xmi:type="uml:Extend" xmi:id="searchProducts_extend_viewProducts" name="extends">
+        <source xmi:idref="searchProducts"/>
+        <target xmi:idref="viewProducts"/>
+      </packagedElement>
+      <!-- Add more extend relationships -->
+
+    </packagedElement>
+  </uml:Model>
+</xmi:XMI> 

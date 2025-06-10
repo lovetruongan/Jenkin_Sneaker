@@ -1,0 +1,117 @@
+@startuml System Use Case Diagram
+
+skinparam actorStyle awesome
+skinparam packageStyle rectangle
+skinparam backgroundColor white
+skinparam handwritten false
+skinparam defaultFontName Arial
+skinparam defaultFontSize 14
+skinparam roundcorner 20
+skinparam shadowing true
+
+' Actors
+actor "Khách hàng" as Customer
+actor "Quản trị viên" as Admin
+actor "Hệ thống" as System
+
+' Use Cases
+rectangle "Quản lý người dùng" {
+  usecase "Đăng nhập" as UC1
+  usecase "Đăng ký" as UC2
+  usecase "Quản lý thông tin cá nhân" as UC3
+  usecase "Quản lý người dùng" as UC4
+  usecase "Phân quyền người dùng" as UC5
+}
+
+rectangle "Quản lý sản phẩm" {
+  usecase "Xem danh sách sản phẩm" as UC6
+  usecase "Tìm kiếm sản phẩm" as UC7
+  usecase "Xem chi tiết sản phẩm" as UC8
+  usecase "Thêm sản phẩm mới" as UC9
+  usecase "Cập nhật sản phẩm" as UC10
+  usecase "Xóa sản phẩm" as UC11
+  usecase "Quản lý danh mục" as UC12
+}
+
+rectangle "Quản lý đơn hàng" {
+  usecase "Tạo đơn hàng" as UC13
+  usecase "Xem lịch sử đơn hàng" as UC14
+  usecase "Hủy đơn hàng" as UC15
+  usecase "Quản lý trạng thái đơn hàng" as UC16
+  usecase "Yêu cầu trả hàng" as UC17
+  usecase "Xử lý yêu cầu trả hàng" as UC18
+}
+
+rectangle "Giỏ hàng và thanh toán" {
+  usecase "Thêm vào giỏ hàng" as UC19
+  usecase "Xem giỏ hàng" as UC20
+  usecase "Cập nhật số lượng" as UC21
+  usecase "Xóa khỏi giỏ hàng" as UC22
+  usecase "Áp dụng mã giảm giá" as UC23
+  usecase "Thanh toán" as UC24
+}
+
+rectangle "Gợi ý sản phẩm" {
+  usecase "Xem sản phẩm gợi ý" as UC25
+  usecase "Tính toán điểm sản phẩm" as UC26
+  usecase "Phân tích lịch sử mua hàng" as UC27
+}
+
+rectangle "Thống kê và báo cáo" {
+  usecase "Xem thống kê doanh thu" as UC28
+  usecase "Xem thống kê sản phẩm" as UC29
+  usecase "Xem thống kê người dùng" as UC30
+}
+
+' Relationships
+Customer --> UC1
+Customer --> UC2
+Customer --> UC3
+Customer --> UC6
+Customer --> UC7
+Customer --> UC8
+Customer --> UC13
+Customer --> UC14
+Customer --> UC15
+Customer --> UC17
+Customer --> UC19
+Customer --> UC20
+Customer --> UC21
+Customer --> UC22
+Customer --> UC23
+Customer --> UC24
+Customer --> UC25
+
+Admin --> UC1
+Admin --> UC4
+Admin --> UC5
+Admin --> UC9
+Admin --> UC10
+Admin --> UC11
+Admin --> UC12
+Admin --> UC16
+Admin --> UC18
+Admin --> UC28
+Admin --> UC29
+Admin --> UC30
+
+System --> UC26
+System --> UC27
+
+' Include relationships
+UC13 ..> UC19 : <<include>>
+UC13 ..> UC20 : <<include>>
+UC13 ..> UC23 : <<include>>
+UC13 ..> UC24 : <<include>>
+UC25 ..> UC26 : <<include>>
+UC26 ..> UC27 : <<include>>
+
+' Extend relationships
+UC7 ..> UC6 : <<extend>>
+UC8 ..> UC6 : <<extend>>
+UC15 ..> UC14 : <<extend>>
+UC17 ..> UC14 : <<extend>>
+UC21 ..> UC20 : <<extend>>
+UC22 ..> UC20 : <<extend>>
+
+@enduml 

@@ -12,6 +12,7 @@ import { Router, RouterModule } from '@angular/router';
 import { RecommendationService } from '../../../core/services/recommendation.service';
 import { CategoriesService } from '../../../core/services/categories.service';
 import { CategoryDto } from '../../../core/dtos/Category.dto';
+import { VoucherDisplayComponent } from '../voucher-display/voucher-display.component';
 
 @Component({
   selector: 'app-home',
@@ -20,7 +21,8 @@ import { CategoryDto } from '../../../core/dtos/Category.dto';
     CarouselModule,
     CurrencyPipe,
     BadgeModule,
-    RouterModule
+    RouterModule,
+    VoucherDisplayComponent
   ],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']

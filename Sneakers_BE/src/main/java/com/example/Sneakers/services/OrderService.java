@@ -99,11 +99,13 @@ public class OrderService implements IOrderService {
                 throw new Exception("Voucher đã hết lượt sử dụng");
             }
 
-            // Check user usage limit
+            // Check user usage limit - Temporarily disabled to allow reuse
+            /*
             Long userUsageCount = voucherUsageRepository.countByVoucherIdAndUserId(voucher.getId(), user.getId());
             if (userUsageCount >= 1) {
                 throw new Exception("Bạn đã sử dụng voucher này rồi");
             }
+            */
 
             // Calculate discount
             discountAmount = (baseTotal * voucher.getDiscountPercentage()) / 100;

@@ -1,11 +1,11 @@
-import { AfterViewInit, Component, Inject, PLATFORM_ID } from '@angular/core';
+import { AfterViewInit, Component, Inject, PLATFORM_ID, OnInit } from '@angular/core';
 import { BaseComponent } from '../../../../core/commonComponent/base.component';
 import { FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ToastModule } from 'primeng/toast';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { CheckboxModule } from 'primeng/checkbox';
-import { Router, RouterModule } from '@angular/router';
+import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import { ToastService } from '../../../../core/services/toast.service';
 import { Subject, catchError, delay, filter, of, switchMap, takeUntil, tap } from 'rxjs';
@@ -16,12 +16,14 @@ import { KeyFilterModule } from 'primeng/keyfilter';
 import { BlockUIModule } from 'primeng/blockui';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { UserDto } from '../../../../core/dtos/user.dto';
-import { isPlatformBrowser } from '@angular/common';
+import { isPlatformBrowser, CommonModule } from '@angular/common';
+import { AccountMonitorService } from '../../../../core/services/account-monitor.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
   imports: [
+    CommonModule,
     FormsModule,
     ReactiveFormsModule,
     ToastModule,
@@ -41,12 +43,21 @@ import { isPlatformBrowser } from '@angular/common';
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss'
 })
-export class LoginComponent extends BaseComponent implements AfterViewInit {
+export class LoginComponent extends BaseComponent implements OnInit, AfterViewInit {
   private token: string | null = null;
   public loginForm: FormGroup;
   public formSubmitSubject = new Subject<void>();
   public formSubmit$ = this.formSubmitSubject.asObservable();
   public blockedUi: boolean = false;
+  public showPassword = false;
+  
+  get userName() {
+    return this.loginForm.get('userName');
+  }
+
+  get password() {
+    return this.loginForm.get('password');
+  }
   
   constructor(
     private readonly fb: FormBuilder,
@@ -54,17 +65,24 @@ export class LoginComponent extends BaseComponent implements AfterViewInit {
     private toastService: ToastService,
     private userSerivce: UserService,
     private router: Router,
+    private route: ActivatedRoute,
+    public accountMonitor: AccountMonitorService,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
     super();
     this.loginForm = this.fb.group({
       userName: [, Validators.required],
-      password: [, Validators.required]
+      password: [, Validators.required],
+      rememberMe: [false]
     });
     if (isPlatformBrowser(this.platformId)) {
       console.log('LoginComponent initialized');
       console.log('Current token:', localStorage.getItem('token'));
     }
+  }
+
+  ngOnInit(): void {
+    // Không cần xử lý query params nữa vì đã có modal global
   }
 
   ngAfterViewInit(): void {
@@ -113,9 +131,25 @@ export class LoginComponent extends BaseComponent implements AfterViewInit {
             }
           }),
           catchError((error) => {
-            console.error('Login error:', error);
-            this.toastService.fail(error.error.message);
-            return of();
+            console.log('--- ERROR CATCH ---');
+            console.log('Status:', error.status);
+            console.log('Error Object:', error.error);
+            console.log('Error Message:', error.error?.message);
+            
+            const isBlocked = error.status === 400 && error.error?.message?.includes('Tài khoản của bạn đã bị khóa');
+            console.log('Is Blocked Condition Met:', isBlocked);
+
+            // Kiểm tra cụ thể nếu lỗi là do tài khoản bị khóa
+            if (isBlocked) {
+              // Hiển thị modal lớn thông báo tài khoản bị khóa
+              this.accountMonitor.showBlockedModal();
+            } else {
+              // Hiển thị toast cho các lỗi đăng nhập khác
+              this.toastService.fail(error.error?.message || 'Đăng nhập thất bại. Vui lòng thử lại.');
+            }
+            
+            // Ngăn không cho observable tiếp tục và gây ra lỗi không cần thiết
+            return of(); 
           })
         )
       }),
@@ -133,5 +167,15 @@ export class LoginComponent extends BaseComponent implements AfterViewInit {
   onSubmit() {
     console.log('Form submitted');
     this.formSubmitSubject.next();
+  }
+
+  togglePassword(): void {
+    this.showPassword = !this.showPassword;
+  }
+
+  onLogin(): void {
+    if (this.loginForm.valid) {
+      this.formSubmitSubject.next();
+    }
   }
 }

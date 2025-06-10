@@ -1,37 +1,151 @@
-<div class="container-fluid p-0 register">
-  <p-blockUI [blocked]="blockedUi">
-    <p-progressSpinner ariaLabel="loading"></p-progressSpinner>
-  </p-blockUI>
-  <div class="row m-0 d-flex align-items-center">
-    <div class="col-lg-3 col-sm-4 offset-lg-4 offset-sm-2 register-form-container">
-      <div class="register-form-container-content">
-        <h2 class="register-title">Đăng ký</h2>
-        <div class="form-group-container">
-          <form (keydown.enter)="formGroupSubmitSubject.next()" class="form-group" [formGroup]="registerForm">
-            <input pKeyFilter="int" type="text" placeholder="Số điện thoại" pInputText formControlName="phoneNumber" />
-            <p-password placeholder="Mật khẩu" [toggleMask]="true" formControlName="password"></p-password>
-            <p-password placeholder="Nhập lại mật khẩu" [toggleMask]="true"
-              formControlName="retypePassword"></p-password>
-            <input type="text" placeholder="Tên đầy đủ" pInputText formControlName="fullName" />
-            <input type="date" placeholder="Ngày sinh" pInputText formControlName="date" />
-            <input type="text" placeholder="Địa chỉ" pInputText formControlName="address" />
-          </form>
-        </div>
-        <p-toast></p-toast>
-        <p-button (click)="formGroupSubmitSubject.next()" class="register__button" label="Đăng ký"
-          type="submit"></p-button>
-        <div class="no-account-container">
-          <span>Đã có tài khoản <a [routerLink]="['/auth-login']">Đăng nhập</a></span>
-        </div>
-        <p>&copy; 2017–2024</p>
+<div class="register-page">
+  <p-toast></p-toast>
+  <div class="register-container">
+    <div class="register-card">
+      <div class="card-header">
+        <h1 class="title">Đăng ký</h1>
+        <p class="subtitle">Tạo tài khoản mới để bắt đầu mua sắm!</p>
       </div>
 
-      <div class="register-form-container-back">
-        <a [routerLink]="['/Home']">
-          <p>Xem sản phẩm</p>
-          <i class="pi pi-arrow-left"></i>
-        </a>
-      </div>
+      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="register-form">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="phone_number">Số điện thoại *</label>
+            <input 
+              type="tel"
+              id="phone_number"
+              formControlName="phone_number"
+              placeholder="Nhập số điện thoại"
+              class="form-input"
+              pKeyFilter="int">
+            <div *ngIf="f['phone_number'].touched && f['phone_number'].errors" class="error-message">
+              <small *ngIf="f['phone_number'].errors['required']">Số điện thoại không được để trống.</small>
+              <small *ngIf="f['phone_number'].errors['pattern']">Số điện thoại không hợp lệ.</small>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="fullname">Họ và tên *</label>
+            <input 
+              type="text"
+              id="fullname"
+              formControlName="fullname"
+              placeholder="Nhập họ và tên"
+              class="form-input">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email *</label>
+          <input 
+            type="email"
+            id="email"
+            formControlName="email"
+            placeholder="Nhập địa chỉ email"
+            class="form-input">
+          <div *ngIf="f['email'].touched && f['email'].errors" class="error-message">
+            <small *ngIf="f['email'].errors['required']">Email không được để trống.</small>
+            <small *ngIf="f['email'].errors['email']">Email không đúng định dạng.</small>
+          </div>
+        </div>
+        
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="password">Mật khẩu *</label>
+            <div class="password-field">
+              <input 
+                [type]="showPassword ? 'text' : 'password'"
+                id="password"
+                formControlName="password"
+                placeholder="Nhập mật khẩu"
+                class="form-input">
+              <button 
+                type="button"
+                class="password-toggle"
+                (click)="togglePassword()">
+                <i [class]="showPassword ? 'pi pi-eye-slash' : 'pi pi-eye'"></i>
+              </button>
+            </div>
+            <div *ngIf="f['password'].touched && f['password'].errors" class="error-message">
+              <small *ngIf="f['password'].errors['required']">Mật khẩu không được để trống.</small>
+              <small *ngIf="f['password'].errors['minlength']">Mật khẩu phải có ít nhất 6 ký tự.</small>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="retypePassword">Nhập lại mật khẩu *</label>
+            <div class="password-field">
+              <input 
+                [type]="showRetypePassword ? 'text' : 'password'"
+                id="retypePassword"
+                formControlName="retypePassword"
+                placeholder="Nhập lại mật khẩu"
+                class="form-input">
+              <button 
+                type="button"
+                class="password-toggle"
+                (click)="toggleRetypePassword()">
+                <i [class]="showRetypePassword ? 'pi pi-eye-slash' : 'pi pi-eye'"></i>
+              </button>
+            </div>
+            <div *ngIf="f['retypePassword'].touched && f['retypePassword'].errors" class="error-message">
+              <small *ngIf="f['retypePassword'].errors['required']">Vui lòng nhập lại mật khẩu.</small>
+              <small *ngIf="f['retypePassword'].errors['passwordMismatch']">Mật khẩu không khớp.</small>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="date_of_birth">Ngày sinh *</label>
+          <input 
+            type="date"
+            id="date_of_birth"
+            formControlName="date_of_birth"
+            class="form-input">
+        </div>
+
+        <div class="form-group">
+          <label for="address">Địa chỉ *</label>
+          <input 
+            type="text"
+            id="address"
+            formControlName="address"
+            placeholder="Nhập địa chỉ"
+            class="form-input">
+        </div>
+
+        <div class="form-group">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="agreeToTerms" formControlName="agreeToTerms">
+            <label class="form-check-label" for="agreeToTerms">
+              <span>Tôi đồng ý với</span>
+              <a href="#" class="terms-link">Điều khoản sử dụng</a>
+              <span>và</span>
+              <a href="#" class="terms-link">Chính sách bảo mật</a>
+            </label>
+          </div>
+        </div>
+
+        <button type="submit" class="register-btn" [class.register-btn-invalid]="registerForm.invalid" [disabled]="registerForm.invalid">
+          Tạo tài khoản
+        </button>
+
+        <div class="divider">
+          <span>hoặc</span>
+        </div>
+
+        <div class="login-prompt">
+          <span>Đã có tài khoản? </span>
+          <a routerLink="/auth-login" class="login-link">Đăng nhập ngay</a>
+        </div>
+      </form>
+    </div>
+
+    <div class="back-home">
+              <a routerLink="/Home" class="back-link">
+        <i class="pi pi-arrow-left"></i>
+        <span>Quay về trang chủ</span>
+      </a>
     </div>
   </div>
 </div>

@@ -8,6 +8,8 @@ import { registerDto } from '../dtos/register.dto';
 import { UserDto } from '../dtos/user.dto';
 import { Observable } from 'rxjs';
 import { isPlatformBrowser } from '@angular/common';
+import { tap } from 'rxjs/operators';
+import { AccountMonitorService } from './account-monitor.service';
 
 @Injectable({
   providedIn: 'root'
@@ -18,7 +20,8 @@ export class UserService {
 
   constructor(
     private readonly httpClient: HttpClient,
-    @Inject(PLATFORM_ID) platformId: Object
+    @Inject(PLATFORM_ID) platformId: Object,
+    private accountMonitor: AccountMonitorService
   ) {
     this.isBrowser = isPlatformBrowser(platformId);
   }
@@ -28,7 +31,7 @@ export class UserService {
       return new HttpHeaders({
         'Content-Type': 'application/json'
       });
-  }
+    }
 
     // If token is provided as parameter, use it
     if (token) {
@@ -42,8 +45,8 @@ export class UserService {
     const storedToken = localStorage.getItem('token');
     if (!storedToken) {
       return new HttpHeaders({
-      'Content-Type': 'application/json'
-    });
+        'Content-Type': 'application/json'
+      });
     }
 
     return new HttpHeaders({
@@ -63,7 +66,12 @@ export class UserService {
   getInforUser(token?: string | null) {
     return this.httpClient.get<UserDto>(`${this.apiUrl}/users/details`, {
       headers: this.getHeaders(token)
-    });
+    }).pipe(
+      tap((userInfo: UserDto) => {
+        // Kiểm tra trạng thái tài khoản khi lấy thông tin user
+        this.accountMonitor.checkAndHandleAccountStatus(userInfo);
+      })
+    );
   }
 
   getAllUser() {

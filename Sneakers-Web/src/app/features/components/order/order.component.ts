@@ -153,12 +153,12 @@ export class OrderComponent extends BaseComponent implements OnInit,AfterViewIni
           this.toastService.success(response.message || 'Áp dụng voucher thành công');
         } else {
           this.resetVoucher();
-          this.toastService.fail(response.message || 'Không thể áp dụng voucher');
+          this.toastService.fail(response.message || 'Không thể áp dụng voucher. Vui lòng thử lại.');
         }
       }),
       catchError((err) => {
         this.resetVoucher();
-        this.toastService.fail("Lỗi khi áp dụng voucher");
+        this.toastService.fail(err.error?.message || 'Lỗi không xác định khi áp dụng voucher.');
         return of(err);
       }),
       takeUntil(this.destroyed$)

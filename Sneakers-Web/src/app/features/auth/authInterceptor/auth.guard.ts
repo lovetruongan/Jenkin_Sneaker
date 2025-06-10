@@ -1,21 +1,27 @@
 import { Injectable } from '@angular/core';
 import { CanActivate, RouterStateSnapshot, ActivatedRouteSnapshot, Router } from '@angular/router';
+import { AuthGuardService } from '../../../core/services/auth-guard.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthGuard implements CanActivate {
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private authGuardService: AuthGuardService
+  ) {}
 
-  canActivate(
+  async canActivate(
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
-  ): boolean {
+  ): Promise<boolean> {
     if (typeof localStorage !== 'undefined' && localStorage.getItem('token') !== null) {
-      return true; 
+      // Kiểm tra trạng thái tài khoản
+      const isAccountActive = await this.authGuardService.checkAccountStatus();
+      return isAccountActive;
     } else {
-      // this.router.navigate(['/auth-login']);
+      this.router.navigate(['/auth-login']);
       return false;
     }
   }
