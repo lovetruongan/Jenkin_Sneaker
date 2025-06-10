@@ -4,7 +4,7 @@ import { OrderService } from './order.service';
 import { OrderHistoryService } from './order-history.service';
 import { ProductService } from './product.service';
 import { isPlatformBrowser } from '@angular/common';
-import { Observable, from, firstValueFrom, of } from 'rxjs';
+import { Observable, from, firstValueFrom, of, catchError } from 'rxjs';
 import { OrderDetailDto } from '../dtos/OrderDetail.dto';
 import { HistoryOrderDto } from '../dtos/HistoryOrder.dto';
 
@@ -34,7 +34,8 @@ export class RecommendationService {
     const token = localStorage.getItem('token');
     console.log('Token status:', token ? 'Found' : 'Not found');
 
-    if (!token) {
+    if (!token || token.trim() === '') {
+      console.log('No valid token found, returning default suggestions');
       return of(this.getDefaultSuggestions(products));
     }
 
@@ -44,11 +45,30 @@ export class RecommendationService {
   private async calculateRecommendations(products: ProductDto[]): Promise<ProductDto[]> {
     const inStockProducts = products.filter(p => p.quantity > 0);
     console.log('Starting product suggestion calculation...');
+    
+    // Check token again before making API calls
+    const token = localStorage.getItem('token');
+    if (!token || token.trim() === '') {
+      console.log('Token missing during calculation, returning default suggestions');
+      return this.getDefaultSuggestions(products);
+    }
+    
     await this.initializePurchasedProducts();
 
     try {
       console.log('Fetching order history for calculations...');
-      const orderHistory = await firstValueFrom(this.orderService.getHistoryOrder());
+      const orderHistory = await firstValueFrom(
+        this.orderService.getHistoryOrder().pipe(
+          catchError(error => {
+            console.error('Error fetching order history:', error);
+            if (error.status === 400 || error.status === 401 || error.status === 403) {
+              console.log('Authentication/authorization error, returning empty array');
+              return of([]);
+            }
+            throw error;
+          })
+        )
+      );
       
       console.log('Order history response:', orderHistory);
       

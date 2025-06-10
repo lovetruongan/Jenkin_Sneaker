@@ -28,6 +28,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("${api.prefix}/users")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "*")
 public class UserController {
     private final UserService userService;
     private final LocalizationUtils localizationUtils;

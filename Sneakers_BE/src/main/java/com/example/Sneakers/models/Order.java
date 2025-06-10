@@ -57,6 +57,9 @@ public class Order {
     @Column(name = "payment_method")
     private String paymentMethod;
 
+    @Column(name = "payment_intent_id")
+    private String paymentIntentId;
+
     @Column(name = "active")
     private Boolean active;
 

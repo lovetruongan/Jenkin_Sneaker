@@ -33,7 +33,7 @@ export class VoucherService {
   // Get all vouchers with pagination
   getAllVouchers(page: number = 0, limit: number = 10, filter: string = 'active'): Observable<VoucherListDto | any> {
     return this.httpClient.get<VoucherListDto | any>(
-      `${this.apiUrl}vouchers?page=${page}&limit=${limit}&filter=${filter}`,
+      `${this.apiUrl}/vouchers?page=${page}&limit=${limit}&filter=${filter}`,
       { headers: this.getHeaders() }
     );
   }
@@ -41,7 +41,7 @@ export class VoucherService {
   // Get voucher by ID
   getVoucherById(id: number): Observable<VoucherDto> {
     return this.httpClient.get<VoucherDto>(
-      `${this.apiUrl}vouchers/${id}`,
+      `${this.apiUrl}/vouchers/${id}`,
       { headers: this.getHeaders() }
     );
   }
@@ -49,7 +49,7 @@ export class VoucherService {
   // Get voucher by code
   getVoucherByCode(code: string): Observable<VoucherDto> {
     return this.httpClient.get<VoucherDto>(
-      `${this.apiUrl}vouchers/code/${code}`,
+      `${this.apiUrl}/vouchers/code/${code}`,
       { headers: this.getHeaders() }
     );
   }
@@ -57,7 +57,7 @@ export class VoucherService {
   // Search vouchers
   searchVouchers(keyword: string, page: number = 0, limit: number = 10): Observable<VoucherListDto | any> {
     return this.httpClient.get<VoucherListDto | any>(
-      `${this.apiUrl}vouchers/search?keyword=${keyword}&page=${page}&limit=${limit}`,
+      `${this.apiUrl}/vouchers/search?keyword=${keyword}&page=${page}&limit=${limit}`,
       { headers: this.getHeaders() }
     );
   }
@@ -65,7 +65,7 @@ export class VoucherService {
   // Create new voucher (Admin only)
   createVoucher(voucher: VoucherDto): Observable<VoucherDto> {
     return this.httpClient.post<VoucherDto>(
-      `${this.apiUrl}vouchers`,
+      `${this.apiUrl}/vouchers`,
       voucher,
       { headers: this.getHeaders() }
     );
@@ -74,7 +74,7 @@ export class VoucherService {
   // Update voucher (Admin only)
   updateVoucher(id: number, voucher: VoucherDto): Observable<VoucherDto> {
     return this.httpClient.put<VoucherDto>(
-      `${this.apiUrl}vouchers/${id}`,
+      `${this.apiUrl}/vouchers/${id}`,
       voucher,
       { headers: this.getHeaders() }
     );
@@ -83,7 +83,7 @@ export class VoucherService {
   // Delete voucher (Admin only)
   deleteVoucher(id: number): Observable<any> {
     return this.httpClient.delete(
-      `${this.apiUrl}vouchers/${id}`,
+      `${this.apiUrl}/vouchers/${id}`,
       { headers: this.getHeaders() }
     );
   }
@@ -91,7 +91,7 @@ export class VoucherService {
   // Apply voucher to check discount
   applyVoucher(applyDto: ApplyVoucherDto): Observable<VoucherApplicationResponseDto> {
     return this.httpClient.post<VoucherApplicationResponseDto>(
-      `${this.apiUrl}vouchers/apply`,
+      `${this.apiUrl}/vouchers/apply`,
       applyDto,
       { headers: this.getHeaders() }
     );

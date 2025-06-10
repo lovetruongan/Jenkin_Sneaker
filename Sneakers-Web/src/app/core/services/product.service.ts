@@ -24,19 +24,19 @@ export class ProductService {
   }
 
   getAllProduct() {
-    return this.httpClient.get<AllProductDto>(`${this.apiUrl}products/all`);
+    return this.httpClient.get<AllProductDto>(`${this.apiUrl}/products/all`);
   }
 
   getProductById(id: string) {
-    return this.httpClient.get<ProductDto>(`${this.apiUrl}products/${id}`);
+    return this.httpClient.get<ProductDto>(`${this.apiUrl}/products/${id}`);
   }
 
   getProductViaPrice(minPrice: number, maxPrice: number) {
-    return this.httpClient.get<AllProductDto>(`${this.apiUrl}products/price?min_price=${minPrice}&max_price=${maxPrice}`);
+    return this.httpClient.get<AllProductDto>(`${this.apiUrl}/products/price?min_price=${minPrice}&max_price=${maxPrice}`);
   }
 
   addProductToCart(product: ProductToCartDto) {
-    return this.httpClient.post(`${this.apiUrl}carts`, product, {
+    return this.httpClient.post(`${this.apiUrl}/carts`, product, {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         Authorization: `Bearer ${this.token}`
@@ -45,7 +45,7 @@ export class ProductService {
   }
 
   removeProductFromCart(id: number){
-    return this.httpClient.post(`${this.apiUrl}carts/${id}`, {
+    return this.httpClient.post(`${this.apiUrl}/carts/${id}`, {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         Authorization: `Bearer ${this.token}`
@@ -54,11 +54,11 @@ export class ProductService {
   }
 
   searchProduct(content: string){
-    return this.httpClient.get<AllProductDto>(`${this.apiUrl}products/search?keyword=${content}`);
+    return this.httpClient.get<AllProductDto>(`${this.apiUrl}/products/search?keyword=${content}`);
   }
 
   getProductFromCart(){
-    return this.httpClient.get<ProductFromCartDto>(`${this.apiUrl}carts`, {
+    return this.httpClient.get<ProductFromCartDto>(`${this.apiUrl}/carts`, {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         Authorization: `Bearer ${this.token}`
@@ -67,7 +67,7 @@ export class ProductService {
   }
 
   updateProductFromCart(idCart: number, product: ProductToCartDto){
-    return this.httpClient.put(`${this.apiUrl}carts/${idCart}`, product, {
+    return this.httpClient.put(`${this.apiUrl}/carts/${idCart}`, product, {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         Authorization: `Bearer ${this.token}`
@@ -76,7 +76,7 @@ export class ProductService {
   }
 
   deleteProductFromCart(id: number){
-    return this.httpClient.delete(`${this.apiUrl}carts/${id}`, {
+    return this.httpClient.delete(`${this.apiUrl}/carts/${id}`, {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         Authorization: `Bearer ${this.token}`
@@ -85,10 +85,10 @@ export class ProductService {
   }
 
   getRelatedProduct(id: string){
-    return this.httpClient.get<AllProductDto>(`${this.apiUrl}products/related/${id}`)
+    return this.httpClient.get<AllProductDto>(`${this.apiUrl}/products/related/${id}`)
   }
   deleteProduct(id: string){
-    return this.httpClient.delete(`${this.apiUrl}products/${id}`,{
+    return this.httpClient.delete(`${this.apiUrl}/products/${id}`,{
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         Authorization: `Bearer ${this.token}`
@@ -97,7 +97,7 @@ export class ProductService {
   }
 
   uploadProduct(product: ProductUploadReq){
-    return this.httpClient.post<{productId: number, message: string}>(`${this.apiUrl}products`, product, {
+    return this.httpClient.post<{productId: number, message: string}>(`${this.apiUrl}/products`, product, {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         Authorization: `Bearer ${this.token}`
@@ -106,14 +106,14 @@ export class ProductService {
   }
 
   uploadImageProduct(files : FormData,id: number){
-    return this.httpClient.post<{message: string}>(`${this.apiUrl}products/uploads/${id}`, files, {
+    return this.httpClient.post<{message: string}>(`${this.apiUrl}/products/uploads/${id}`, files, {
       headers: new HttpHeaders({
         Authorization: `Bearer ${this.token}`
       })
     })
   }
   updateProduct(product: ProductUploadReq, id: number){
-    return this.httpClient.put<{message: string}>(`${this.apiUrl}products/${id}`, product, {
+    return this.httpClient.put<{message: string}>(`${this.apiUrl}/products/${id}`, product, {
       headers: new HttpHeaders({
         Authorization: `Bearer ${this.token}`
       })

@@ -23,7 +23,8 @@ import { OrderManageComponent } from './features/components/order-manage/order-m
 import { ADMIN_ROUTES } from './features/admin/admin.routes';
 // import { VoucherManageComponent } from './features/components/voucher-manage/voucher-manage.component';
 import { VoucherManageComponent } from './features/components/voucher-manage/voucher-manage.component';
-import { MomoReturnComponent } from './features/components/momo-return/momo-return.component';
+import { ReturnRequestComponent } from './features/components/return-request/return-request.component';
+import { MyReturnsComponent } from './features/components/my-returns/my-returns.component';
 
 export const routes: Routes = [
   {
@@ -35,10 +36,6 @@ export const routes: Routes = [
     path: 'register',
     component: RegisterComponent,
     canActivate: [loginGuard]
-  },
-  {
-    path: 'momo-return',
-    component: MomoReturnComponent
   },
   {
     path: '',
@@ -91,6 +88,16 @@ export const routes: Routes = [
       {
         path: 'history',
         component: HistoryOrderComponent,
+        canActivate: [AuthGuard]
+      },
+      {
+        path: 'return-request/:orderId',
+        component: ReturnRequestComponent,
+        canActivate: [AuthGuard]
+      },
+      {
+        path: 'my-returns',
+        component: MyReturnsComponent,
         canActivate: [AuthGuard]
       },
       {

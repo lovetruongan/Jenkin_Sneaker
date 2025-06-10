@@ -8,8 +8,10 @@ import com.example.Sneakers.models.OrderStatus;
 import com.example.Sneakers.repositories.OrderRepository;
 import com.stripe.exception.StripeException;
 import com.stripe.model.PaymentIntent;
+import com.stripe.model.Refund;
 import com.stripe.model.SetupIntent;
 import com.stripe.param.PaymentIntentCreateParams;
+import com.stripe.param.RefundCreateParams;
 import com.stripe.param.SetupIntentCreateParams;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -91,6 +93,7 @@ public class StripeService implements IStripeService {
                     // Update order status to processing
                     order.setStatus(OrderStatus.PROCESSING);
                     order.setPaymentMethod("Thanh toán thẻ thành công");
+                    order.setPaymentIntentId(intent.getId());
                     orderRepository.save(order);
                 }
             }
@@ -108,6 +111,28 @@ public class StripeService implements IStripeService {
         } catch (StripeException e) {
             log.error("Stripe error retrieving payment intent: {}", e.getMessage(), e);
             throw new Exception("Failed to retrieve payment intent: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public void refund(String paymentIntentId) throws Exception {
+        try {
+            RefundCreateParams params = RefundCreateParams.builder()
+                .setPaymentIntent(paymentIntentId)
+                .build();
+            Refund refund = Refund.create(params);
+            
+            // Optionally, handle different refund statuses
+            if (!"succeeded".equals(refund.getStatus())) {
+                throw new Exception("Refund did not succeed. Status: " + refund.getStatus());
+            }
+
+            // Here you might want to find the associated ReturnRequest and update its status to REFUND_COMPLETED
+            // This requires a bit more logic to link paymentIntentId back to a ReturnRequest
+            
+        } catch (StripeException e) {
+            log.error("Stripe error creating refund: {}", e.getMessage(), e);
+            throw new Exception("Failed to create refund: " + e.getMessage());
         }
     }
 

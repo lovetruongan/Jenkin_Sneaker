@@ -3,24 +3,16 @@ import { BaseComponent } from '../../../core/commonComponent/base.component';
 import { OrderService } from '../../../core/services/order.service';
 import { filter, tap } from 'rxjs';
 import { HistoryOrderDto } from '../../../core/dtos/HistoryOrder.dto';
-import { CurrencyPipe, DatePipe } from '@angular/common';
-import { environment } from '../../../../environments/environment.development';
-import { NgSwitch, NgSwitchCase } from '@angular/common';
-import { Router } from '@angular/router';
-import { RouterLink } from '@angular/router';
+import { CurrencyPipe, DatePipe, NgSwitch, NgSwitchCase } from '@angular/common';
+import { environment } from '../../../../environments/environment';
+import { Router, RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-history-order',
   standalone: true,
-  imports: [
-    CurrencyPipe,
-    DatePipe,
-    NgSwitch,
-    NgSwitchCase,
-    RouterLink
-  ],
+  imports: [CurrencyPipe, DatePipe, NgSwitch, NgSwitchCase, RouterLink],
   templateUrl: './history-order.component.html',
-  styleUrl: './history-order.component.scss'
+  styleUrls: ['./history-order.component.scss']
 })
 export class HistoryOrderComponent extends BaseComponent implements OnInit {
   public historyOrder: HistoryOrderDto[] = [];
@@ -42,8 +34,25 @@ export class HistoryOrderComponent extends BaseComponent implements OnInit {
     ).subscribe();
   }
 
-  viewOrderDetail(orderId: number){
-    this.router.navigate([`/order-detail/${orderId}`]);
+  viewOrderDetail(orderId: number) {
+    this.router.navigate(['/order-detail', orderId]);
   }
 
+  canReturnOrder(order: HistoryOrderDto): boolean {
+    const eligibleStatuses = ['delivered', 'success', 'shipped'];
+    if (!eligibleStatuses.includes(order.status.toLowerCase())) {
+        return false;
+    }
+
+    const orderDate = new Date(order.order_date);
+    const today = new Date();
+    const timeDifference = today.getTime() - orderDate.getTime();
+    const daysDifference = Math.floor(timeDifference / (1000 * 3600 * 24));
+
+    return daysDifference <= 30;
+  }
+
+  requestReturn(orderId: number): void {
+    this.router.navigate(['/return-request', orderId]);
+  }
 }

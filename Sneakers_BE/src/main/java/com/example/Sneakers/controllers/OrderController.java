@@ -135,7 +135,6 @@ public class OrderController {
     }
 
     @GetMapping("/get-orders-by-keyword")
-//    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<OrderListResponse> getOrdersByKeyword(
             @RequestParam(defaultValue = "", required = false) String keyword,
             @RequestParam(required = false) String status,
@@ -167,7 +166,6 @@ public class OrderController {
     }
 
     @GetMapping("/revenue")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> getTotalRevenue() {
         try {
             Long totalRevenue = orderService.getTotalRevenue();

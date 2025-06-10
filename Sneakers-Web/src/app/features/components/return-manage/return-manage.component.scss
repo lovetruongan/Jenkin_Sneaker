@@ -1,0 +1,83 @@
+.admin-return-manage-container {
+  padding: 2rem;
+  background-color: #f4f7f9;
+
+  .header {
+    margin-bottom: 2rem;
+    h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #2c3e50;
+    }
+    p {
+      color: #7f8c8d;
+      font-size: 1rem;
+    }
+  }
+
+  .stats-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+
+    .stat-card {
+      .p-card-body {
+        padding: 1.5rem;
+        text-align: center;
+        .p-card-title {
+          font-size: 1rem;
+          font-weight: 600;
+          color: #7f8c8d;
+        }
+        .stat-value {
+          font-size: 2.5rem;
+          font-weight: 700;
+          margin-top: 0.5rem;
+        }
+      }
+      &.pending .stat-value { color: #f39c12; }
+      &.approved .stat-value { color: #3498db; }
+      &.rejected .stat-value { color: #e74c3c; }
+    }
+  }
+
+  .table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1.2rem;
+    font-weight: 600;
+  }
+
+  .p-datatable-customers {
+    .p-datatable-thead > tr > th {
+      background-color: #e9ecef;
+      color: #495057;
+      font-weight: 600;
+    }
+    .p-button {
+      margin-right: 0.5rem;
+    }
+  }
+  
+  .form-group {
+    margin-top: 1.5rem;
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+    textarea {
+      width: 100%;
+    }
+  }
+}
+
+// Custom severity for PrimeNG tags
+:host ::ng-deep {
+  .p-tag-info {
+    background-color: #3498db;
+    color: #ffffff;
+  }
+} 

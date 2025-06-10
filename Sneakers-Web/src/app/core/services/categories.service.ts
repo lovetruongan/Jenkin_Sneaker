@@ -21,16 +21,16 @@ export class CategoriesService {
    }
 
   getCategories(){
-    return this.httpClient.get<CategoriesDto[]>(`${this.apiUrl}categories`);
+    return this.httpClient.get<CategoriesDto[]>(`${this.apiUrl}/categories`);
   }
   getCategoryById(id: number){
-    return this.httpClient.get<CategoriesDto>(`${this.apiUrl}categories/${id}`);
+    return this.httpClient.get<CategoriesDto>(`${this.apiUrl}/categories/${id}`);
   }
   getAllProductByCategory(id: number){
-    return this.httpClient.get<AllProductDto>(`${this.apiUrl}products/category/${id}`);
+    return this.httpClient.get<AllProductDto>(`${this.apiUrl}/products/category/${id}`);
   }
   postCategory(value: {name: string}){
-    return this.httpClient.post<{categories: CategoriesDto[],message: string}>(`${this.apiUrl}categories`, value , {
+    return this.httpClient.post<{categories: CategoriesDto[],message: string}>(`${this.apiUrl}/categories`, value , {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         Authorization: `Bearer ${this.token}`
@@ -39,7 +39,7 @@ export class CategoriesService {
   }
 
   updateCategory(value: {name: string}, id: number){
-    return this.httpClient.put<{categories: CategoriesDto[],message: string}>(`${this.apiUrl}categories/${id}`, value , {
+    return this.httpClient.put<{categories: CategoriesDto[],message: string}>(`${this.apiUrl}/categories/${id}`, value , {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         Authorization: `Bearer ${this.token}`
@@ -48,7 +48,7 @@ export class CategoriesService {
   }
 
   deleteCategory(id: number){
-    return this.httpClient.delete<{categories: CategoriesDto[],message: string}>(`${this.apiUrl}categories/${id}` , {
+    return this.httpClient.delete<{categories: CategoriesDto[],message: string}>(`${this.apiUrl}/categories/${id}` , {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         Authorization: `Bearer ${this.token}`

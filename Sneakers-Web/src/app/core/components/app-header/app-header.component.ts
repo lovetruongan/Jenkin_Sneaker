@@ -112,6 +112,13 @@ export class AppHeaderComponent extends BaseComponent implements AfterViewInit,O
         }
       },
       {
+        label: 'Trả hàng của tôi',
+        icon: 'pi pi-replay',
+        command: () => {
+          this.goToMyReturns();
+        }
+      },
+      {
         label: 'Sign out',
         icon: 'pi pi-power-off',
         command: () => {
@@ -171,5 +178,9 @@ export class AppHeaderComponent extends BaseComponent implements AfterViewInit,O
 
   goToHistory(){
     this.router.navigate(['/history']);
+  }
+
+  goToMyReturns(){
+    this.router.navigate(['/my-returns']);
   }
 }

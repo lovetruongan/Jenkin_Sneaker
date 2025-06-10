@@ -1,0 +1,54 @@
+<div class="return-request-container">
+  <div class="card">
+    <div class="card-header">
+      <h1>Yêu cầu trả hàng</h1>
+      <a routerLink="/history" class="back-link">
+        <i class="pi pi-arrow-left"></i> Quay lại lịch sử đơn hàng
+      </a>
+    </div>
+
+    <div class="card-body">
+      <div *ngIf="isLoading" class="loading-spinner">
+        <p-progressSpinner></p-progressSpinner>
+        <p>Đang tải thông tin đơn hàng...</p>
+      </div>
+
+      <div *ngIf="!isLoading && order" class="order-details">
+        <h2>Chi tiết đơn hàng #{{ order.id }}</h2>
+        <p><strong>Ngày đặt:</strong> {{ order.order_date | date: 'dd/MM/yyyy' }}</p>
+        <p><strong>Tổng tiền:</strong> {{ order.total_money | currency:'VND':'symbol' }}</p>
+        <p><strong>Trạng thái:</strong> <span class="status-badge status-{{order.status.toLowerCase()}}">{{ order.status }}</span></p>
+
+        <div class="order-items">
+          <h4>Các sản phẩm trong đơn:</h4>
+          <ul>
+            <li *ngFor="let item of order.order_details">
+              <img [src]="apiImage + item.product?.thumbnail" alt="{{ item.product?.name }}" class="product-image">
+              <div class="item-info">
+                <span class="product-name">{{ item.product?.name }} (x{{ item.number_of_products }})</span>
+                <span class="product-price">{{ item.price | currency:'VND':'symbol' }}</span>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <form [formGroup]="returnForm" (ngSubmit)="onSubmit()" *ngIf="!isLoading && order">
+        <div class="form-group">
+          <label for="reason">Lý do trả hàng:</label>
+          <textarea id="reason" formControlName="reason" class="form-control" rows="5" placeholder="Vui lòng mô tả chi tiết lý do bạn muốn trả hàng (ít nhất 10 ký tự)."></textarea>
+          <div *ngIf="returnForm.get('reason')?.invalid && (returnForm.get('reason')?.dirty || returnForm.get('reason')?.touched)" class="invalid-feedback">
+            <div *ngIf="returnForm.get('reason')?.errors?.['required']">Lý do không được để trống.</div>
+            <div *ngIf="returnForm.get('reason')?.errors?.['minlength']">Lý do phải có ít nhất 10 ký tự.</div>
+            <div *ngIf="returnForm.get('reason')?.errors?.['maxlength']">Lý do không được vượt quá 1000 ký tự.</div>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-submit" [disabled]="returnForm.invalid || isSubmitting">
+          <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+          {{ isSubmitting ? 'Đang gửi...' : 'Gửi yêu cầu' }}
+        </button>
+      </form>
+    </div>
+  </div>
+</div> 

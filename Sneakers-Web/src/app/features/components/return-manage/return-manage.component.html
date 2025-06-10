@@ -1,0 +1,112 @@
+<div class="admin-return-manage-container">
+  <div class="header">
+    <h1>Quản lý trả hàng & hoàn tiền</h1>
+    <p>Xem xét và xử lý các yêu cầu trả hàng từ khách hàng.</p>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="stats-cards">
+    <p-card header="Tổng số yêu cầu" styleClass="stat-card">
+      <div class="stat-value">{{ totalRequests }}</div>
+    </p-card>
+    <p-card header="Đang chờ xử lý" styleClass="stat-card pending">
+      <div class="stat-value">{{ pendingRequests }}</div>
+    </p-card>
+    <p-card header="Đã chấp thuận" styleClass="stat-card approved">
+      <div class="stat-value">{{ approvedRequests }}</div>
+    </p-card>
+    <p-card header="Đã từ chối" styleClass="stat-card rejected">
+      <div class="stat-value">{{ rejectedRequests }}</div>
+    </p-card>
+  </div>
+
+  <!-- Data Table -->
+  <p-card>
+    <p-table #dt 
+             [value]="allRequests" 
+             [loading]="isLoading"
+             [paginator]="true" 
+             [rows]="10" 
+             [rowsPerPageOptions]="[10, 25, 50]"
+             [globalFilterFields]="['id', 'order_id', 'customer_name', 'reason', 'status']"
+             styleClass="p-datatable-customers"
+             responsiveLayout="scroll">
+      
+      <ng-template pTemplate="caption">
+        <div class="table-header">
+          Danh sách yêu cầu
+          <span class="p-input-icon-left">
+            <i class="pi pi-search"></i>
+            <input pInputText type="text" (input)="filterGlobal($event, dt)" placeholder="Tìm kiếm..." />
+          </span>
+        </div>
+      </ng-template>
+
+      <ng-template pTemplate="header">
+        <tr>
+          <th pSortableColumn="id">ID <p-sortIcon field="id"></p-sortIcon></th>
+          <th pSortableColumn="order_id">Đơn hàng <p-sortIcon field="order_id"></p-sortIcon></th>
+          <th pSortableColumn="customer_name">Khách hàng <p-sortIcon field="customer_name"></p-sortIcon></th>
+          <th>Lý do</th>
+          <th pSortableColumn="refund_amount">Hoàn tiền <p-sortIcon field="refund_amount"></p-sortIcon></th>
+          <th pSortableColumn="requested_at">Ngày Y/C <p-sortIcon field="requested_at"></p-sortIcon></th>
+          <th pSortableColumn="status">Trạng thái <p-sortIcon field="status"></p-sortIcon></th>
+          <th>Hành động</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-request>
+        <tr>
+          <td>{{ request.id }}</td>
+          <td>#{{ request.order_id }}</td>
+          <td>{{ request.customer_name }}</td>
+          <td pTooltip="{{request.reason}}" tooltipPosition="top">{{ request.reason | slice:0:50 }}{{ request.reason.length > 50 ? '...' : '' }}</td>
+          <td>{{ request.refund_amount | currency:'VND' }}</td>
+          <td>{{ request.requested_at | date:'dd/MM/yy HH:mm' }}</td>
+          <td>
+            <p-tag [value]="request.status" [severity]="getStatusSeverity(request.status)"></p-tag>
+          </td>
+          <td>
+            <div *ngIf="request.status === 'PENDING'">
+              <button pButton pRipple icon="pi pi-check" class="p-button-rounded p-button-success p-mr-2" (click)="showActionDialog(request, 'approve')" pTooltip="Approve"></button>
+              <button pButton pRipple icon="pi pi-times" class="p-button-rounded p-button-danger" (click)="showActionDialog(request, 'reject')" pTooltip="Reject"></button>
+            </div>
+            <p-tag *ngIf="request.status !== 'PENDING'" value="Đã xử lý" severity="info"></p-tag>
+          </td>
+        </tr>
+      </ng-template>
+      
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="8">Không có yêu cầu nào.</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </p-card>
+
+  <!-- Action Dialog -->
+  <p-dialog [(visible)]="displayActionDialog" 
+            [header]="currentAction === 'approve' ? 'Chấp thuận yêu cầu' : 'Từ chối yêu cầu'"
+            [modal]="true" 
+            [style]="{width: '50vw'}" 
+            [draggable]="false" 
+            [resizable]="false">
+    
+    <div class="p-fluid" *ngIf="currentRequest">
+      <p>Bạn có chắc muốn <strong>{{ currentAction === 'approve' ? 'CHẤP THUẬN' : 'TỪ CHỐI' }}</strong> yêu cầu trả hàng cho đơn hàng <strong>#{{ currentRequest.orderId }}</strong>?</p>
+      <div class="form-group">
+        <label for="adminNotes">Ghi chú của quản trị viên (bắt buộc):</label>
+        <textarea id="adminNotes" pInputTextarea [(ngModel)]="adminNotes" rows="4" required></textarea>
+      </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+      <p-button icon="pi pi-times" label="Hủy bỏ" styleClass="p-button-text" (click)="displayActionDialog=false"></p-button>
+      <p-button icon="pi pi-check" 
+                [label]="isSubmitting ? 'Đang xử lý...' : 'Xác nhận'" 
+                [disabled]="isSubmitting || !adminNotes.trim()" 
+                (click)="confirmAction()">
+      </p-button>
+    </ng-template>
+  </p-dialog>
+</div> 

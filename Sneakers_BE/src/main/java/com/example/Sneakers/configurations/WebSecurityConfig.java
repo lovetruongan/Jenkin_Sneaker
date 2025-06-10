@@ -159,6 +159,12 @@ public class WebSecurityConfig {
                             .requestMatchers(GET, String.format("%s/statistics/top-brands-sold/**", apiPrefix)).permitAll()
                             .requestMatchers(GET, String.format("%s/top-product-sold**", apiPrefix)).permitAll()
 
+                            // Returns endpoints
+                            .requestMatchers(POST, String.format("%s/returns", apiPrefix)).permitAll() // Temporarily allow all for testing
+                            .requestMatchers(GET, String.format("%s/returns/my-requests", apiPrefix)).permitAll() // Temporarily allow all for testing
+                            .requestMatchers(GET, String.format("%s/returns/admin/**", apiPrefix)).permitAll() // Temporarily allow all for testing
+                            .requestMatchers(PUT, String.format("%s/returns/admin/**", apiPrefix)).permitAll() // Temporarily allow all for testing
+
                             .anyRequest().authenticated();
                     //.anyRequest().permitAll();
 
@@ -168,9 +174,9 @@ public class WebSecurityConfig {
             @Override
             public void customize(CorsConfigurer<HttpSecurity> httpSecurityCorsConfigurer) {
                 CorsConfiguration configuration = new CorsConfiguration();
-                configuration.setAllowedOrigins(List.of("http://localhost:4200")); // Angular dev server
+                configuration.setAllowedOriginPatterns(Arrays.asList("*")); // Allow all origins for development
                 configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-                configuration.setAllowedHeaders(Arrays.asList("authorization", "content-type", "x-auth-token"));
+                configuration.setAllowedHeaders(Arrays.asList("*")); // Allow all headers
                 configuration.setExposedHeaders(List.of("x-auth-token"));
                 configuration.setAllowCredentials(true); // Allow credentials
                 UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

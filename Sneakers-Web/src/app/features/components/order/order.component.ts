@@ -23,8 +23,6 @@ import { VoucherApplicationResponseDto } from '../../../core/dtos/voucherApplica
 import { ButtonModule } from 'primeng/button';
 import { StripePaymentComponent } from '../stripe-payment/stripe-payment.component';
 import { DialogModule } from 'primeng/dialog';
-import { MomoService } from '../../../core/services/momo.service';
-import { OrderDto } from '../../../core/dtos/Order.dto';
 
 @Component({
   selector: 'app-order',
@@ -82,7 +80,6 @@ export class OrderComponent extends BaseComponent implements OnInit,AfterViewIni
     { name: 'Thanh toán khi nhận hàng', key: 'Cash' },
     { name: 'Chuyển khoản ngân hàng', key: 'Banking' },
     { name: 'Thanh toán bằng thẻ Visa/Mastercard', key: 'Stripe' },
-    { name: 'Thanh toán bằng ví MoMo', key: 'Momo' },
   ];
 
   // Stripe payment properties
@@ -97,8 +94,7 @@ export class OrderComponent extends BaseComponent implements OnInit,AfterViewIni
     private commonService: CommonService,
     private router: Router,
     private productService: ProductService,
-    private voucherService: VoucherService,
-    private momoService: MomoService
+    private voucherService: VoucherService
   ) {
     super();
     this.inforShipForm = this.fb.group({
@@ -186,59 +182,13 @@ export class OrderComponent extends BaseComponent implements OnInit,AfterViewIni
     if (this.inforShipForm.invalid){
       this.toastService.fail("Vui lòng nhập đầy đủ thông tin giao hàng");
     } else {
-      // Check payment method
+      // Check if Stripe payment is selected
       if (this.selectedPayMethod.key === 'Stripe') {
         this.processStripeOrder();
-      } else if (this.selectedPayMethod.key === 'Momo') {
-        this.processMomoOrder();
-      }
-      else {
+      } else {
         this.processRegularOrder();
       }
     }
-  }
-
-  private processMomoOrder(): void {
-    this.blockUi();
-    const orderData: OrderDto = {
-      fullname: this.inforShipForm.value.fullName,
-      email: this.inforShipForm.value.email,
-      phone_number: this.inforShipForm.value.phoneNumber,
-      address: this.inforShipForm.value.address,
-      note: this.inforShipForm.value.note,
-      shipping_method: this.methodShippingValue.name,
-      payment_method: 'Pending MoMo Payment',
-      cart_items: this.productOrder,
-      total_money: this.totalCost,
-      ...(this.isVoucherApplied && { voucher_code: this.voucherCode })
-    };
-
-    // 1. Create the order in your database
-    this.orderService.postOrder(orderData).pipe(
-      switchMap((orderInfor: any) => {
-        const orderId = orderInfor.id;
-        this.commonService.orderId.next(orderId);
-        
-        // 2. Create the MoMo payment request
-        const momoRequest: OrderDto = { ...orderData, id: orderId };
-        return this.momoService.createPayment(momoRequest);
-      }),
-      tap(momoResponse => {
-        if (momoResponse && momoResponse.payUrl) {
-          // 3. Redirect to MoMo payment gateway
-          window.location.href = momoResponse.payUrl;
-        } else {
-          this.toastService.fail("Không thể tạo link thanh toán MoMo.");
-          this.unblockUi();
-        }
-      }),
-      catchError((err) => {
-        this.unblockUi();
-        this.toastService.fail("Lỗi khi tạo đơn hàng hoặc thanh toán MoMo.");
-        return of(err);
-      }),
-      takeUntil(this.destroyed$)
-    ).subscribe();
   }
 
   private processStripeOrder(): void {
@@ -341,21 +291,16 @@ export class OrderComponent extends BaseComponent implements OnInit,AfterViewIni
 
   onStripePaymentError(error: string): void {
     this.toastService.fail(`Thanh toán thất bại: ${error}`);
-    this.showStripeDialog = false; // Hide dialog on error
-    this.unblockUi();
+    // Keep dialog open for retry
   }
 
   onStripePaymentCancel(): void {
     this.showStripeDialog = false;
-    this.unblockUi();
-    this.toastService.success('Thanh toán đã được hủy.');
+    this.toastService.success("Đã hủy thanh toán");
+    // Order is already created but payment is pending
   }
 
   blockUi() {
-    this.blockedUi = true;
-  }
-
-  unblockUi() {
-    this.blockedUi = false;
+    this.blockedUi = !this.blockedUi;
   }
 }

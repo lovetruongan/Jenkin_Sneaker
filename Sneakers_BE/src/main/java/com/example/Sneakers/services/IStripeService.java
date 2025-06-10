@@ -7,4 +7,5 @@ public interface IStripeService {
     StripePaymentResponseDTO createPaymentIntent(StripePaymentRequestDTO request) throws Exception;
     StripePaymentResponseDTO confirmPayment(String paymentIntentId) throws Exception;
     String createPaymentMethodClientSecret() throws Exception;
+    void refund(String paymentIntentId) throws Exception;
 } 

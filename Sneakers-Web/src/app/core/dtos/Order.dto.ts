@@ -1,7 +1,6 @@
 import { ProductToCartDto } from "./productToCart.dto";
 
 export interface OrderDto {
-    id?: number;
     fullname: string,
     email: string,
     phone_number: string,

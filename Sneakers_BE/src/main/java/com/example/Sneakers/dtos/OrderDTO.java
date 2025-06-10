@@ -17,9 +17,6 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class OrderDTO {
-    @JsonProperty("id")
-    private Long id;
-
     @JsonProperty("user_id")
     @Min(value = 1, message = "User's id must be > 0")
     private Long userId;

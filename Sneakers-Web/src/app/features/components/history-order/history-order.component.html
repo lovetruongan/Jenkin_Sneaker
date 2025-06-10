@@ -6,7 +6,7 @@
             <div class="col-2 font-bold">Trạng thái</div>
             <div class="col-2 font-bold">Ngày đặt</div>
             <div class="col-2 font-bold">Tổng tiền</div>
-            <div class="col-1 font-bold"></div>
+            <div class="col-1 font-bold">Thao tác</div>
         </div>
         @for(order of historyOrder; track order){
             <div class="row">
@@ -32,8 +32,15 @@
                 </div>
                 <div class="col-2 d-flex align-items-center">{{order.order_date | date: 'dd/MM/yyyy'}}</div>
                 <div class="col-2 d-flex align-items-center">{{order.total_money | currency:'VND':'symbol':'1.0-0'}}</div>
-                <div class="col-1 d-flex align-items-center">
-                    <button (click)="viewOrderDetail(order.id)" class="history-order-view-deatail">Xem chi tiết</button>
+                <div class="col-1 d-flex align-items-center flex-column">
+                    <button (click)="viewOrderDetail(order.id)" class="history-order-view-detail mb-2">
+                        Xem chi tiết
+                    </button>
+                    @if(canReturnOrder(order)) {
+                        <button (click)="requestReturn(order.id)" class="history-order-return-btn">
+                            Trả hàng
+                        </button>
+                    }
                 </div>
             </div>
         }
