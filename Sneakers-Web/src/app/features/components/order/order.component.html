@@ -95,6 +95,22 @@
                         <li class="payMethod-item">
                             <p-radioButton name="item" [value]="item" [(ngModel)]="selectedPayMethod" [inputId]="item.key"></p-radioButton>
                             <label [for]="item.key" class="ml-2">{{item.name}}</label>
+                            
+                            <!-- VNPay bank selection -->
+                            @if (item.key === 'VNPay' && selectedPayMethod?.key === 'VNPay') {
+                                <div class="bank-selection mt-2">
+                                    <label class="font-bold">Chọn ngân hàng:</label>
+                                    <p-dropdown 
+                                        [options]="bankOptions" 
+                                        [(ngModel)]="selectedBankCode" 
+                                        optionLabel="name" 
+                                        optionValue="code"
+                                        [showClear]="false" 
+                                        placeholder="Chọn ngân hàng"
+                                        class="w-full">
+                                    </p-dropdown>
+                                </div>
+                            }
                         </li>
                     }
                 </ul>

@@ -217,6 +217,14 @@ public class WebSecurityConfig {
                                                                         String.format("%s/ai/**",
                                                                                         apiPrefix))
                                                         .permitAll()
+                                                        .requestMatchers(GET,
+                                                                        String.format("%s/payments/**",
+                                                                                        apiPrefix))
+                                                        .permitAll()
+                                                        .requestMatchers(POST,
+                                                                        String.format("%s/payments/**",
+                                                                                        apiPrefix))
+                                                        .permitAll()
 
                                                         .anyRequest().authenticated();
                                         // .anyRequest().permitAll();

@@ -31,3 +31,90 @@
     color: #007bff !important;
     font-size: 1.1rem;
 }
+
+// VNPay payment styles
+.payMethod-item {
+    margin-bottom: 1rem;
+    
+    .bank-selection {
+        margin-left: 1.5rem;
+        padding: 0.75rem;
+        background-color: #f8f9fa;
+        border-radius: 0.375rem;
+        border-left: 3px solid #007bff;
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+            color: #495057;
+        }
+        
+        .p-dropdown {
+            width: 100%;
+            
+            .p-dropdown-label {
+                font-size: 0.875rem;
+            }
+        }
+    }
+}
+
+// Payment method styling
+.payMethod-list {
+    list-style: none;
+    padding: 0;
+    margin: 1rem 0;
+    
+    .payMethod-item {
+        padding: 0.75rem;
+        border: 1px solid #dee2e6;
+        border-radius: 0.375rem;
+        margin-bottom: 0.5rem;
+        transition: all 0.2s ease;
+        
+        &:hover {
+            background-color: #f8f9fa;
+            border-color: #007bff;
+        }
+        
+        label {
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        // Selected state
+        &:has(input[type="radio"]:checked) {
+            background-color: #e3f2fd;
+            border-color: #007bff;
+            
+            label {
+                color: #007bff;
+            }
+        }
+    }
+}
+
+// Order button styling
+.order-button {
+    width: 100%;
+    padding: 1rem;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 0.375rem;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    margin-top: 1rem;
+    
+    &:hover {
+        background-color: #0056b3;
+    }
+    
+    &:disabled {
+        background-color: #6c757d;
+        cursor: not-allowed;
+    }
+}

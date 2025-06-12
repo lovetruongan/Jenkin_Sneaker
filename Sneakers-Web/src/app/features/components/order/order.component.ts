@@ -21,6 +21,7 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { VoucherService } from '../../../core/services/voucher.service';
 import { VoucherApplicationResponseDto } from '../../../core/dtos/voucherApplication.dto';
 import { ButtonModule } from 'primeng/button';
+import { VNPayService, VNPayCreatePaymentRequest } from '../../../core/services/vnpay.service';
 
 @Component({
   selector: 'app-order',
@@ -68,6 +69,7 @@ export class OrderComponent extends BaseComponent implements OnInit,AfterViewIni
   }[];
   public methodShippingValue!: {name: string, code: string,price: number};
   public selectedPayMethod!: {name: string, key: string};
+  public selectedBankCode: string = 'NCB';
 
   payMethod: {
     name: string,
@@ -75,6 +77,33 @@ export class OrderComponent extends BaseComponent implements OnInit,AfterViewIni
   }[] = [
     { name: 'Thanh toán khi nhận hàng', key: 'Cash' },
     { name: 'Chuyển khoản ngân hàng', key: 'Banking' },
+    { name: 'Thanh toán VNPay', key: 'VNPay' },
+  ];
+
+  bankOptions: {
+    name: string,
+    code: string
+  }[] = [
+    { name: 'Ngân hàng NCB', code: 'NCB' },
+    { name: 'Agribank', code: 'AGRIBANK' },
+    { name: 'SCB', code: 'SCB' },
+    { name: 'Sacombank', code: 'SACOMBANK' },
+    { name: 'Eximbank', code: 'EXIMBANK' },
+    { name: 'MSBANK', code: 'MSBANK' },
+    { name: 'NAMABANK', code: 'NAMABANK' },
+    { name: 'Visa', code: 'VISA' },
+    { name: 'Mastercard', code: 'MASTERCARD' },
+    { name: 'JCB', code: 'JCB' },
+    { name: 'UPI', code: 'UPI' },
+    { name: 'VIB', code: 'VIB' },
+    { name: 'Vietcombank', code: 'VIETCOMBANK' },
+    { name: 'Vietinbank', code: 'VIETINBANK' },
+    { name: 'Techcombank', code: 'TECHCOMBANK' },
+    { name: 'TPBANK', code: 'TPBANK' },
+    { name: 'BIDV', code: 'BIDV' },
+    { name: 'DONGABANK', code: 'DONGABANK' },
+    { name: 'BAOVIBANK', code: 'BAOVIBANK' },
+    { name: 'HDBANK', code: 'HDBANK' },
   ];
 
   constructor(
@@ -85,7 +114,8 @@ export class OrderComponent extends BaseComponent implements OnInit,AfterViewIni
     private commonService: CommonService,
     private router: Router,
     private productService: ProductService,
-    private voucherService: VoucherService
+    private voucherService: VoucherService,
+    private vnpayService: VNPayService
   ) {
     super();
     this.inforShipForm = this.fb.group({
@@ -193,15 +223,11 @@ export class OrderComponent extends BaseComponent implements OnInit,AfterViewIni
           this.commonService.orderId.next(orderInfor.id); 
         }),
         switchMap(() => {
-          this.productOrderLocalStorage = JSON.parse(localStorage.getItem("productOrder")!);
-          const fncDel = this.productOrderLocalStorage.map((po) => this.productService.deleteProductFromCart(po.id))
-          return forkJoin(fncDel);
-        }),
-        tap(() => {
-          this.commonService.intermediateObservable.next(true);
-          localStorage.removeItem("productOrder");
-          this.blockUi();
-          this.router.navigate([`/order-detail/${this.orderId}`]);
+          if (this.selectedPayMethod.key === 'VNPay') {
+            return this.processVNPayPayment();
+          } else {
+            return this.processNormalOrder();
+          }
         }),
         catchError((err) => {
           this.blockUi();
@@ -211,6 +237,51 @@ export class OrderComponent extends BaseComponent implements OnInit,AfterViewIni
         takeUntil(this.destroyed$)
       ).subscribe();
     }
+  }
+
+  private processVNPayPayment() {
+    const finalAmount = this.finalCost + this.methodShippingValue.price;
+    const paymentRequest: VNPayCreatePaymentRequest = {
+      amount: finalAmount,
+      bankCode: this.selectedBankCode,
+      language: 'vn',
+      orderInfo: `Thanh toan don hang #${this.orderId}`,
+      orderId: this.orderId
+    };
+
+    return this.vnpayService.createPayment(paymentRequest).pipe(
+      tap((response) => {
+        if (response.code === '00' && response.data) {
+          // Store order info for later use
+          localStorage.setItem('pendingOrderId', this.orderId.toString());
+          localStorage.setItem('pendingPaymentAmount', finalAmount.toString());
+          
+          this.blockUi();
+          this.toastService.success('Đang chuyển hướng đến trang thanh toán VNPay...');
+          
+          // Redirect to VNPay
+          setTimeout(() => {
+            this.vnpayService.redirectToPayment(response.data);
+          }, 1000);
+        } else {
+          throw new Error('Failed to create VNPay payment URL');
+        }
+      })
+    );
+  }
+
+  private processNormalOrder() {
+    this.productOrderLocalStorage = JSON.parse(localStorage.getItem("productOrder")!);
+    const fncDel = this.productOrderLocalStorage.map((po) => this.productService.deleteProductFromCart(po.id))
+    
+    return forkJoin(fncDel).pipe(
+      tap(() => {
+        this.commonService.intermediateObservable.next(true);
+        localStorage.removeItem("productOrder");
+        this.blockUi();
+        this.router.navigate([`/order-detail/${this.orderId}`]);
+      })
+    );
   }
 
   blockUi() {

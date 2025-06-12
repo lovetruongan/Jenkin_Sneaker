@@ -23,6 +23,7 @@ import { OrderManageComponent } from './features/components/order-manage/order-m
 import { ADMIN_ROUTES } from './features/admin/admin.routes';
 // import { VoucherManageComponent } from './features/components/voucher-manage/voucher-manage.component';
 import { VoucherManageComponent } from './features/components/voucher-manage/voucher-manage.component';
+import { VnpayReturnComponent } from './features/components/vnpay-return/vnpay-return.component';
 
 export const routes: Routes = [
   {
@@ -117,6 +118,10 @@ export const routes: Routes = [
         path: 'voucherManage',
         component: VoucherManageComponent,
         canActivate: [RoleGuard]
+      },
+      {
+        path: 'vnpay-return',
+        component: VnpayReturnComponent
       }
     ]
   }

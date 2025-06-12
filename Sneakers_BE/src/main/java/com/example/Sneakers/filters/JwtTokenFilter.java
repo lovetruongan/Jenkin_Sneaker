@@ -93,6 +93,11 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             return true;
         }
 
+        // Bypass for all payments endpoints (GET and POST)
+        if (requestURI.contains("/payments/")) {
+            return true;
+        }
+
         if (requestPath.equals(String.format("%s/orders", apiPrefix))
                 && requestMethod.equals("GET")) {
             // Allow access to %s/orders

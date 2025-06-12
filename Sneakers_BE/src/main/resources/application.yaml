@@ -48,3 +48,12 @@ chroma:
 # AI Features Configuration
 ai:
   enabled: true # Set to true when Google Cloud is configured
+
+# VNPay Configuration
+vnpay:
+  url: https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
+  return-url: http://localhost:4200/vnpay-return
+  tmn-code: JEQ64ZP9
+  secret-key: K2MEKYRFARPM7ELWJSJ2UBZME3LSUYN6
+  api-url: https://sandbox.vnpayment.vn/merchant_webapi/api/transaction
+  version: 2.1.0
