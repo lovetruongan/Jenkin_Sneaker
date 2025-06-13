@@ -271,11 +271,11 @@ CREATE TABLE `products` (
 INSERT INTO `products` (`id`, `name`, `price`, `thumbnail`, `description`, `created_at`, `updated_at`, `category_id`, `discount`, `quantity`) VALUES
 (1, 'Nike Air Force 1 Full White', 798000, '64baf7b5-635b-4a9e-aec7-03d0fedac82f_nike-air-force-1-low-replica-800x600.jpg', 'Đây là mô tả', '2024-02-16 16:46:58', '2025-06-09 22:55:00', 1, 30, 52),
 (2, 'Adidas Superstar trắng sọc đen', 3000000, '68c9641a-df79-440d-a7a3-2249e64685db_adidas-superstar-white-replica.jpg', 'Giày adidas Superstar ra đời trên sân bóng rổ nhưng đã trở thành quán quân của phong cách đường phố. Bất kể bạn đang chơi bóng rổ hay chỉ đơn giản là xuống phố, đôi giày này sẽ mang đến cho bạn phong cách đơn giản mà cực cool, một item must-have thường ngày suốt năm thập kỷ qua.', '2024-02-17 07:35:46', '2025-06-09 21:07:04', 2, 20, 5),
-(3, 'Nike Air Force 1 Low Cream Black Swoosh', 24076756, 'ef350705-89f2-4e37-a293-cec3ec4bf069_af1-cream-black-swoosh-800x600.jpg', 'Ab velit laborum.', '2024-02-17 07:35:46', '2025-06-09 22:31:35', 1, 60, 0),
+(3, 'Nike Air Force 1 Low Cream Black Swoosh', 24076756, 'ef350705-89f2-4e37-a293-cec3ec4bf069_af1-cream-black-swoosh-800x600.jpg', 'Ab velit laborum.', '2024-02-17 07:35:46', '2025-06-09 22:31:35', 1, 60, 40),
 (4, 'Air Force 1 G-Dragon Peaceminusone Para-noise', 53057840, 'ef20dd75-5f3d-4540-aebd-d3a34211e716_Nike-Air-Force-1-Low-G-Dragon-Peaceminusone-Para-Noise-replica-800x600.jpg', 'Cupiditate voluptatem corrupti et fugit quia.', '2024-02-17 07:35:46', '2024-02-17 07:35:46', 1, NULL, 0),
 (5, 'Nike Air Force 1 Gucci', 39024180, '3fdcde54-b611-45ea-b693-e94b6dca086d_af1-gucci-nike-1-800x600.jpg', 'Sed est iusto sed voluptatem rerum maxime.', '2024-02-17 07:35:46', '2025-06-10 00:29:04', 1, 60, 50),
 (6, 'Nike Air Force 1 Low Valentines Day 2024', 32191804, 'dd4e2fcd-9b54-4d89-988a-df9cfda47f55_giay-nike-air-force-1-low-valentines-day-2024-like-auth.jpg', 'Id dolorum nihil dolor neque voluptatem.', '2024-02-17 07:35:46', '2025-06-09 23:22:44', 1, 5, 4),
-(7, 'Air Jordan 1 Mid Chicago White Toe', 73324944, 'cd721569-4060-4f22-b63e-6a4fbf3a2d95_Giay-Nike-Air-Jordan-1-Mid-Chicago-White-Toe-800x600.jpg', 'Tempora laudantium natus.', '2024-02-17 07:35:46', '2024-02-17 07:35:46', 1, NULL, 0),
+(7, 'Air Jordan 1 Mid Chicago White Toe', 73324944, 'cd721569-4060-4f22-b63e-6a4fbf3a2d95_Giay-Nike-Air-Jordan-1-Mid-Chicago-White-Toe-800x600.jpg', 'Tempora laudantium natus.', '2024-02-17 07:35:46', '2024-02-17 07:35:46', 1, NULL, 50),
 (8, 'Air Jordan 1 Mid Panda', 48354256, '75b77e09-5ddb-445f-9456-c0d10ac84acb_Air-Jordan-1-Mid-Panda.jpg', 'Rerum placeat dignissimos blanditiis sint quis.', '2024-02-17 07:35:46', '2025-06-09 19:20:30', 1, 80, 3),
 (9, 'Air Jordan 1 Light Smoke Grey', 28441420, '96a4724d-6df3-488c-9ec5-55cb525a921c_Jordan-1-Mid-Light-Smoke-Grey-80.jpg', 'Voluptas esse dolorum iure veritatis a.', '2024-02-17 07:35:46', '2025-06-09 19:20:42', 1, 20, 1),
 (10, 'Air Jordan 1 Mid Tuxedo', 58791932, 'c2b778a5-4ad6-45c6-a8b4-47f779d23dad_Jordan-1-Mid-Tuxedo-White-Black-800x600.jpg', 'Officia quis doloremque.', '2024-02-17 07:35:46', '2024-02-17 07:35:46', 1, NULL, 0),
@@ -829,7 +829,7 @@ ALTER TABLE `orders`
 -- AUTO_INCREMENT cho bảng `order_details`
 --
 ALTER TABLE `order_details`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=82;
 
 --
 -- AUTO_INCREMENT cho bảng `products`
@@ -847,7 +847,7 @@ ALTER TABLE `product_images`
 -- AUTO_INCREMENT cho bảng `return_requests`
 --
 ALTER TABLE `return_requests`
-  MODIFY `id` bigint NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
 
 --
 -- AUTO_INCREMENT cho bảng `roles`
@@ -859,13 +859,13 @@ ALTER TABLE `roles`
 -- AUTO_INCREMENT cho bảng `social_accounts`
 --
 ALTER TABLE `social_accounts`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
 
 --
 -- AUTO_INCREMENT cho bảng `tokens`
 --
 ALTER TABLE `tokens`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
 
 --
 -- AUTO_INCREMENT cho bảng `users`
@@ -877,7 +877,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT cho bảng `vouchers`
 --
 ALTER TABLE `vouchers`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT cho bảng `voucher_usage`

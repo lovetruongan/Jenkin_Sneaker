@@ -108,9 +108,20 @@ public class OrderResponse {
                 .shippingMethod(order.getShippingMethod())
                 .shippingDate(order.getShippingDate())
                 .paymentMethod(order.getPaymentMethod())
+                .discountAmount(order.getDiscountAmount())
                 .orderDetails(orderDetailResponses)
                 .build();
-        
+
+        // Map voucher information if present
+        if (order.getVoucher() != null) {
+            VoucherInfo voucherInfo = VoucherInfo.builder()
+                    .code(order.getVoucher().getCode())
+                    .name(order.getVoucher().getName())
+                    .discountPercentage(order.getVoucher().getDiscountPercentage())
+                    .build();
+            orderResponse.setVoucher(voucherInfo);
+        }
+
         if (order.getOrderDetails() != null && !order.getOrderDetails().isEmpty()) {
             String productNames = order.getOrderDetails().stream()
                     .map(od -> od.getProduct().getName())

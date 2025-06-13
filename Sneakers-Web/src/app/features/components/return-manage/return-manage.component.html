@@ -100,7 +100,7 @@
             [resizable]="false">
     
     <div class="p-fluid" *ngIf="currentRequest">
-      <p>{{ getDialogMessage() }}</p>
+      <p [innerHTML]="getDialogMessage()"></p>
       <div class="form-group">
         <label for="adminNotes">Ghi chú của quản trị viên (bắt buộc):</label>
         <textarea id="adminNotes" pInputTextarea [(ngModel)]="adminNotes" rows="4" required></textarea>

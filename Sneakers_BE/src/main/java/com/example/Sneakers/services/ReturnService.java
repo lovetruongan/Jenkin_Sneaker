@@ -44,7 +44,8 @@ public class ReturnService implements IReturnService {
                 .orElseThrow(() -> new DataNotFoundException("Order not found"));
 
         if (!order.getUser().getId().equals(userId)) {
-            throw new PermissionDenyException("User does not have permission to create a return request for this order");
+            throw new PermissionDenyException(
+                    "User does not have permission to create a return request for this order");
         }
 
         if (returnRequestRepository.findByOrderId(order.getId()).isPresent()) {
@@ -81,9 +82,9 @@ public class ReturnService implements IReturnService {
         if (!returnRequest.getStatus().equals("PENDING")) {
             throw new Exception("Return request can no longer be approved.");
         }
-        
+
         Order order = returnRequest.getOrder();
-        
+
         // Handle refund based on payment method
         if ("Thanh toán thẻ thành công".equals(order.getPaymentMethod()) && order.getPaymentIntentId() != null) {
             stripeService.refund(order.getPaymentIntentId());
@@ -107,16 +108,17 @@ public class ReturnService implements IReturnService {
 
     @Override
     @Transactional
-    public ReturnRequest rejectReturnRequest(Long requestId, AdminReturnActionDTO actionDTO) throws DataNotFoundException {
+    public ReturnRequest rejectReturnRequest(Long requestId, AdminReturnActionDTO actionDTO)
+            throws DataNotFoundException {
         ReturnRequest returnRequest = findReturnRequestById(requestId);
         returnRequest.setStatus("REJECTED");
         returnRequest.setAdminNotes(actionDTO.getAdminNotes());
-        
+
         // Optionally, revert order status if needed
         Order order = returnRequest.getOrder();
         order.setStatus("delivered"); // or its original status before return request
         orderRepository.save(order);
-        
+
         return returnRequestRepository.save(returnRequest);
     }
 
@@ -150,19 +152,19 @@ public class ReturnService implements IReturnService {
     @Transactional
     public ReturnRequest completeRefund(Long requestId, AdminReturnActionDTO actionDTO) throws Exception {
         ReturnRequest returnRequest = findReturnRequestById(requestId);
-        
+
         if (!"AWAITING_REFUND".equals(returnRequest.getStatus()) && !"APPROVED".equals(returnRequest.getStatus())) {
             throw new Exception("Return request is not in a state that allows refund completion.");
         }
-        
+
         Order order = returnRequest.getOrder();
-        
+
         // Mark as completed and update order status to canceled
         returnRequest.setStatus("REFUNDED");
         returnRequest.setAdminNotes("Manual refund completed. " + actionDTO.getAdminNotes());
         order.setStatus("canceled"); // Chuyển trạng thái đơn hàng thành đã hủy
-        
+
         orderRepository.save(order);
         return returnRequestRepository.save(returnRequest);
     }
-} 
+}

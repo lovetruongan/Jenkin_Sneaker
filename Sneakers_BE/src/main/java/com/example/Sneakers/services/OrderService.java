@@ -101,11 +101,13 @@ public class OrderService implements IOrderService {
 
             // Check user usage limit - Temporarily disabled to allow reuse
             /*
-            Long userUsageCount = voucherUsageRepository.countByVoucherIdAndUserId(voucher.getId(), user.getId());
-            if (userUsageCount >= 1) {
-                throw new Exception("Bạn đã sử dụng voucher này rồi");
-            }
-            */
+             * Long userUsageCount =
+             * voucherUsageRepository.countByVoucherIdAndUserId(voucher.getId(),
+             * user.getId());
+             * if (userUsageCount >= 1) {
+             * throw new Exception("Bạn đã sử dụng voucher này rồi");
+             * }
+             */
 
             // Calculate discount
             discountAmount = (baseTotal * voucher.getDiscountPercentage()) / 100;
@@ -183,7 +185,7 @@ public class OrderService implements IOrderService {
             Product product = productRepository.findById(productId)
                     .orElseThrow(() -> new DataNotFoundException("Product not found with id: " + productId));
 
-            if(product.getQuantity() < quantity){
+            if (product.getQuantity() < quantity) {
                 throw new Exception("Product " + product.getName() + " is out of stock");
             }
 
@@ -204,7 +206,7 @@ public class OrderService implements IOrderService {
 
         // Lưu danh sách OrderDetail vào cơ sở dữ liệu
         orderDetailRepository.saveAll(orderDetails);
-        
+
         // Gửi mail thông báo cho người dùng (không throw exception nếu thất bại)
         try {
             Email email = new Email();
@@ -212,7 +214,7 @@ public class OrderService implements IOrderService {
             String subject = "Đặt hàng thành công từ Sneaker Store - Đơn hàng #" + order.getId();
             String content = BuilderEmailContent.buildOrderEmailContent(order);
             boolean sendMail = email.sendEmail(to, subject, content);
-            
+
             if (!sendMail) {
                 System.err.println("Warning: Failed to send order confirmation email to " + to);
             }
@@ -220,13 +222,13 @@ public class OrderService implements IOrderService {
             // Log email error but don't fail the order creation
             System.err.println("Warning: Exception while sending email: " + emailException.getMessage());
         }
-        
+
         return OrderIdResponse.fromOrder(order);
     }
 
     @Override
     public OrderResponse getOrder(Long id) {
-        Order order = orderRepository.findById(id).orElse(null);
+        Order order = orderRepository.findByIdWithDetails(id).orElse(null);
         return OrderResponse.fromOrder(order);
     }
 
@@ -294,7 +296,8 @@ public class OrderService implements IOrderService {
     }
 
     @Override
-    public Page<Order> getOrdersByKeyword(String keyword, String status, LocalDate startDate, LocalDate endDate, Pageable pageable) {
+    public Page<Order> getOrdersByKeyword(String keyword, String status, LocalDate startDate, LocalDate endDate,
+            Pageable pageable) {
         return orderRepository.findByKeyword(keyword, status, startDate, endDate, pageable);
     }
 
@@ -315,7 +318,7 @@ public class OrderService implements IOrderService {
         Long totalRevenue = orderRepository.calculateTotalRevenue();
         Long todayOrders = orderRepository.countOrdersToday();
         Long totalProductsSold = orderRepository.countTotalProductsSold();
-        
+
         return new DashboardStatsDTO(totalRevenue, todayOrders, totalProductsSold);
     }
 }
