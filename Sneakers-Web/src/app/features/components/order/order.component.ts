@@ -216,7 +216,7 @@ export class OrderComponent extends BaseComponent implements OnInit,AfterViewIni
       address: this.inforShipForm.value.address,
       note: this.inforShipForm.value.note || '',
       shipping_method: this.methodShippingValue.name,
-      payment_method: 'Pending Stripe Payment',
+      payment_method: this.selectedPayMethod.key,
       cart_items: this.productOrder.map(item => ({
         product_id: Number(item.product_id),
         quantity: Number(item.quantity),
@@ -292,7 +292,7 @@ export class OrderComponent extends BaseComponent implements OnInit,AfterViewIni
   onStripePaymentSuccess(paymentIntent: any): void {
     // Payment successful, update order status on backend
     this.blockUi();
-    this.orderService.updateOrderStatus(this.orderId, 'Paid').pipe(
+    this.orderService.updateOrderStatus(this.orderId, 'paid').pipe(
       tap(() => {
         this.showStripeDialog = false;
         this.toastService.success("Thanh toán và đặt hàng thành công!");
@@ -311,14 +311,27 @@ export class OrderComponent extends BaseComponent implements OnInit,AfterViewIni
   }
 
   onStripePaymentError(error: string): void {
+    this.showStripeDialog = false;
     this.toastService.fail(`Thanh toán thất bại: ${error}`);
-    // Keep dialog open for retry
+    // Update order status to 'payment_failed'
+    this.orderService.updateOrderStatus(this.orderId, 'payment_failed').pipe(
+        catchError((err) => {
+            console.error('Failed to update order status to payment_failed', err);
+            return of(err);
+        })
+    ).subscribe();
   }
 
   onStripePaymentCancel(): void {
     this.showStripeDialog = false;
-    this.toastService.success("Đã hủy thanh toán");
-    // Order is already created but payment is pending
+    this.toastService.fail('Thanh toán đã bị hủy.');
+    // Update order status to 'cancelled'
+    this.orderService.updateOrderStatus(this.orderId, 'cancelled').pipe(
+        catchError((err) => {
+            console.error('Failed to update order status to cancelled', err);
+            return of(err);
+        })
+    ).subscribe();
   }
 
   blockUi() {

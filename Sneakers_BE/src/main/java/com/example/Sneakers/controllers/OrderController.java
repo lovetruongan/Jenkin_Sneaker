@@ -63,13 +63,11 @@ public class OrderController {
     }
 
     @GetMapping("/user")
-    public ResponseEntity<?> getOrdersByUser(
-            @RequestHeader("Authorization") String token){
+    public ResponseEntity<?> getOrdersByUserId(@RequestHeader("Authorization") String authorizationHeader) {
         try {
-            List<OrderHistoryResponse> orders = orderService.findByUserId(token);
+            List<OrderHistoryResponse> orders = orderService.findByUserId(authorizationHeader);
             return ResponseEntity.ok(orders);
-        }
-        catch (Exception e ){
+        } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }

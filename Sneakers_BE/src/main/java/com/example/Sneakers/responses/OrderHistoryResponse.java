@@ -40,6 +40,9 @@ public class OrderHistoryResponse {
     @JsonProperty("phone_number")
     private String phoneNumber;
 
+    @JsonProperty("payment_method")
+    private String paymentMethod;
+
     public static OrderHistoryResponse fromOrder(Order order){
         OrderHistoryResponseBuilder builder = OrderHistoryResponse.builder()
                 .id(order.getId())
@@ -48,7 +51,8 @@ public class OrderHistoryResponse {
                 .totalMoney(order.getTotalMoney())
                 .orderDate(order.getOrderDate())
                 .buyerName(order.getFullName())
-                .phoneNumber(order.getPhoneNumber());
+                .phoneNumber(order.getPhoneNumber())
+                .paymentMethod(order.getPaymentMethod());
 
         if (order.getOrderDetails() != null && !order.getOrderDetails().isEmpty()) {
             // Lấy thumbnail của sản phẩm đầu tiên

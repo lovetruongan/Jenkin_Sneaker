@@ -146,6 +146,15 @@ export class OrderService {
     })
   }
 
+  findByUserId(token: string) {
+    return this.httpClient.get(`${this.apiUrl}/orders/user`, {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      })
+    });
+  }
+
   updateOrderStatus(orderId: number, status: string) {
     return this.httpClient.put(`${this.apiUrl}/orders/status/${orderId}`, { status }, {
       headers: this.getHeaders(),
