@@ -73,15 +73,29 @@
           <td>
             <div *ngIf="request.status === 'PENDING'">
               <button pButton pRipple icon="pi pi-check" class="p-button-rounded p-button-success p-mr-2" (click)="showActionDialog(request, 'approve')" pTooltip="Approve"></button>
-              <button pButton pRipple icon="pi pi-times" class="p-button-rounded p-button-danger" (click)="showActionDialog(request, 'reject')" pTooltip="Reject"></button>
+              <button *ngIf="request.status === 'PENDING'" pButton pRipple icon="pi pi-times" class="p-button-sm p-button-danger"
+                (click)="showActionDialog(request, 'reject')" pTooltip="Reject request"></button>
             </div>
-            <div *ngIf="request.status === 'AWAITING_REFUND'">
-              <button pButton pRipple icon="pi pi-check-circle" label="Hoàn tiền xong" class="p-button-sm p-button-success" (click)="showCompleteRefundDialog(request)" pTooltip="Mark manual refund as completed"></button>
-            </div>
-            <div *ngIf="request.status === 'APPROVED' && request.payment_method === 'VNPAY'">
-              <button pButton pRipple icon="pi pi-undo" label="Hoàn tiền VNPAY" class="p-button-warning" (click)="showVnpayRefundDialog(request)"></button>
-            </div>
-            <p-tag *ngIf="request.status !== 'PENDING' && request.status !== 'AWAITING_REFUND'" value="Đã xử lý" severity="info"></p-tag>
+
+            <!-- Conditional Refund/Action Buttons -->
+            <ng-container *ngIf="request.status === 'AWAITING_REFUND'">
+              <!-- Manual/COD refund completion -->
+              <button *ngIf="request.payment_method === 'COD'" pButton pRipple icon="pi pi-check-circle"
+                label="Đánh dấu hoàn tất" class="p-button-success" (click)="showCompleteRefundDialog(request)"
+                pTooltip="Mark manual refund as completed"></button>
+
+              <!-- VNPAY Refund Button -->
+              <button *ngIf="request.payment_method === 'VNPAY'" pButton pRipple icon="pi pi-undo"
+                label="Hoàn tiền VNPAY" class="p-button-warning" (click)="showVnpayRefundDialog(request)"></button>
+
+              <!-- Stripe Refund Button -->
+              <button *ngIf="request.payment_method === 'STRIPE'" pButton pRipple icon="pi pi-undo"
+                label="Hoàn tiền Stripe" class="p-button-info"
+                (click)="approveReturnRequestAndRefund(request)"></button>
+            </ng-container>
+
+            <p-tag *ngIf="!['PENDING', 'AWAITING_REFUND'].includes(request.status)" value="Đã xử lý"
+              severity="info"></p-tag>
           </td>
         </tr>
       </ng-template>

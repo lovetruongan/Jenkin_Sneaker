@@ -19,7 +19,7 @@ export interface VnpayRefundRequest {
   order_id: number;
   amount: number;
   order_info: string;
-  create_by: string;
+  created_by: string;
 }
 
 export interface ReturnRequestResponse {

@@ -23,6 +23,7 @@ public class OrderDTO {
     @JsonProperty("fullname")
     private String fullName;
 
+    @JsonProperty("email")
     private String email;
 
     @JsonProperty("phone_number")

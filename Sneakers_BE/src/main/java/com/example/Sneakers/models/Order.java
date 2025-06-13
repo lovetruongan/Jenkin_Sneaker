@@ -63,6 +63,9 @@ public class Order {
     @Column(name = "vnp_TxnRef")
     private String vnpTxnRef;
 
+    @Column(name = "vnp_TransactionNo")
+    private String vnpTransactionNo;
+
     @Column(name = "active")
     private Boolean active;
 

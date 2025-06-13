@@ -7,5 +7,5 @@ import java.util.Map;
 
 public interface IVnPayService {
     String createOrder(long total, String orderInfo, Long orderId);
-    Map<String, String> refund(VnpayRefundRequestDTO vnpayRefundRequestDTO, HttpServletRequest request) throws IOException;
+    Map<String, String> refund(VnpayRefundRequestDTO vnpayRefundRequestDTO, HttpServletRequest request) throws Exception;
 } 

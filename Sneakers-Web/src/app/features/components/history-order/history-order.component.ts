@@ -31,8 +31,8 @@ import { StripePaymentComponent } from '../stripe-payment/stripe-payment.compone
   standalone: true,
   imports: [
     CommonModule,
-    CurrencyPipe,
-    DatePipe,
+    CurrencyPipe, 
+    DatePipe, 
     FormsModule,
     PaginatorModule,
     TagModule,
@@ -121,7 +121,7 @@ export class HistoryOrderComponent implements OnInit {
         order.fullname.toLowerCase().includes(lowercasedTerm)
       );
     }
-    
+
     this.filteredOrders = orders;
     this.paginate({ first: 0, rows: this.rows });
   }

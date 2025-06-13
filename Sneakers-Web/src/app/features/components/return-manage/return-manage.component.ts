@@ -153,24 +153,19 @@ export class ReturnManageComponent implements OnInit {
       order_id: this.currentRequest.order_id,
       amount: this.currentRequest.refund_amount,
       order_info: this.adminNotes,
-      create_by: 'admin'
+      created_by: 'admin'
     };
 
+    console.log('VNPAY Refund Request Data:', refundData);
+    
     this.returnService.refundVnpay(refundData).subscribe({
       next: (response) => {
         this.isSubmitting = false;
         this.displayVnpayRefundDialog = false;
-        this.toastService.success('VNPAY refund processed successfully!');
+        this.toastService.success('VNPAY refund processed successfully! Order status updated to canceled.');
         
-        // Update the local request list
-        const index = this.allRequests.findIndex(r => r.id === this.currentRequest?.id);
-        if (index > -1) {
-            // Assuming the backend doesn't return the updated request, we update it manually
-            this.allRequests[index].status = 'REFUNDED';
-            this.allRequests[index].admin_notes = this.adminNotes;
-            this.allRequests = [...this.allRequests]; // Trigger change detection
-            this.calculateStats();
-        }
+        // Reload the entire list to ensure all statuses are up-to-date
+        this.loadAllRequests();
       },
       error: (err) => {
         this.isSubmitting = false;
@@ -219,6 +214,35 @@ export class ReturnManageComponent implements OnInit {
       error: (err: any) => {
         this.isSubmitting = false;
         this.toastService.fail(`Failed to process request. ` + (err.error?.message || ''));
+      }
+    });
+  }
+
+  approveReturnRequestAndRefund(request: ReturnRequestResponse): void {
+    if (!this.isBrowser) return;
+
+    if (!confirm('Are you sure you want to approve this request and process a Stripe refund? This action cannot be undone.')) {
+      return;
+    }
+
+    this.isSubmitting = true;
+    const actionData: AdminReturnAction = { admin_notes: 'Stripe refund processed automatically.' };
+
+    this.returnService.approveReturnRequest(request.id, actionData).subscribe({
+      next: (updatedRequest) => {
+        this.isSubmitting = false;
+        this.toastService.success('Request approved and Stripe refund initiated successfully!');
+
+        const index = this.allRequests.findIndex(r => r.id === updatedRequest.id);
+        if (index > -1) {
+          this.allRequests[index] = updatedRequest;
+          this.allRequests = [...this.allRequests]; // Trigger change detection
+          this.calculateStats();
+        }
+      },
+      error: (err) => {
+        this.isSubmitting = false;
+        this.toastService.fail('Stripe refund failed: ' + (err.error?.message || err.message));
       }
     });
   }

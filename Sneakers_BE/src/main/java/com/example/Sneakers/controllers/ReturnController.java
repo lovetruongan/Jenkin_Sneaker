@@ -5,7 +5,9 @@ import com.example.Sneakers.dtos.ReturnRequestDTO;
 import com.example.Sneakers.dtos.ReturnRequestResponseDTO;
 import com.example.Sneakers.models.ReturnRequest;
 import com.example.Sneakers.responses.MessageResponse;
+import com.example.Sneakers.responses.ReturnRequestResponse;
 import com.example.Sneakers.services.IReturnService;
+import com.example.Sneakers.services.IUserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -25,6 +27,7 @@ import java.util.stream.Collectors;
 public class ReturnController {
 
     private final IReturnService returnService;
+    private final IUserService userService;
 
     @PostMapping("")
     public ResponseEntity<?> createReturnRequest(

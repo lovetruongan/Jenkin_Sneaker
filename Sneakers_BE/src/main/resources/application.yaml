@@ -38,6 +38,18 @@ jwt:
 
 logging.level.org.springframework.security: DEBUG
 
+# Logging Configuration
+logging:
+  level:
+    com.example.Sneakers.controllers.VnpayController: DEBUG
+    com.example.Sneakers.services.VnPayService: DEBUG
+    org.springframework.security: DEBUG
+  file:
+    name: logs/sneakers-app.log
+  pattern:
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    console: "%d{HH:mm:ss} %-5level %logger{36} - %msg%n"
+
 # Chroma Vector Database Configuration
 chroma:
   collection:
@@ -55,8 +67,9 @@ stripe:
     publishable-key: pk_test_51RYEK0RoKh7pvaZeTzq1TjxJXE4Rfr5xwKIP6uL1kJDET3mb78shODbWhYyL1znUhqyanmoPV18g8zGCTkDUuok6003ObawJA1
 
 # VNPAY Configuration (Test Mode)
-vnpay:
-  tmnCode: "R5QX2TZO" # Replace with your TmnCode
-  hashSecret: "FT254A9XGNV0X8WQR7PK2YTI5HI3SPNA" # Replace with your HashSecret
-  url: "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"
-  returnUrl: "http://localhost:4200/vnpay-payment"
+payment:
+  vnpay:
+    tmnCode: "R5QX2TZO" # Replace with your TmnCode
+    hashSecret: "FT254A9XGNV0X8WQR7PK2YTI5HI3SPNA" # Replace with your HashSecret
+    url: "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"
+    returnUrl: "http://localhost:8089/api/v1/vnpay/payment-callback"

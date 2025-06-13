@@ -86,20 +86,25 @@ public class ReturnService implements IReturnService {
         Order order = returnRequest.getOrder();
         String paymentMethod = order.getPaymentMethod();
 
+        log.info("Approving return request {} for order {} with payment method: {}", requestId, order.getId(), paymentMethod);
+
         // Handle refund based on payment method
         if ("Thanh toán thẻ thành công".equals(paymentMethod) || "Stripe".equalsIgnoreCase(paymentMethod)) {
             // Auto-refund for Stripe
+            log.info("Processing automatic Stripe refund for order: {}", order.getId());
             stripeService.refund(order.getPaymentIntentId());
             returnRequest.setAdminNotes("Refunded via Stripe. " + actionDTO.getAdminNotes());
             returnRequest.setStatus("REFUNDED");
             order.setStatus("canceled");
         } else if ("VNPAY".equalsIgnoreCase(paymentMethod)) {
-            // For VNPAY, just approve it. The admin will trigger the refund manually.
+            // For VNPAY, set to AWAITING_REFUND so admin can trigger VNPAY refund
+            log.info("Setting VNPAY order to AWAITING_REFUND status for manual refund processing: {}", order.getId());
             returnRequest.setAdminNotes("Approved for VNPAY refund. " + actionDTO.getAdminNotes());
-            returnRequest.setStatus("APPROVED");
-            // The order status remains unchanged until the VNPAY refund is confirmed.
+            returnRequest.setStatus("AWAITING_REFUND");
+            order.setStatus("awaiting_refund");
         } else {
             // For COD or other methods, mark for manual refund
+            log.info("Setting COD/other payment method to AWAITING_REFUND for manual processing: {}", order.getId());
             returnRequest.setAdminNotes("Manual refund required. " + actionDTO.getAdminNotes());
             returnRequest.setStatus("AWAITING_REFUND");
             order.setStatus("awaiting_refund");
@@ -175,9 +180,13 @@ public class ReturnService implements IReturnService {
     @Transactional
     public ReturnRequest processVnpayRefund(Long requestId) throws Exception {
         ReturnRequest returnRequest = findReturnRequestById(requestId);
-        if(!"APPROVED".equals(returnRequest.getStatus())){
-            throw new Exception("Return request is not in an approved state for VNPAY refund.");
+        
+        // Accept both APPROVED and AWAITING_REFUND statuses for VNPAY refund
+        if (!"APPROVED".equals(returnRequest.getStatus()) && !"AWAITING_REFUND".equals(returnRequest.getStatus())) {
+            throw new Exception("Return request is not in a valid state for VNPAY refund. Current status: " + returnRequest.getStatus());
         }
+
+        log.info("Processing VNPAY refund for return request: {}", requestId);
 
         Order order = returnRequest.getOrder();
         returnRequest.setStatus("REFUNDED");

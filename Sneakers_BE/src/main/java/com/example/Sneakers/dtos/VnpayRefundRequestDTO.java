@@ -22,6 +22,6 @@ public class VnpayRefundRequestDTO {
     @JsonProperty("order_info")
     private String orderInfo;
 
-    @JsonProperty("create_by")
-    private String createBy;
+    @JsonProperty("created_by")
+    private String createdBy;
 } 
