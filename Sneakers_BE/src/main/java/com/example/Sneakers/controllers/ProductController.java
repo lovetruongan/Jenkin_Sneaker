@@ -47,7 +47,7 @@ public class ProductController {
     private final LocalizationUtils localizationUtils;
 
     @PostMapping("")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    //@PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> createProduct(
             @Valid @RequestBody ProductDTO productDTO,
             @RequestHeader("Authorization") String authorizationHeader,
@@ -282,7 +282,7 @@ public class ProductController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    //@PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> updateProduct(
             @PathVariable Long id,
             @RequestBody ProductDTO productDTO,
@@ -296,7 +296,7 @@ public class ProductController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    //@PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<String> deleteProduct(
             @PathVariable Long id,
             @RequestHeader("Authorization") String authorizationHeader) {

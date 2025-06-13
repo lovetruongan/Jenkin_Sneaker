@@ -1,0 +1,50 @@
+<p-toast></p-toast>
+<div class="voucher-display-container" *ngIf="!isLoading && vouchers.length > 0">
+  <h2 class="section-title">
+    <i class="pi pi-ticket"></i>
+    Voucher có sẵn cho bạn
+  </h2>
+  <div class="vouchers-grid">
+    <div class="voucher-card" *ngFor="let voucher of vouchers">
+      <div class="voucher-icon">
+        <i class="bi bi-ticket-perforated"></i>
+      </div>
+      <div class="voucher-details">
+        <h3 class="voucher-name">{{ voucher.name }}</h3>
+        <div class="voucher-info">
+          <span class="discount-percent">Giảm {{ voucher.discount_percentage }}%</span>
+          <div class="voucher-conditions">
+            <span *ngIf="voucher.min_order_value && voucher.min_order_value > 0">
+              Đơn tối thiểu {{ voucher.min_order_value | currency:'VND':'symbol-narrow':'1.0-0' }}
+            </span>
+            <span *ngIf="voucher.max_discount_amount && voucher.max_discount_amount > 0">
+              Giảm tối đa {{ voucher.max_discount_amount | currency:'VND':'symbol-narrow':'1.0-0' }}
+            </span>
+          </div>
+        </div>
+        <div class="voucher-usage-info">
+          <p class="voucher-usage">Lượt sử dụng còn lại: <strong>{{ voucher.remaining_quantity }}</strong></p>
+          <p class="voucher-expiry" [ngClass]="{'expiring-soon': voucher.is_expiring_soon}">
+            <i class="pi pi-clock"></i>
+            {{ voucher.status_message }}
+          </p>
+        </div>
+      </div>
+      <div class="voucher-code">
+        <span>Mã: <strong>{{ voucher.code }}</strong></span>
+        <button class="copy-btn" (click)="copyCode(voucher.code)">Copy</button>
+      </div>
+    </div>
+  </div>
+  <div class="view-all">
+    <a routerLink="/vouchers">Xem tất cả voucher</a>
+  </div>
+</div>
+
+<div *ngIf="isLoading" class="loading-container">
+  <p>Đang tải voucher...</p>
+</div>
+
+<div *ngIf="!isLoading && vouchers.length === 0" class="no-vouchers-container">
+  <p>Hiện tại không có voucher nào.</p>
+</div> 

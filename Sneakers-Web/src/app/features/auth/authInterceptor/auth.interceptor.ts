@@ -1,30 +1,40 @@
-import { Injectable } from '@angular/core';
-import { HttpInterceptor, HttpEvent, HttpHandler, HttpRequest } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Injectable, PLATFORM_ID, Inject } from '@angular/core';
+import { HttpInterceptor, HttpEvent, HttpHandler, HttpRequest, HttpErrorResponse } from '@angular/common/http';
+import { Observable, throwError } from 'rxjs';
 import { Router } from '@angular/router';
-import { tap } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+import { isPlatformBrowser } from '@angular/common';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
-    constructor(private router: Router) {}
+    constructor(
+        private router: Router,
+        @Inject(PLATFORM_ID) private platformId: Object
+    ) {}
+
     intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-        if (localStorage.getItem('token') != null){
+        if (!isPlatformBrowser(this.platformId)) {
+            return next.handle(req);
+        }
+
+        const token = localStorage.getItem('token');
+        if (token){
             const cloneReq = req.clone({
-                headers: req.headers.set('Authorization','Bearer ' + localStorage.getItem('token'))
+                headers: req.headers.set('Authorization', 'Bearer ' + token)
             });
             return next.handle(cloneReq).pipe(
-                tap(
-                    succ => {},
-                    err => {
-                        if (err.status == 401){
-                            localStorage.removeItem('token');
-                            this.router.navigateByUrl('/auth-login');
-                        }
+                catchError((error: HttpErrorResponse) => {
+                    if (error.status === 401 || error.status === 403) {
+                        // Token is invalid or expired, or user is not authorized
+                        localStorage.removeItem('token');
+                        localStorage.removeItem('userInfor');
+                        this.router.navigate(['/auth-login']);
                     }
-                )
-            )
+                    return throwError(() => error);
+                })
+            );
         } else {
-            return next.handle(req.clone());
+            return next.handle(req);
         }
     }
 }

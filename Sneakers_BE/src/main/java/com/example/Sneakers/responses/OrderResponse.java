@@ -14,7 +14,9 @@ import java.time.LocalDate;
 import java.util.Date;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
+@Data
 @Getter
 @Setter
 @AllArgsConstructor
@@ -26,8 +28,8 @@ public class OrderResponse {
     @JsonProperty("user_id")
     private Long userId;
 
-    @JsonProperty("fullname")
-    private String fullName;
+    @JsonProperty("buyer_name")
+    private String buyerName;
 
     @JsonProperty("phone_number")
     private String phoneNumber;
@@ -67,7 +69,13 @@ public class OrderResponse {
     private Long discountAmount;
 
     @JsonProperty("order_details")
-    private List<OrderDetail> orderDetails;
+    private List<OrderDetailResponse> orderDetails;
+
+    @JsonProperty("product_name")
+    private String productName;
+
+    @JsonProperty("total_products")
+    private int totalProducts;
 
     @Data
     @Builder
@@ -81,20 +89,15 @@ public class OrderResponse {
     }
 
     public static OrderResponse fromOrder(Order order) {
-        OrderResponse.VoucherInfo voucherInfo = null;
-        if (order.getVoucher() != null) {
-            voucherInfo = VoucherInfo.builder()
-                    .code(order.getVoucher().getCode())
-                    .name(order.getVoucher().getName())
-                    .discountPercentage(order.getVoucher().getDiscountPercentage())
-                    .build();
-        }
+        List<OrderDetailResponse> orderDetailResponses = order.getOrderDetails()
+                .stream()
+                .map(OrderDetailResponse::fromOrderDetail)
+                .collect(Collectors.toList());
 
-        return OrderResponse
-                .builder()
+        OrderResponse orderResponse = OrderResponse.builder()
                 .id(order.getId())
                 .userId(order.getUser().getId())
-                .fullName(order.getFullName())
+                .buyerName(order.getFullName())
                 .phoneNumber(order.getPhoneNumber())
                 .email(order.getEmail())
                 .address(order.getAddress())
@@ -105,9 +108,35 @@ public class OrderResponse {
                 .shippingMethod(order.getShippingMethod())
                 .shippingDate(order.getShippingDate())
                 .paymentMethod(order.getPaymentMethod())
-                .voucher(voucherInfo)
                 .discountAmount(order.getDiscountAmount())
-                .orderDetails(order.getOrderDetails())
+                .orderDetails(orderDetailResponses)
                 .build();
+
+        // Map voucher information if present
+        if (order.getVoucher() != null) {
+            VoucherInfo voucherInfo = VoucherInfo.builder()
+                    .code(order.getVoucher().getCode())
+                    .name(order.getVoucher().getName())
+                    .discountPercentage(order.getVoucher().getDiscountPercentage())
+                    .build();
+            orderResponse.setVoucher(voucherInfo);
+        }
+
+        if (order.getOrderDetails() != null && !order.getOrderDetails().isEmpty()) {
+            String productNames = order.getOrderDetails().stream()
+                    .map(od -> od.getProduct().getName())
+                    .collect(Collectors.joining(", "));
+            orderResponse.setProductName(productNames);
+
+            long totalProducts = order.getOrderDetails().stream()
+                    .mapToLong(OrderDetail::getNumberOfProducts)
+                    .sum();
+            orderResponse.setTotalProducts((int) totalProducts);
+        } else {
+            orderResponse.setProductName("N/A");
+            orderResponse.setTotalProducts(0);
+        }
+
+        return orderResponse;
     }
 }

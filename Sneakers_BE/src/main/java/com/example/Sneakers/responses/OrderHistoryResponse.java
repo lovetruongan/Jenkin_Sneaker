@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -49,15 +50,25 @@ public class OrderHistoryResponse {
                 .buyerName(order.getFullName())
                 .phoneNumber(order.getPhoneNumber());
 
-        // Kiểm tra xem danh sách orderDetails có rỗng không trước khi truy cập
-        if (!order.getOrderDetails().isEmpty()) {
-            builder.thumbnail(order.getOrderDetails().get(0).getProduct().getThumbnail())
-                    .productName(order.getOrderDetails().get(0).getProduct().getName())
-                    .totalProducts(order.getOrderDetails().size());
+        if (order.getOrderDetails() != null && !order.getOrderDetails().isEmpty()) {
+            // Lấy thumbnail của sản phẩm đầu tiên
+            builder.thumbnail(order.getOrderDetails().get(0).getProduct().getThumbnail());
+            
+            // Nối tên tất cả sản phẩm
+            String productNames = order.getOrderDetails().stream()
+                    .map(od -> od.getProduct().getName())
+                    .collect(Collectors.joining(", "));
+            builder.productName(productNames);
+            
+            // Tính tổng số lượng sản phẩm
+            long totalProducts = order.getOrderDetails().stream()
+                    .mapToLong(od -> od.getNumberOfProducts())
+                    .sum();
+            builder.totalProducts((int) totalProducts);
+
         } else {
-            // Xử lý trường hợp danh sách orderDetails rỗng
             builder.thumbnail("notfound.jpg")
-                    .productName("Not found")
+                    .productName("N/A")
                     .totalProducts(0);
         }
 

@@ -1,112 +1,143 @@
-<div class="shoppingCart">
-  <p-confirmDialog></p-confirmDialog>
-  <div class="container px-3 my-5">
-    <!-- Shopping cart table -->
-    <div class="card">
-      <div class="card-header">
-        <h2 class="text-danger">Shopping Cart</h2>
+<p-confirmDialog></p-confirmDialog>
+<p-toast></p-toast>
+
+<div class="cart-wrapper">
+  <div class="cart-header">
+    <h1>Giỏ hàng của bạn</h1>
+    <p>Có {{ productsInCart.length }} sản phẩm trong giỏ hàng</p>
+  </div>
+
+  @if(productsInCart.length > 0) {
+    <div class="cart-content">
+      <!-- Left Column: Cart Items -->
+      <div class="cart-items-section">
+        <div class="items-card">
+          <div class="items-header">
+            <p-button label="Tiếp tục mua sắm" icon="pi pi-arrow-left" styleClass="p-button-text" routerLink="/all-product"></p-button>
+            <p-button label="Xóa tất cả" icon="pi pi-trash" styleClass="p-button-text p-button-danger" (click)="confirmDeleteAll()"></p-button>
+          </div>
+          
+          <div class="items-list">
+            @for(item of productsInCart; track item.id){
+              <div class="cart-item" [class.selected]="isProductSelected(item.id)">
+                <!-- Product Image -->
+                <div class="item-image">
+                  <img [src]="apiImage + item.products.thumbnail" [alt]="item.products.name">
+                </div>
+                
+                <!-- Product Info -->
+                <div class="item-info">
+                  <h4 class="product-name">{{ item.products.name }}</h4>
+                  <div class="product-meta">
+                    <span class="size">Size: {{ item.size }}</span>
+                    <span class="price">{{ item.products.price | currency:'VND':'symbol':'1.0-0' }}</span>
+                  </div>
+                  
+                  <!-- Quantity Controls -->
+                  <div class="quantity-controls">
+                    <span class="quantity-label">Số lượng:</span>
+                    <p-inputNumber [(ngModel)]="item.quantity" [min]="1" [max]="10"
+                                   (onInput)="updateProductSubject.next({id: item.id, quantity: +$event.value})"
+                                   buttonLayout="horizontal" [showButtons]="true"
+                                   decrementButtonClass="p-button-secondary p-button-sm"
+                                   incrementButtonClass="p-button-secondary p-button-sm"
+                                   incrementButtonIcon="pi pi-plus"
+                                   decrementButtonIcon="pi pi-minus"
+                                   styleClass="quantity-input">
+                    </p-inputNumber>
+                  </div>
+                </div>
+                
+                <!-- Actions & Total -->
+                <div class="item-actions">
+                  <div class="item-total">
+                    {{ (item.products.price * item.quantity) | currency:'VND':'symbol':'1.0-0' }}
+                  </div>
+                  <div class="action-buttons">
+                    <div class="select-product">
+                      <p-checkbox [binary]="true" [value]="item.id" (onChange)="onCheckboxChange($event, item.id)" styleClass="mr-2"></p-checkbox>
+                      <label class="select-label">Chọn</label>
+                    </div>
+                    <p-button icon="pi pi-trash" styleClass="p-button-text p-button-danger p-button-sm" (click)="deleteProduct(item.id)" pTooltip="Xóa sản phẩm"></p-button>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
       </div>
-      <div class="card-body row d-flex justify-content-between">
-        <div class="col-12 col-lg-8">
-          @if(producsInCart.length > 0) {
-            <div class="table-responsive">
-              <table class="table m-0">
-                <thead>
-                  <tr>
-                    <th class="text-center py-3 px-4" style="min-width: 200px;">Product Name &amp; Details</th>
-                    <th class="text-center py-3 px-4" style="width: 100px;">Price</th>
-                    <th class="text-center py-3 px-4" style="width: 120px;">Quantity</th>
-                    <th class="text-center py-3 px-4" style="width: 100px;">Total</th>
-                    <th class="text-center py-3 px-4 choose" style="width: 10px;">Buy</th>
-                    <!-- <th class="text-center align-middle py-3 px-0" style="width: 60px;">x</th> -->
-                  </tr>
-                </thead>
-                <tbody>
-                  @for(itemCart of producsInCart; track itemCart){
-                  <tr>
-                    <td class="p-4">
-                      <div class="media d-flex align-items-center justify-content-between">
-                        <p-button (click)="deleteProduct(itemCart.id)" icon="pi pi-times"></p-button>
-                        <img [src]="apiImage + itemCart.products.thumbnail"
-                          class="d-block ui-w-40 ui-bordered mr-4" alt="ao1">
-                        <div class="media-body text-end">
-                          <a href="#" class="d-block text-dark product-name">{{itemCart.products.name}}</a>
-                          <small>
-                            <span class="text-muted">Size: </span>{{itemCart.size}} &nbsp;
-                          </small>
-                        </div>
-                      </div>
-                    </td>
-                    <td class="text-right font-weight-semibold align-middle p-4">{{itemCart.products.price |
-                      currency:'VND':'symbol':'1.0-0'}}</td>
-                    <td class="align-middle p-4">
-                      <div class="d-flex">
-                        <p-button icon="pi pi-minus" (click)="updateProductSubject.next({quantity: itemCart.quantity-1, id: itemCart.id})"></p-button>
-                        <p-inputNumber [(ngModel)]="itemCart.quantity" buttonLayout="horizontal"
-                          inputId="horizontal"></p-inputNumber>
-                        <p-button icon="pi pi-plus" (click)="updateProductSubject.next({quantity: itemCart.quantity+1, id: itemCart.id})"></p-button>
-                      </div>
-                    </td>
-                    <td class="text-center font-weight-semibold align-middle p-4">{{(itemCart.quantity * itemCart.products.price) |
-                      currency:'VND':'symbol':'1.0-0'}}</td>
-                    <td class="align-middle text-center p-4">
-                      <input (change)="onCheckboxChange($event,itemCart.id)" type="checkbox" style="width: 20px; height: 20px;">
-                    </td>
-                  </tr>
-                  }
-                </tbody>
-              </table>
+
+      <!-- Right Column: Order Summary -->
+      <div class="summary-section">
+        <div class="summary-card">
+          <h2 class="summary-title">Tóm tắt đơn hàng</h2>
+          
+          @if(productToOrder.length > 0) {
+            <div class="selected-products">
+              <p class="selected-count">
+                <i class="pi pi-check-circle"></i>
+                Đã chọn {{ productToOrder.length }} sản phẩm
+              </p>
+            </div>
+          } @else {
+            <div class="no-selection">
+              <p class="selection-notice">
+                <i class="pi pi-info-circle"></i>
+                Vui lòng chọn sản phẩm để thanh toán
+              </p>
             </div>
           }
-          @else {
-            <h3>Chưa có sản phẩm nào trong giỏ hàng</h3>
-          }
-          <div class="d-flex flex-row justify-content-around align-items-center my-3">
-            <button (click)="backToAll()" type="button" class="btn btn-lg table-button mt-2 mr-3 text-uppercase text-light">
-              <i class="pi pi-arrow-left" style="color: red;"></i>
-              Tiếp tục xem sản phẩm</button>
+          
+          <div class="summary-details">
+            <div class="summary-line">
+              <span>Tổng phụ:</span>
+              <span class="amount">{{ getSelectedProductsTotal() | currency:'VND':'symbol':'1.0-0' }}</span>
+            </div>
+            <div class="summary-line">
+              <span>Phí vận chuyển:</span>
+              <span class="amount">{{ shipCost | currency:'VND':'symbol':'1.0-0' }}</span>
+            </div>
+            <div class="summary-line total">
+              <span>Tổng cộng:</span>
+              <span class="total-amount">{{ getSelectedProductsTotal() + shipCost | currency:'VND':'symbol':'1.0-0' }}</span>
+            </div>
+          </div>
+
+          <div class="summary-actions">
+            <button type="button" 
+                    class="p-button p-component checkout-btn"
+                    [disabled]="productToOrder.length === 0"
+                    (click)="sendProductToOrder()">
+              <i class="pi pi-credit-card"></i>
+              <span>Tiến hành thanh toán</span>
+            </button>
+            
+            @if(productToOrder.length === 0) {
+              <p class="checkout-hint">Chọn ít nhất 1 sản phẩm để thanh toán</p>
+            }
           </div>
         </div>
 
-        <div class="col-12 col-lg-4 cart__right">
-          <h6 class="card__right--title text-uppercase fw-bold">Tổng số lượng</h6>
-          <hr>
-          <div class=" card__right--price d-flex justify-content-between align-items-center">
-            <p>Tổng phụ</p>
-            <p><span>{{totalCost | currency:'VND':'symbol':'1.0-0'}}</span></p>
-          </div>
-          <hr>
-          <div class="card__right--ship d-flex justify-content-between align-items-center">
-            <p>Giao hàng</p>
-            <div>
-              <p>{{shipCost | currency:'VND':'symbol':'1.0-0'}}</p>
-            </div>
-          </div>
-          <hr>
-          <div class="card__right--price d-flex justify-content-between align-items-center">
-            <p>Tổng</p>
-            <p><span>{{totalCost + shipCost | currency:'VND':'symbol':'1.0-0'}}</span></p>
-          </div>
-          <hr>
-          <p-toast></p-toast>
-          <div class="card__right--button my-4">
-            <button (click)="sendProductToOrder()" class="btn text-uppercase text-light fw-bold">tiến hành thanh toán</button>
-          </div>
-          <hr>
-          <div class="card__right--voucher d-flex flex-row">
-            <i class="pi pi-tag"></i>
-            <h4 class="mx-4">Phiếu ưu đãi</h4>
-          </div>
-          <hr>
-          <div class="card__right--voucher--code">
-            <input type="text" placeholder="Mã ưu đãi">
-          </div>
-          <div class="cart__right--apply">
-            <button class="btn">Áp dụng</button>
-          </div>
+        <!-- Additional Info Card -->
+        <div class="info-card">
+          <h3>Thông tin vận chuyển</h3>
+          <ul class="shipping-info">
+            <li><i class="pi pi-check-circle"></i> Miễn phí vận chuyển cho đơn hàng trên 500,000₫</li>
+            <li><i class="pi pi-clock"></i> Giao hàng trong 2-3 ngày làm việc</li>
+            <li><i class="pi pi-shield"></i> Đổi trả miễn phí trong 30 ngày</li>
+          </ul>
         </div>
-
       </div>
     </div>
-  </div>
+  } @else {
+    <!-- Empty Cart -->
+    <div class="empty-cart">
+      <div class="empty-content">
+        <i class="pi pi-shopping-cart empty-icon"></i>
+        <h3>Giỏ hàng của bạn đang trống</h3>
+        <p>Hãy bắt đầu mua sắm để lấp đầy giỏ hàng nào!</p>
+        <p-button label="Bắt đầu mua sắm" icon="pi pi-arrow-right" routerLink="/all-product" styleClass="start-shopping-btn"></p-button>
+      </div>
+    </div>
+  }
 </div>

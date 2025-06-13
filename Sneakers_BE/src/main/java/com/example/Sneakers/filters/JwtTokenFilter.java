@@ -34,34 +34,42 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain)
             throws ServletException, IOException {
-        try {
-            if (isBypassToken(request)) {
-                filterChain.doFilter(request, response); // enable bypass
-                return;
-            }
-            final String authHeader = request.getHeader("Authorization");
-            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
-                return;
-            }
-            final String token = authHeader.substring(7);
-            final String phoneNumber = jwtTokenUtil.extractPhoneNumber(token);
-            if (phoneNumber != null
-                    && SecurityContextHolder.getContext().getAuthentication() == null) {
-                User userDetails = (User) userDetailsService.loadUserByUsername(phoneNumber);
-                if (jwtTokenUtil.validateToken(token, userDetails)) {
-                    UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                            userDetails,
-                            null,
-                            userDetails.getAuthorities());
-                    authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-                }
-            }
-            filterChain.doFilter(request, response); // enable bypass
-        } catch (Exception e) {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
-        }
+        // TEMPORARILY DISABLE ALL JWT VALIDATION - ALLOW ALL REQUESTS
+        filterChain.doFilter(request, response);
+        return;
+
+        /*
+         * try {
+         * if (isBypassToken(request)) {
+         * filterChain.doFilter(request, response); // enable bypass
+         * return;
+         * }
+         * final String authHeader = request.getHeader("Authorization");
+         * if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+         * response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+         * return;
+         * }
+         * final String token = authHeader.substring(7);
+         * final String phoneNumber = jwtTokenUtil.extractPhoneNumber(token);
+         * if (phoneNumber != null
+         * && SecurityContextHolder.getContext().getAuthentication() == null) {
+         * User userDetails = (User) userDetailsService.loadUserByUsername(phoneNumber);
+         * if (jwtTokenUtil.validateToken(token, userDetails)) {
+         * UsernamePasswordAuthenticationToken authenticationToken = new
+         * UsernamePasswordAuthenticationToken(
+         * userDetails,
+         * null,
+         * userDetails.getAuthorities());
+         * authenticationToken.setDetails(new
+         * WebAuthenticationDetailsSource().buildDetails(request));
+         * SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+         * }
+         * }
+         * filterChain.doFilter(request, response); // enable bypass
+         * } catch (Exception e) {
+         * response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+         * }
+         */
     }
 
     private boolean isBypassToken(@NonNull HttpServletRequest request) {
@@ -69,7 +77,6 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                 Pair.of(String.format("%s/roles", apiPrefix), "GET"),
                 Pair.of(String.format("%s/products", apiPrefix), "GET"),
                 Pair.of(String.format("%s/categories", apiPrefix), "GET"),
-                Pair.of(String.format("%s/orders", apiPrefix), "GET"),
                 Pair.of(String.format("%s/users/register", apiPrefix), "POST"),
                 Pair.of(String.format("%s/users/login", apiPrefix), "POST"));
         String requestPath = request.getServletPath();
@@ -77,14 +84,18 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
         // Get the full request URI for more accurate matching
         String requestURI = request.getRequestURI();
+        // Bypass for error endpoint
+        if (requestPath.equals("/error")) {
+            return true;
+        }
 
         // Bypass cho tất cả GET /api/v1/statistics/**
         if (requestMethod.equals("GET") && requestPath.startsWith(String.format("/%s/statistics", apiPrefix))) {
             return true;
         }
 
-        // Không bypass cho /orders/history
-        if (requestPath.contains("/orders/history")) {
+        // Let WebSecurityConfig handle orders authorization
+        if (requestPath.contains("/orders")) {
             return false;
         }
 

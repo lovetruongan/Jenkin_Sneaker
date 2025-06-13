@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { AppHeaderComponent } from '../app-header/app-header.component';
 import { AppNavbarComponent } from '../app-navbar/app-navbar.component';
@@ -26,7 +26,7 @@ import { takeUntil, tap } from 'rxjs';
   templateUrl: './app-layout.component.html',
   styleUrl: './app-layout.component.scss'
 })
-export class AppLayoutComponent extends BaseComponent implements AfterViewInit{
+export class AppLayoutComponent extends BaseComponent implements AfterViewInit {
   public blockedUi: boolean = false;
 
   constructor(
@@ -34,6 +34,7 @@ export class AppLayoutComponent extends BaseComponent implements AfterViewInit{
   ) {
     super();
   }
+
   ngAfterViewInit(): void {
     this.loadingService.loading$.pipe(
       tap((loading) => {
@@ -42,5 +43,4 @@ export class AppLayoutComponent extends BaseComponent implements AfterViewInit{
       takeUntil(this.destroyed$)
     ).subscribe();
   }
-  
 }

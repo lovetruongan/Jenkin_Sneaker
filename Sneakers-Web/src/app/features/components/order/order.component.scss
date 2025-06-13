@@ -1,33 +1,256 @@
-// Add these voucher styles
-.voucher-input-group {
-    input {
-        font-size: 0.875rem;
-    }
-    
-    button {
-        font-size: 0.875rem;
-        padding: 0.25rem 0.75rem;
-    }
+:host {
+  display: block;
+  background-color: var(--surface-ground);
+  min-height: 100vh;
 }
 
-.applied-voucher {
-    .voucher-info {
+.order-wrapper {
+  padding: 2rem 1rem;
+}
+
+.order-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  align-items: start;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+}
+
+// Left Column - Order Summary
+.order-summary-section {
+  .summary-card {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 2rem;
+  }
+
+  .section-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    color: var(--text-color);
+  }
+
+  .product-list {
+    margin-bottom: 2rem;
+
+    .product-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem 0;
+      border-bottom: 1px solid var(--surface-border);
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      .product-image {
+        width: 70px;
+        height: 70px;
+        object-fit: cover;
+        border-radius: 8px;
+        border: 1px solid var(--surface-border);
+      }
+
+      .product-details {
+        flex: 1;
+
+        .product-name {
+          font-size: 1rem;
+          font-weight: 500;
+          margin: 0 0 0.5rem 0;
+          color: var(--text-color);
+        }
+
+        .product-meta {
+          font-size: 0.875rem;
+          color: var(--text-color-secondary);
+          margin: 0;
+        }
+      }
+
+      .product-price {
+        font-weight: 600;
+        color: var(--primary-color);
+        font-size: 1rem;
+      }
+    }
+  }
+
+  .voucher-section {
+    margin-bottom: 2rem;
+    padding: 1.5rem 0;
+    border-top: 1px solid var(--surface-border);
+    border-bottom: 1px solid var(--surface-border);
+
+    .voucher-input {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+
+      .voucher-field {
+        flex: 1;
+      }
+
+      .voucher-btn {
+        white-space: nowrap;
+      }
+    }
+
+    .applied-voucher {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #e8f5e8;
+      padding: 0.75rem 1rem;
+      border-radius: 6px;
+      border: 1px solid #4caf50;
+
+      .voucher-text {
+        color: #2e7d32;
         font-size: 0.875rem;
-        color: #28a745;
-        margin-right: 0.5rem;
+      }
     }
-    
-    button {
-        padding: 0.25rem;
-        font-size: 0.75rem;
+  }
+
+  .order-total {
+    .total-line {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
+      font-size: 1rem;
+
+      &.discount {
+        color: #4caf50;
+        font-weight: 500;
+      }
+
+      &.final {
+        font-size: 1.25rem;
+        font-weight: 700;
+        padding-top: 1rem;
+        border-top: 2px solid var(--primary-color);
+        color: var(--primary-color);
+      }
     }
+  }
 }
 
-.text-danger {
-    color: #dc3545 !important;
+// Right Column - Customer Information
+.customer-info-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+
+  .info-card {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  }
+
+  .section-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    color: var(--text-color);
+  }
+
+  .payment-form {
+    .form-row {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+
+      @media (max-width: 576px) {
+        flex-direction: column;
+        gap: 0;
+      }
+
+      .form-group {
+        flex: 1;
+        margin-bottom: 1rem;
+
+        &.full-width {
+          flex: 1 1 100%;
+        }
+
+        label {
+          display: block;
+          margin-bottom: 0.5rem;
+          font-weight: 500;
+          color: var(--text-color-secondary);
+        }
+
+        input, textarea {
+          width: 100%;
+        }
+      }
+    }
+  }
+
+  .shipping-dropdown {
+    width: 100%;
+  }
+
+  .payment-methods {
+    margin-bottom: 2rem;
+
+    .payment-option {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 1rem;
+      margin-bottom: 0.5rem;
+      border: 1px solid var(--surface-border);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background-color: var(--surface-hover);
+        border-color: var(--primary-color);
+      }
+
+      .payment-logo {
+        width: 40px;
+        height: 20px;
+        object-fit: contain;
+      }
+
+      label {
+        cursor: pointer;
+        font-weight: 500;
+        flex: 1;
+      }
+    }
+  }
+
+  .order-btn {
+    width: 100%;
+    padding: 1rem;
+    font-size: 1rem;
+    font-weight: 600;
+  }
 }
 
-.text-primary {
-    color: #007bff !important;
-    font-size: 1.1rem;
+// Dialog styling
+::ng-deep .p-dialog {
+  .p-dialog-header {
+    border-bottom: 1px solid var(--surface-border);
+  }
+  .p-dialog-footer {
+    border-top: 1px solid var(--surface-border);
+  }
 }

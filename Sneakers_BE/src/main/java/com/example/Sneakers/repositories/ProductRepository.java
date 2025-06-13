@@ -17,6 +17,11 @@ public interface ProductRepository extends JpaRepository<Product,Long> {
 
     boolean existsByName(String name);
 
+    long countByQuantityGreaterThan(Long quantity);
+
+    @Query("SELECT SUM(p.quantity) FROM Product p")
+    Long sumTotalQuantity();
+
     @Query("SELECT p FROM Product p WHERE " +
             "(:categoryId IS NULL OR :categoryId = 0 OR p.category.id = :categoryId) " +
             "AND (:keyword IS NULL OR :keyword = '' OR p.name LIKE %:keyword% OR p.description LIKE %:keyword%)")

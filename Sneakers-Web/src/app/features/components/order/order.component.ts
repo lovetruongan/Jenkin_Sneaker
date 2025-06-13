@@ -21,6 +21,12 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { VoucherService } from '../../../core/services/voucher.service';
 import { VoucherApplicationResponseDto } from '../../../core/dtos/voucherApplication.dto';
 import { ButtonModule } from 'primeng/button';
+import { StripePaymentComponent } from '../stripe-payment/stripe-payment.component';
+import { DialogModule } from 'primeng/dialog';
+import { CardModule } from 'primeng/card';
+import { DividerModule } from 'primeng/divider';
+import { TooltipModule } from 'primeng/tooltip';
+import { environment } from '../../../../environments/environment.development';
 
 @Component({
   selector: 'app-order',
@@ -37,7 +43,12 @@ import { ButtonModule } from 'primeng/button';
     BlockUIModule,
     ProgressSpinnerModule,
     AsyncPipe,
-    ButtonModule
+    ButtonModule,
+    StripePaymentComponent,
+    DialogModule,
+    CardModule,
+    DividerModule,
+    TooltipModule
   ],
   providers: [
     ToastService,
@@ -56,10 +67,11 @@ export class OrderComponent extends BaseComponent implements OnInit,AfterViewIni
   public voucherCode: string = '';
   public isVoucherApplied: boolean = false;
   public appliedVoucherName: string = '';
+  public apiImage: string = environment.apiImage;
   
   private productOrderLocalStorage: ProductsInCartDto[] = [];
   public blockedUi: boolean = false;
-  private orderId: number = 0;
+  public orderId: number = 0;
 
   public methodShipping!: {
     name: string,
@@ -67,15 +79,21 @@ export class OrderComponent extends BaseComponent implements OnInit,AfterViewIni
     price: number
   }[];
   public methodShippingValue!: {name: string, code: string,price: number};
-  public selectedPayMethod!: {name: string, key: string};
+  public selectedPayMethod!: {name: string, key: string, logo: string};
 
   payMethod: {
     name: string,
-    key: string
+    key: string,
+    logo: string
   }[] = [
-    { name: 'Thanh toán khi nhận hàng', key: 'Cash' },
-    { name: 'Chuyển khoản ngân hàng', key: 'Banking' },
+    { name: 'Thanh toán khi nhận hàng', key: 'Cash', logo: 'assets/images/payment-icons/cash.svg' },
+    { name: 'Chuyển khoản ngân hàng', key: 'Banking', logo: 'assets/images/payment-icons/bank.svg' },
+    { name: 'Thanh toán bằng thẻ Visa/Mastercard', key: 'Stripe', logo: 'assets/images/payment-icons/stripe.svg' },
   ];
+
+  // Stripe payment properties
+  public showStripeDialog: boolean = false;
+  public isStripePayment: boolean = false;
 
   constructor(
     private fb: FormBuilder,
@@ -89,11 +107,11 @@ export class OrderComponent extends BaseComponent implements OnInit,AfterViewIni
   ) {
     super();
     this.inforShipForm = this.fb.group({
-      fullName: [, Validators.required],
-      address: [, Validators.required],
-      phoneNumber :[, Validators.required],
-      email: [],
-      note:[]
+      fullName: ['', Validators.required],
+      address: ['', Validators.required],
+      phoneNumber: ['', [Validators.required, Validators.minLength(5)]],
+      email: ['', [Validators.email]],
+      note: ['']
     })
   }
   ngOnInit(): void {
@@ -144,12 +162,12 @@ export class OrderComponent extends BaseComponent implements OnInit,AfterViewIni
           this.toastService.success(response.message || 'Áp dụng voucher thành công');
         } else {
           this.resetVoucher();
-          this.toastService.fail(response.message || 'Không thể áp dụng voucher');
+          this.toastService.fail(response.message || 'Không thể áp dụng voucher. Vui lòng thử lại.');
         }
       }),
       catchError((err) => {
         this.resetVoucher();
-        this.toastService.fail("Lỗi khi áp dụng voucher");
+        this.toastService.fail(err.error?.message || 'Lỗi không xác định khi áp dụng voucher.');
         return of(err);
       }),
       takeUntil(this.destroyed$)
@@ -173,44 +191,144 @@ export class OrderComponent extends BaseComponent implements OnInit,AfterViewIni
     if (this.inforShipForm.invalid){
       this.toastService.fail("Vui lòng nhập đầy đủ thông tin giao hàng");
     } else {
-      this.blockUi();
-      const orderData = {
-        fullname: this.inforShipForm.value.fullName,
-        email: this.inforShipForm.value.email,
-        phone_number: this.inforShipForm.value.phoneNumber,
-        address: this.inforShipForm.value.address,
-        note: this.inforShipForm.value.note,
-        shipping_method: this.methodShippingValue.name,
-        payment_method: this.selectedPayMethod.name,
-        cart_items: this.productOrder,
-        total_money: this.totalCost, // Original total
-        ...(this.isVoucherApplied && { voucher_code: this.voucherCode }) // Add voucher code if applied
-      };
-      
-      this.orderService.postOrder(orderData).pipe(
-        tap((orderInfor: any) => {
-          this.orderId = orderInfor.id;
-          this.commonService.orderId.next(orderInfor.id); 
-        }),
-        switchMap(() => {
-          this.productOrderLocalStorage = JSON.parse(localStorage.getItem("productOrder")!);
-          const fncDel = this.productOrderLocalStorage.map((po) => this.productService.deleteProductFromCart(po.id))
-          return forkJoin(fncDel);
-        }),
-        tap(() => {
-          this.commonService.intermediateObservable.next(true);
-          localStorage.removeItem("productOrder");
-          this.blockUi();
-          this.router.navigate([`/order-detail/${this.orderId}`]);
-        }),
-        catchError((err) => {
-          this.blockUi();
-          this.toastService.fail("Đặt hàng không thành công");
-          return of(err);
-        }),
-        takeUntil(this.destroyed$)
-      ).subscribe();
+      // Check if Stripe payment is selected
+      if (this.selectedPayMethod.key === 'Stripe') {
+        this.processStripeOrder();
+      } else {
+        this.processRegularOrder();
+      }
     }
+  }
+
+  private processStripeOrder(): void {
+    // Create order first, then show Stripe payment dialog
+    this.blockUi();
+    
+    // Get user info from localStorage (optional, as backend uses token)
+    const userInfor = JSON.parse(localStorage.getItem("userInfor") || '{}');
+    const userId = userInfor.id;
+
+    const orderData = {
+      ...(userId && { user_id: Number(userId) }),
+      fullname: this.inforShipForm.value.fullName,
+      email: this.inforShipForm.value.email,
+      phone_number: this.inforShipForm.value.phoneNumber,
+      address: this.inforShipForm.value.address,
+      note: this.inforShipForm.value.note || '',
+      shipping_method: this.methodShippingValue.name,
+      payment_method: 'Pending Stripe Payment',
+      cart_items: this.productOrder.map(item => ({
+        product_id: Number(item.product_id),
+        quantity: Number(item.quantity),
+        size: Number(item.size)
+      })),
+      total_money: Math.round(this.finalCost),
+      ...(this.isVoucherApplied && { voucher_code: this.voucherCode })
+    };
+
+    this.orderService.postOrder(orderData).pipe(
+      tap((orderInfor: any) => {
+        this.orderId = orderInfor.id;
+        this.commonService.orderId.next(orderInfor.id);
+        this.blockUi();
+        // Show Stripe payment dialog
+        this.showStripeDialog = true;
+        this.isStripePayment = true;
+      }),
+      catchError((err) => {
+        this.blockUi();
+        console.error('Order creation error:', err);
+        this.toastService.fail("Không thể tạo đơn hàng: " + (err.error?.message || err.message));
+        return of(err);
+      }),
+      takeUntil(this.destroyed$)
+    ).subscribe();
+  }
+
+  private processRegularOrder(): void {
+    this.blockUi();
+    
+    // Get user info from localStorage (optional, as backend uses token)
+    const userInfor = JSON.parse(localStorage.getItem("userInfor") || '{}');
+    const userId = userInfor.id;
+
+    const orderData = {
+      ...(userId && { user_id: Number(userId) }),
+      fullname: this.inforShipForm.value.fullName,
+      email: this.inforShipForm.value.email,
+      phone_number: this.inforShipForm.value.phoneNumber,
+      address: this.inforShipForm.value.address,
+      note: this.inforShipForm.value.note || '',
+      shipping_method: this.methodShippingValue.name,
+      payment_method: this.selectedPayMethod.name,
+      cart_items: this.productOrder.map(item => ({
+        product_id: Number(item.product_id),
+        quantity: Number(item.quantity),
+        size: Number(item.size)
+      })),
+      total_money: Math.round(this.finalCost),
+      ...(this.isVoucherApplied && { voucher_code: this.voucherCode })
+    };
+
+    this.orderService.postOrder(orderData).pipe(
+      tap((orderInfor: any) => {
+        this.orderId = orderInfor.id;
+        this.commonService.orderId.next(orderInfor.id);
+      }),
+      switchMap(() => {
+        this.productOrderLocalStorage = JSON.parse(localStorage.getItem("productOrder")!);
+        const fncDel = this.productOrderLocalStorage.map((po) => this.productService.deleteProductFromCart(po.id))
+        return forkJoin(fncDel);
+      }),
+      tap(() => {
+        this.commonService.intermediateObservable.next(true);
+        localStorage.removeItem("productOrder");
+        this.blockUi();
+        this.router.navigate([`/order-detail/${this.orderId}`]);
+      }),
+      catchError((err) => {
+        this.blockUi();
+        console.error('Order creation error:', err);
+        this.toastService.fail("Đặt hàng không thành công: " + (err.error?.message || err.message));
+        return of(err);
+      }),
+      takeUntil(this.destroyed$)
+    ).subscribe();
+  }
+
+  onStripePaymentSuccess(paymentIntent: any): void {
+    // Clear cart and redirect to order detail
+    this.productOrderLocalStorage = JSON.parse(localStorage.getItem("productOrder")!);
+    const fncDel = this.productOrderLocalStorage.map((po) => this.productService.deleteProductFromCart(po.id));
+    
+    forkJoin(fncDel).pipe(
+      tap(() => {
+        this.commonService.intermediateObservable.next(true);
+        localStorage.removeItem("productOrder");
+        this.showStripeDialog = false;
+        this.toastService.success("Thanh toán thành công!");
+        this.router.navigate([`/order-detail/${this.orderId}`]);
+      }),
+      catchError((err) => {
+        console.error('Error clearing cart:', err);
+        // Still redirect even if cart clearing fails
+        this.showStripeDialog = false;
+        this.router.navigate([`/order-detail/${this.orderId}`]);
+        return of(err);
+      }),
+      takeUntil(this.destroyed$)
+    ).subscribe();
+  }
+
+  onStripePaymentError(error: string): void {
+    this.toastService.fail(`Thanh toán thất bại: ${error}`);
+    // Keep dialog open for retry
+  }
+
+  onStripePaymentCancel(): void {
+    this.showStripeDialog = false;
+    this.toastService.success("Đã hủy thanh toán");
+    // Order is already created but payment is pending
   }
 
   blockUi() {

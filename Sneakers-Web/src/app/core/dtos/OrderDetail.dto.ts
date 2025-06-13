@@ -2,9 +2,9 @@ import { ProductDto } from "./product.dto";
 
 export interface OrderDetailDto {
     id: number,
-    numberOfProducts: number,
+    number_of_products: number,
     price: number,
-    product: ProductDto,
+    product?: ProductDto,
     size: number,
-    totalMoney: number
+    total_money: number
 }

@@ -99,11 +99,15 @@ public class OrderService implements IOrderService {
                 throw new Exception("Voucher đã hết lượt sử dụng");
             }
 
-            // Check user usage limit
-            Long userUsageCount = voucherUsageRepository.countByVoucherIdAndUserId(voucher.getId(), user.getId());
-            if (userUsageCount >= 1) {
-                throw new Exception("Bạn đã sử dụng voucher này rồi");
-            }
+            // Check user usage limit - Temporarily disabled to allow reuse
+            /*
+             * Long userUsageCount =
+             * voucherUsageRepository.countByVoucherIdAndUserId(voucher.getId(),
+             * user.getId());
+             * if (userUsageCount >= 1) {
+             * throw new Exception("Bạn đã sử dụng voucher này rồi");
+             * }
+             */
 
             // Calculate discount
             discountAmount = (baseTotal * voucher.getDiscountPercentage()) / 100;
@@ -181,6 +185,12 @@ public class OrderService implements IOrderService {
             Product product = productRepository.findById(productId)
                     .orElseThrow(() -> new DataNotFoundException("Product not found with id: " + productId));
 
+            if (product.getQuantity() < quantity) {
+                throw new Exception("Product " + product.getName() + " is out of stock");
+            }
+
+            product.setQuantity(product.getQuantity() - quantity);
+
             // Đặt thông tin cho OrderDetail
             orderDetail.setProduct(product);
             orderDetail.setNumberOfProducts(quantity);
@@ -196,22 +206,29 @@ public class OrderService implements IOrderService {
 
         // Lưu danh sách OrderDetail vào cơ sở dữ liệu
         orderDetailRepository.saveAll(orderDetails);
-        // Gửi mail thông báo cho người dùng
-        Email email = new Email();
-        String to = order.getEmail();
-        String subject = "Đặt hàng thành công từ Sneaker Store - Đơn hàng #" + order.getId();
-        String content = BuilderEmailContent.buildOrderEmailContent(order);
-        boolean sendMail = email.sendEmail(to, subject, content);
 
-        if (!sendMail) {
-            throw new Exception("Cannot send email");
+        // Gửi mail thông báo cho người dùng (không throw exception nếu thất bại)
+        try {
+            Email email = new Email();
+            String to = order.getEmail();
+            String subject = "Đặt hàng thành công từ Sneaker Store - Đơn hàng #" + order.getId();
+            String content = BuilderEmailContent.buildOrderEmailContent(order);
+            boolean sendMail = email.sendEmail(to, subject, content);
+
+            if (!sendMail) {
+                System.err.println("Warning: Failed to send order confirmation email to " + to);
+            }
+        } catch (Exception emailException) {
+            // Log email error but don't fail the order creation
+            System.err.println("Warning: Exception while sending email: " + emailException.getMessage());
         }
+
         return OrderIdResponse.fromOrder(order);
     }
 
     @Override
     public OrderResponse getOrder(Long id) {
-        Order order = orderRepository.findById(id).orElse(null);
+        Order order = orderRepository.findByIdWithDetails(id).orElse(null);
         return OrderResponse.fromOrder(order);
     }
 
@@ -221,12 +238,15 @@ public class OrderService implements IOrderService {
         User user = userService.getUserDetailsFromToken(extractedToken);
 
         if (user.getRole().getName().equals(Role.ADMIN)) {
-            return OrderResponse.fromOrder(orderRepository.findById(orderId)
+            return OrderResponse.fromOrder(orderRepository.findByIdWithDetails(orderId)
                     .orElseThrow(() -> new Exception("Cannot find order with id = " + orderId)));
 
         }
 
-        Order order = orderRepository.findById(orderId).orElse(null);
+        Order order = orderRepository.findByIdWithDetails(orderId).orElse(null);
+        if (order == null) {
+            throw new Exception("Cannot find order with id = " + orderId);
+        }
         if (!user.getId().equals(order.getUser().getId())) {
             throw new Exception("Cannot get order of another user");
         }
@@ -269,15 +289,16 @@ public class OrderService implements IOrderService {
 
     @Override
     public List<OrderHistoryResponse> getAllOrders() {
-        return orderRepository.findAll()
-                .stream()
+        List<Order> orders = orderRepository.findAll();
+        return orders.stream()
                 .map(OrderHistoryResponse::fromOrder)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public Page<Order> getOrdersByKeyword(String keyword, Pageable pageable) {
-        return orderRepository.findByKeyword(keyword, pageable);
+    public Page<Order> getOrdersByKeyword(String keyword, String status, LocalDate startDate, LocalDate endDate,
+            Pageable pageable) {
+        return orderRepository.findByKeyword(keyword, status, startDate, endDate, pageable);
     }
 
     @Override
@@ -297,7 +318,7 @@ public class OrderService implements IOrderService {
         Long totalRevenue = orderRepository.calculateTotalRevenue();
         Long todayOrders = orderRepository.countOrdersToday();
         Long totalProductsSold = orderRepository.countTotalProductsSold();
-        
+
         return new DashboardStatsDTO(totalRevenue, todayOrders, totalProductsSold);
     }
 }

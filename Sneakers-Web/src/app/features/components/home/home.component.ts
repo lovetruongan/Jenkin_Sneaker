@@ -13,6 +13,7 @@ import { Router, RouterModule } from '@angular/router';
 import { RecommendationService } from '../../../core/services/recommendation.service';
 import { CategoriesService } from '../../../core/services/categories.service';
 import { CategoryDto } from '../../../core/dtos/Category.dto';
+import { VoucherDisplayComponent } from '../voucher-display/voucher-display.component';
 
 import { AiChatbotComponent } from '../../../core/components/ai-chatbot/ai-chatbot.component';
 
@@ -25,7 +26,8 @@ import { AiChatbotComponent } from '../../../core/components/ai-chatbot/ai-chatb
     CurrencyPipe,
     BadgeModule,
     RouterModule,
-    AiChatbotComponent
+    AiChatbotComponent,
+    VoucherDisplayComponent
   ],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']

@@ -1,38 +1,77 @@
-<div class="container-fluid p-0">
-  <p-blockUI [blocked]="blockedUi">
-    <p-progressSpinner ariaLabel="loading"></p-progressSpinner>
-  </p-blockUI>
-  <div class="row m-0 d-flex align-items-center">
-    <div class="col-lg-3 col-sm-4 offset-lg-4 offset-sm-2 login-form-container">
-      <!-- <img class="login-logo" src="/src/assets/images/z5126507952479_4523e39e253c486dd6fd48597dcf5a49.jpg" alt="#"> -->
-      <div class="login-form-container-content">
-        <h2 class="login-title">Đăng nhập</h2>
-        <div class="form-group-container">
-          <form (keydown.enter)="formSubmitSubject.next()" class="form-group" [formGroup]="loginForm">
-            <input pInputText pKeyFilter="int" required="" placeholder="Số điện thoại" formControlName="userName" />
-            <p-password class="login-password" required="" placeholder="Mật khẩu" [toggleMask]="true"
-              formControlName="password" [feedback]="false"></p-password>
-          </form>
-        </div>
-        <div class="remember-pass d-flex">
-          <p-checkbox class="remember-pass_checkbox" [binary]="true" inputId="binary" value="Ghi nhớ tài khoản này"
-            inputId="remember"></p-checkbox>
-          <label for="remember">Ghi nhớ tài khoản này</label>
-        </div>
-        <p-toast></p-toast>
-        <p-button (click)="formSubmitSubject.next()" class="login__button" label="Đăng nhập" type="submit"></p-button>
-        <div class="no-account-container">
-          <span>Chưa có tài khoản <a [routerLink]="['/register']">Đăng ký</a></span>
-        </div>
-        <p class="text-light display-10">&copy; 2017–2024</p>
+<div class="login-page">
+  <p-toast></p-toast>
+  <div class="login-container">
+    <div class="login-card">
+      <div class="card-header">
+        <h1 class="title">Đăng nhập</h1>
+        <p class="subtitle">Chào mừng bạn quay trở lại!</p>
       </div>
-      <div class="login-form-container-back">
-        <a [routerLink]="['/Home']">
-          <p>Xem sản phẩm</p>
-          <i class="pi pi-arrow-left"></i>
-        </a>
-      </div>
-      <p>&copy; 2017–2024</p>
+
+      <form [formGroup]="loginForm" (ngSubmit)="onLogin()" class="login-form">
+        <div class="form-group">
+          <label for="userName">Số điện thoại</label>
+          <input 
+            type="tel"
+            id="userName"
+            formControlName="userName"
+            placeholder="Nhập số điện thoại"
+            class="form-input"
+            pKeyFilter="int">
+          <div *ngIf="userName?.invalid && (userName?.dirty || userName?.touched)" class="error-message">
+            <small *ngIf="userName?.errors?.['required']">Số điện thoại không được để trống.</small>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Mật khẩu</label>
+          <div class="password-field">
+            <input 
+              [type]="showPassword ? 'text' : 'password'"
+              id="password"
+              formControlName="password"
+              placeholder="Nhập mật khẩu"
+              class="form-input">
+            <button 
+              type="button"
+              class="password-toggle"
+              (click)="togglePassword()">
+              <i [class]="showPassword ? 'pi pi-eye-slash' : 'pi pi-eye'"></i>
+            </button>
+          </div>
+          <div *ngIf="password?.invalid && (password?.dirty || password?.touched)" class="error-message">
+            <small *ngIf="password?.errors?.['required']">Mật khẩu không được để trống.</small>
+          </div>
+        </div>
+
+        <div class="form-options">
+          <label class="checkbox-wrapper">
+            <input type="checkbox" formControlName="rememberMe">
+            <span class="checkmark"></span>
+            <span class="checkbox-text">Ghi nhớ tài khoản</span>
+          </label>
+          <a href="#" class="forgot-link">Quên mật khẩu?</a>
+        </div>
+
+        <button type="submit" class="login-btn" [disabled]="loginForm.invalid">
+          Đăng nhập
+        </button>
+
+        <div class="divider">
+          <span>hoặc</span>
+        </div>
+
+        <div class="register-prompt">
+          <span>Chưa có tài khoản? </span>
+          <a routerLink="/register" class="register-link">Đăng ký ngay</a>
+        </div>
+      </form>
+    </div>
+
+    <div class="back-home">
+                <a routerLink="/Home" class="back-link">
+        <i class="pi pi-arrow-left"></i>
+        <span>Quay về trang chủ</span>
+      </a>
     </div>
   </div>
 </div>

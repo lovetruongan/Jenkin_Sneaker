@@ -1,0 +1,53 @@
+.layout-main {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  background: #1a1a1a;
+}
+
+.layout-topbar {
+  margin: 0;
+  padding: 0;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.layout-navbar {
+  margin: 0;
+  padding: 0;
+  position: fixed;
+  top: 65px; // Exact header height
+  left: 0;
+  right: 0;
+  z-index: 999;
+}
+
+.layout-main-content {
+  flex: 1;
+  margin-top: 125px; // Header (65px) + Navbar (60px)
+  background: #f8f9fa;
+  min-height: calc(100vh - 125px);
+}
+
+/* Remove any default margins and ensure seamless connection */
+:host {
+  display: block;
+  margin: 0;
+  padding: 0;
+}
+
+/* Global body styling for dark theme */
+:ng-deep {
+  body {
+    margin: 0;
+    padding: 0;
+    background: #1a1a1a;
+  }
+  
+  * {
+    box-sizing: border-box;
+  }
+}

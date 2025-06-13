@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "ng serve --proxy-config proxy.conf.json",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
@@ -37,6 +37,7 @@
     "primeicons": "^6.0.1",
     "primeng": "^17.12.0",
     "rxjs": "~7.8.0",
+    "@stripe/stripe-js": "^2.4.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.14.3"
   },

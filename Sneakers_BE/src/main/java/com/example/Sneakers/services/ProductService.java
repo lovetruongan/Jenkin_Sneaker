@@ -48,6 +48,7 @@ public class ProductService implements IProductService {
                 .description(productDTO.getDescription())
                 .category(existingCategory)
                 .discount(productDTO.getDiscount())
+                .quantity(productDTO.getQuantity())
                 .build();
         Product savedProduct = productRepository.save(newProduct);
 
@@ -96,6 +97,7 @@ public class ProductService implements IProductService {
                 existingProduct.setThumbnail(productDTO.getThumbnail());
             }
             existingProduct.setDiscount(productDTO.getDiscount());
+            existingProduct.setQuantity(productDTO.getQuantity());
             Product updatedProduct = productRepository.save(existingProduct);
 
             // Publish event for re-indexing

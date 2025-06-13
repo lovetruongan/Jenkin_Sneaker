@@ -4,7 +4,7 @@ import { OrderService } from './order.service';
 import { OrderHistoryService } from './order-history.service';
 import { ProductService } from './product.service';
 import { isPlatformBrowser } from '@angular/common';
-import { Observable, from, firstValueFrom, of } from 'rxjs';
+import { Observable, from, firstValueFrom, of, catchError } from 'rxjs';
 import { OrderDetailDto } from '../dtos/OrderDetail.dto';
 import { HistoryOrderDto } from '../dtos/HistoryOrder.dto';
 
@@ -34,7 +34,8 @@ export class RecommendationService {
     const token = localStorage.getItem('token');
     console.log('Token status:', token ? 'Found' : 'Not found');
 
-    if (!token) {
+    if (!token || token.trim() === '') {
+      console.log('No valid token found, returning default suggestions');
       return of(this.getDefaultSuggestions(products));
     }
 
@@ -42,12 +43,32 @@ export class RecommendationService {
   }
 
   private async calculateRecommendations(products: ProductDto[]): Promise<ProductDto[]> {
+    const inStockProducts = products.filter(p => p.quantity > 0);
     console.log('Starting product suggestion calculation...');
+    
+    // Check token again before making API calls
+    const token = localStorage.getItem('token');
+    if (!token || token.trim() === '') {
+      console.log('Token missing during calculation, returning default suggestions');
+      return this.getDefaultSuggestions(products);
+    }
+    
     await this.initializePurchasedProducts();
 
     try {
       console.log('Fetching order history for calculations...');
-      const orderHistory = await firstValueFrom(this.orderService.getHistoryOrder());
+      const orderHistory = await firstValueFrom(
+        this.orderService.getHistoryOrder().pipe(
+          catchError(error => {
+            console.error('Error fetching order history:', error);
+            if (error.status === 400 || error.status === 401 || error.status === 403) {
+              console.log('Authentication/authorization error, returning empty array');
+              return of([]);
+            }
+            throw error;
+          })
+        )
+      );
       
       console.log('Order history response:', orderHistory);
       
@@ -78,8 +99,8 @@ export class RecommendationService {
               productIds.add(detail.product.id);
               // Track quantity for this product
               const currentQuantity = purchaseQuantities.get(detail.product.id) || 0;
-              purchaseQuantities.set(detail.product.id, currentQuantity + detail.numberOfProducts);
-              totalPurchasedQuantity += detail.numberOfProducts;
+              purchaseQuantities.set(detail.product.id, currentQuantity + detail.number_of_products);
+              totalPurchasedQuantity += detail.number_of_products;
             }
           });
         }
@@ -124,7 +145,7 @@ export class RecommendationService {
               if (completeProduct?.category_id !== undefined && completeProduct?.category_id !== null) {
                 const categoryId = completeProduct.category_id;
                 const currentCount = this.categoryFrequency.get(categoryId) || 0;
-                this.categoryFrequency.set(categoryId, currentCount + detail.numberOfProducts);
+                this.categoryFrequency.set(categoryId, currentCount + detail.number_of_products);
                 productsWithValidCategory++;
                 this.purchasedProducts.add(detail.product.id);
               }
@@ -151,7 +172,7 @@ export class RecommendationService {
       console.log('\nTotal category frequency:', totalCategoryFrequency);
 
       // Calculate price statistics
-      const prices = products.map(p => p.price);
+      const prices = inStockProducts.map(p => p.price);
       const priceStats = {
         average: prices.reduce((a, b) => a + b, 0) / prices.length,
         standardDeviation: Math.sqrt(
@@ -163,16 +184,24 @@ export class RecommendationService {
       };
 
       // Calculate scores for each product
-      const scores = products.map(product => {
+      const scores = inStockProducts.map(product => {
         // Initialize score components
         const scoreComponents = {
           price: 0,
           category: 0,
           random: Math.random() * 0.05, // 5% random factor
-          discount: product.discount ? 0.4 : 0, // 40% boost for discounted items
+          discount: product.discount ? (product.discount / 100) * 0.4 : 0, // Discount score proportional to discount percentage (max 40%)
           penalty: 0, // Penalty for previously purchased products
           total: 0
         };
+
+        // Log discount calculation
+        if (product.discount) {
+          console.log(`Discount score calculation for ${product.name}:`, {
+            discount_percentage: product.discount,
+            discount_score: scoreComponents.discount.toFixed(3)
+          });
+        }
 
         // Price score (35% weight) - products closer to average price get higher scores
         const priceDeviation = Math.abs(product.price - priceStats.average);
@@ -272,9 +301,7 @@ export class RecommendationService {
   }
 
   private getDefaultSuggestions(products: ProductDto[]): ProductDto[] {
-    // Return random products when no user data is available
-    return products
-      .sort(() => Math.random() - 0.5)
-      .slice(0, 8);
+    // Filter out-of-stock products and return the first 8 as default suggestions
+    return products.filter(p => p.quantity > 0).slice(0, 8);
   }
 } 

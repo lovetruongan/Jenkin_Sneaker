@@ -1,227 +1,198 @@
+:host {
+  display: block;
+  background-color: #f7f9fc;
+  height: 100%;
+}
+
 .order-manage-container {
-  padding: 1.5rem;
-  height: 100vh;
+  padding: 1rem;
+  height: 100%;
   display: flex;
   flex-direction: column;
+  gap: 1.5rem;
+}
 
-  .order-header {
-    margin-bottom: 2rem;
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1.5rem;
+}
 
-    h2 {
-      margin: 0;
-      font-size: 1.8rem;
-      color: #333;
-    }
+.order-header h2 {
+  font-size: 1.5rem;
+  color: #34495e;
+  font-weight: 600;
+  margin: 0;
+}
+
+::ng-deep .search-card {
+  .p-card-content {
+    padding: 1.5rem;
   }
-
-  .order-table {
-    background: white;
-    border-radius: 8px;
-    overflow: visible;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 2rem;
-
-    ::ng-deep {
-      .p-datatable {
-        display: flex;
-        flex-direction: column;
-        height: 100%;
-
-        .p-datatable-wrapper {
-          flex: 1;
-          overflow: auto;
-        }
-
-        .p-datatable-header {
-          background-color: #f8f9fa;
-          padding: 1rem;
-          font-weight: 600;
-        }
-
-        .p-datatable-thead > tr > th {
-          background-color: #f8f9fa;
-          color: #495057;
-          font-weight: 600;
-          padding: 1rem;
-          border-bottom: 1px solid #dee2e6;
-          text-align: left;
-          position: sticky;
-          top: 0;
-          z-index: 1;
-          
-          &:first-child { width: 100px; }  // ID column
-          &:nth-child(2) { width: 150px; }  // Buyer name column
-          &:nth-child(3) { width: 120px; }  // Phone number column
-          &:nth-child(4) { width: 20%; }   // Product name column
-          &:nth-child(5) { width: 100px; }  // Quantity column
-          &:nth-child(6) { width: 150px; }  // Date column
-          &:nth-child(7) { width: 150px; }  // Total column
-          &:nth-child(8) { width: 180px; }  // Status column
-          &:last-child { width: 100px; }    // Actions column
-        }
-
-        .p-datatable-tbody > tr {
-          &:nth-child(even) {
-            background-color: #f8f9fa;
-          }
-
-          > td {
-            padding: 1rem;
-            border-bottom: 1px solid #dee2e6;
-            
-            .p-dropdown {
-              width: 100%;
-              min-width: 150px;
-
-              .p-dropdown-label {
-                padding: 0.5rem;
-                font-size: 0.9rem;
-              }
-
-              .p-dropdown-panel {
-                z-index: 1000;
-              }
-            }
-
-            .p-button.p-button-icon-only {
-              width: 2.5rem;
-              height: 2.5rem;
-            }
-          }
-
-          &:hover {
-            background-color: #e9ecef;
-          }
-        }
-
-        .p-paginator {
-          padding: 1.5rem;
-          margin-top: 1rem;
-          border-top: 1px solid #dee2e6;
-          background-color: #fff;
-          position: sticky;
-          bottom: 0;
-          z-index: 2;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-
-          .p-paginator-current {
-            margin-right: auto;
-          }
-
-          .p-paginator-element {
-            margin: 0 0.2rem;
-            min-width: 2.5rem;
-            height: 2.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-          }
-
-          .p-paginator-pages {
-            display: flex;
-            gap: 0.5rem;
-          }
-        }
-      }
-
-      .p-dropdown-panel {
-        z-index: 1000 !important;
-      }
-    }
-  }
-
-  .text-center {
-    text-align: center;
-    padding: 2rem;
-    color: #6c757d;
+  .p-fluid .field > label {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    display: inline-block;
   }
 }
 
-// Responsive adjustments
-@media (max-width: 768px) {
-  .order-manage-container {
-    padding: 1rem;
-    height: auto;
+.order-table-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0; // Important for flex-grow in a flex column
+  
+  ::ng-deep .p-card-body {
+    padding: 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
 
-    .order-header {
-      margin-bottom: 1.5rem;
+  ::ng-deep .p-card-content {
+    height: 100%;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+  }
+}
 
-      h2 {
-        font-size: 1.5rem;
-        text-align: center;
-      }
+.order-table {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+::ng-deep .p-datatable {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  .p-datatable-wrapper {
+    flex-grow: 1;
+    overflow-y: auto;
+  }
+
+  .p-datatable-thead > tr > th {
+    background-color: #f1f3f5;
+    font-weight: 600;
+    color: #34495e;
+    padding: 1rem 1.5rem;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+
+  .p-datatable-tbody > tr > td {
+    padding: 1rem 1.5rem;
+    vertical-align: middle;
+    border-color: #e9ecef;
+
+    .p-dropdown {
+      min-width: 170px;
     }
-
-    .order-table {
-      margin: 0 -1rem;
-      width: calc(100% + 2rem);
-      border-radius: 0;
-
-      ::ng-deep {
-        .p-datatable {
-          .p-datatable-thead {
-            display: none;
-          }
-
-          .p-datatable-tbody > tr {
-            display: block;
-            margin-bottom: 1rem;
-            border: 1px solid #dee2e6;
-            border-radius: 4px;
-            background: white;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-
-            > td {
-              display: flex;
-              justify-content: space-between;
-              align-items: center;
-              padding: 0.75rem;
-              border: none;
-              border-bottom: 1px solid #dee2e6;
-
-              &:last-child {
-                border-bottom: none;
-              }
-
-              &:before {
-                content: attr(data-label);
-                font-weight: 600;
-                color: #495057;
-                margin-right: 1rem;
-                min-width: 120px;
-              }
-
-              &[data-label="Tên người mua"],
-              &[data-label="Số điện thoại"] {
-                word-break: break-word;
-              }
-            }
-          }
-
-          .p-paginator {
-            position: static;
-            flex-wrap: wrap;
-            justify-content: center;
-            padding: 1.5rem;
-            margin-top: 1rem;
-
-            .p-paginator-current {
-              width: 100%;
-              text-align: center;
-              margin-bottom: 1rem;
-            }
-
-            .p-paginator-pages {
-              margin: 0.5rem 0;
-            }
-          }
-        }
-      }
+    .p-button {
+      margin-right: 0.5rem;
     }
   }
+
+  .p-paginator.p-paginator-bottom {
+    border-top: 1px solid #e9ecef;
+    padding: 1rem;
+    background: #fff;
+  }
+}
+
+// Responsive Design
+@media (max-width: 992px) {
+  .search-card .grid {
+    .field {
+      margin-bottom: 1rem;
+    }
+    .align-items-end {
+      align-self: flex-end;
+    }
+  }
+}
+
+@media (max-width: 767px) {
+  .order-manage-container {
+    padding: 1rem;
+  }
+
+  .order-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .order-header h2 {
+    font-size: 1.5rem;
+  }
+
+  .header-search-container .p-inputtext {
+    width: 100%;
+  }
+
+  .p-datatable-responsive-scroll .p-datatable-wrapper {
+    overflow-x: auto;
+  }
+
+  ::ng-deep .p-dialog {
+    width: 90vw !important;
+  }
+}
+
+.search-fab {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  z-index: 1000;
+}
+
+.header-search-container {
+  cursor: pointer;
+}
+
+.header-search-container .p-inputtext {
+  width: 280px;
+  transition: width 0.3s;
+}
+
+.header-search-container .p-inputtext:focus {
+  width: 350px;
+}
+
+.payment-method-stripe-success,
+.payment-method-stripe-pending,
+.payment-method-cod,
+.payment-method-default {
+    padding: 5px 10px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-align: center;
+    display: inline-block;
+    color: white;
+}
+
+.payment-method-stripe-success {
+    background-color: #28a745; // Green
+    border: 1px solid #218838;
+}
+
+.payment-method-stripe-pending {
+    background-color: #ffc107; // Yellow
+    color: #212529;
+    border: 1px solid #e0a800;
+}
+
+.payment-method-cod {
+    background-color: #17a2b8; // Teal
+    border: 1px solid #138496;
+}
+
+.payment-method-default {
+    background-color: #6c757d; // Gray
+    border: 1px solid #5a6268;
 }

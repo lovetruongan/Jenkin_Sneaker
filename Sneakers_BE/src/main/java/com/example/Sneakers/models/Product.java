@@ -34,6 +34,9 @@ public class Product extends BaseEntity {
 
     private Long discount;
 
+    @Column(name = "quantity")
+    private Long quantity;
+
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<ProductImage> productImages;
 }

@@ -17,4 +17,14 @@ export class ToastService {
   fail(content : string){
     this.messageService.add({ severity: 'error', summary: 'Thất bại', detail: content});
   }
+
+  accountBlocked(content : string){
+    this.messageService.add({ 
+      severity: 'error', 
+      summary: 'Tài khoản bị khóa', 
+      detail: content,
+      life: 5000,
+      sticky: true
+    });
+  }
 }

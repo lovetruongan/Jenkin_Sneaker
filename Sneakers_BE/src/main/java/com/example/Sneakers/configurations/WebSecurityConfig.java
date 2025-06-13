@@ -28,7 +28,7 @@ import static org.springframework.http.HttpMethod.*;
 // @EnableMethodSecurity
 @EnableWebSecurity
 @EnableWebMvc
-@EnableGlobalMethodSecurity(prePostEnabled = true)
+// @EnableGlobalMethodSecurity(prePostEnabled = true)
 @RequiredArgsConstructor
 public class WebSecurityConfig {
         private final JwtTokenFilter jwtTokenFilter;

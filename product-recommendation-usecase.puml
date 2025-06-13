@@ -1,0 +1,72 @@
+@startuml Product Recommendation Use Case
+
+skinparam actorStyle awesome
+skinparam packageStyle rectangle
+skinparam backgroundColor white
+skinparam handwritten false
+skinparam defaultFontName Arial
+skinparam defaultFontSize 14
+skinparam roundcorner 20
+skinparam shadowing true
+
+actor "Khách hàng" as Customer
+actor "Hệ thống" as System
+
+rectangle "Chức năng gợi ý sản phẩm" {
+  usecase "Xem sản phẩm gợi ý" as UC1
+  usecase "Tính toán điểm sản phẩm" as UC2
+  usecase "Phân tích lịch sử mua hàng" as UC3
+  usecase "Phân tích danh mục sản phẩm" as UC4
+  usecase "Tính toán giá sản phẩm" as UC5
+  usecase "Áp dụng giảm giá" as UC6
+  usecase "Hiển thị sản phẩm mặc định" as UC7
+  usecase "Lưu log gợi ý" as UC8
+}
+
+Customer --> UC1
+System --> UC2
+System --> UC3
+System --> UC4
+System --> UC5
+System --> UC6
+System --> UC7
+System --> UC8
+
+UC1 ..> UC2 : <<include>>
+UC2 ..> UC3 : <<include>>
+UC2 ..> UC4 : <<include>>
+UC2 ..> UC5 : <<include>>
+UC2 ..> UC6 : <<include>>
+UC1 ..> UC7 : <<extend>>
+UC2 ..> UC8 : <<include>>
+
+note right of UC2
+  Các yếu tố tính điểm:
+  - Giá (35%)
+  - Danh mục (30%)
+  - Giảm giá (40%)
+  - Ngẫu nhiên (5%)
+  - Phạt mua lại (-20%)
+end note
+
+note right of UC3
+  Phân tích:
+  - Số lượng sản phẩm đã mua
+  - Tần suất mua theo danh mục
+  - Tổng số lượng đã mua
+end note
+
+note right of UC4
+  Phân tích:
+  - Tần suất mua theo danh mục
+  - Tỷ lệ danh mục trong tổng số
+end note
+
+note right of UC5
+  Tính toán:
+  - Giá trung bình
+  - Độ lệch chuẩn
+  - Giá min/max
+end note
+
+@enduml 

@@ -18,7 +18,6 @@ import java.util.List;
 @NoArgsConstructor
 public class OrderDTO {
     @JsonProperty("user_id")
-    @Min(value = 1, message = "User's id must be > 0")
     private Long userId;
 
     @JsonProperty("fullname")

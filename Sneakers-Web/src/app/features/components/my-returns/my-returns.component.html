@@ -1,0 +1,43 @@
+<div class="my-returns-container">
+  <div class="header">
+    <h1>Yêu cầu trả hàng của tôi</h1>
+    <a routerLink="/history" class="btn-link">
+      <i class="pi pi-shopping-bag"></i> Lịch sử mua hàng
+    </a>
+  </div>
+
+  <div *ngIf="isLoading" class="loading-container">
+    <p-progressSpinner></p-progressSpinner>
+    <p>Đang tải danh sách...</p>
+  </div>
+
+  <div *ngIf="!isLoading && myRequests.length === 0" class="no-requests-container">
+    <div class="empty-state">
+      <i class="pi pi-inbox empty-icon"></i>
+      <h3>Chưa có yêu cầu trả hàng</h3>
+      <p>Bạn chưa có yêu cầu trả hàng nào. Nếu cần, bạn có thể tạo yêu cầu từ trang lịch sử mua hàng.</p>
+    </div>
+  </div>
+
+  <div *ngIf="!isLoading && myRequests.length > 0" class="requests-list">
+    <div *ngFor="let request of myRequests" class="request-card">
+      <div class="card-main-info">
+        <div class="card-header">
+          <span class="order-id">Đơn hàng #{{ request.order_id }}</span>
+          <span class="status-badge" [ngClass]="getStatusClass(request.status)">
+            {{ request.status }}
+          </span>
+        </div>
+        <div class="card-body">
+          <p><strong>Lý do:</strong> {{ request.reason }}</p>
+          <p><strong>Số tiền hoàn:</strong> {{ request.refund_amount | currency:'VND':'symbol' }}</p>
+          <p class="request-date">Yêu cầu lúc: {{ request.requested_at | date:'HH:mm dd/MM/yyyy' }}</p>
+        </div>
+      </div>
+      <div class="card-footer" *ngIf="request.admin_notes">
+        <p><strong>Phản hồi từ quản trị viên:</strong></p>
+        <p class="admin-notes">{{ request.admin_notes }}</p>
+      </div>
+    </div>
+  </div>
+</div> 

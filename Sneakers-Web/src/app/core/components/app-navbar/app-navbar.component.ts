@@ -27,6 +27,7 @@ export class AppNavbarComponent extends BaseComponent implements OnInit {
   public roleId: number = 100;
   public token: string | null = null;
   public isMenuOpen: boolean = false;
+  public isLoggedIn: boolean = false;
   categories: MenuItem[] = [];
 
   constructor(
@@ -37,6 +38,7 @@ export class AppNavbarComponent extends BaseComponent implements OnInit {
     super();
     if (typeof localStorage != 'undefined'){
       this.token = localStorage.getItem("token");
+      this.isLoggedIn = !!this.token;
       this.roleId = parseInt(JSON.parse(localStorage.getItem("userInfor") || '{"role_id": "0"}').role_id || '0');
     }
   }

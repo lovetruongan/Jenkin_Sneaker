@@ -28,35 +28,66 @@
           </li>
         } @else if (roleId == 2) {
           <li class="nav-item">
-            <a class="nav-link" aria-current="true" href="#">Trang chủ</a>
+            <a class="nav-link" aria-current="true" href="#">
+              <i class="pi pi-home"></i>
+              <span class="nav-text">Trang chủ</span>
+            </a>
           </li>
 
           <li class="nav-item">
-            <a class="nav-link" href="" [routerLink]="['/admin/dashboard']">Dashboard</a>
+            <a class="nav-link" href="" [routerLink]="['/admin/dashboard']">
+              <i class="pi pi-chart-bar"></i>
+              <span class="nav-text">Dashboard</span>
+            </a>
           </li>
 
           <li class="nav-item">
-            <a class="nav-link" href="" [routerLink]="['/userManage']">Quản lý người dùng</a>
+            <a class="nav-link" href="" [routerLink]="['/userManage']">
+              <i class="pi pi-users"></i>
+              <span class="nav-text">Người dùng</span>
+            </a>
           </li>
 
           <li class="nav-item">
-            <a class="nav-link" href="" [routerLink]="['/orderManage']">Quản lý đơn hàng</a>
+            <a class="nav-link" href="" [routerLink]="['/orderManage']">
+              <i class="pi pi-shopping-cart"></i>
+              <span class="nav-text">Đơn hàng</span>
+            </a>
           </li>
 
           <li class="nav-item">
-            <a class="nav-link" href="" [routerLink]="['/uploadProduct']">Thêm sản phẩm</a>
+            <a class="nav-link" href="" [routerLink]="['/uploadProduct']">
+              <i class="pi pi-plus"></i>
+              <span class="nav-text">Sản phẩm</span>
+            </a>
           </li>
 
           <li class="nav-item">
-            <a class="nav-link" href="" [routerLink]="['/categoryManage']">Quản lý danh mục</a>
+            <a class="nav-link" href="" [routerLink]="['/categoryManage']">
+              <i class="pi pi-tags"></i>
+              <span class="nav-text">Danh mục</span>
+            </a>
           </li>
 
           <li class="nav-item">
-            <a class="nav-link" href="" [routerLink]="['/voucherManage']">Quản lý voucher</a>
+            <a class="nav-link" href="" [routerLink]="['/voucherManage']">
+              <i class="pi pi-ticket"></i>
+              <span class="nav-text">Voucher</span>
+            </a>
           </li>
           
           <li class="nav-item">
-            <a class="nav-link" href="" [routerLink]="['/allProduct']">Tất cả sản phẩm</a>
+            <a class="nav-link" href="" [routerLink]="['/admin/returns']">
+              <i class="pi pi-replay"></i>
+              <span class="nav-text">Trả hàng</span>
+            </a>
+          </li>
+          
+          <li class="nav-item">
+            <a class="nav-link" href="" [routerLink]="['/allProduct']">
+              <i class="pi pi-th-large"></i>
+              <span class="nav-text">Cửa hàng</span>
+            </a>
           </li>
         } @else {}
       </ul>
