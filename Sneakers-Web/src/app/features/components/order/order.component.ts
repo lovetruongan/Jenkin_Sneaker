@@ -7,7 +7,7 @@ import { FormBuilder, FormGroup, FormsModule, Validators, ReactiveFormsModule } 
 import { CommonService } from '../../../core/services/common.service';
 import { ProductsInCartDto } from '../../../core/dtos/productsInCart.dto';
 import { catchError, forkJoin, of, switchMap, takeUntil, tap } from 'rxjs';
-import { CurrencyPipe, AsyncPipe } from '@angular/common';
+import { CurrencyPipe, AsyncPipe, NgClass } from '@angular/common';
 import { DropdownModule } from 'primeng/dropdown';
 import { ToastService } from '../../../core/services/toast.service';
 import { MessageService } from 'primeng/api';
@@ -27,6 +27,8 @@ import { CardModule } from 'primeng/card';
 import { DividerModule } from 'primeng/divider';
 import { TooltipModule } from 'primeng/tooltip';
 import { environment } from '../../../../environments/environment.development';
+import { VnpayService } from '../../../core/services/vnpay.service';
+import { VnpayPaymentResponse } from '../../../core/responses/vnpay-payment.response';
 
 @Component({
   selector: 'app-order',
@@ -48,7 +50,8 @@ import { environment } from '../../../../environments/environment.development';
     DialogModule,
     CardModule,
     DividerModule,
-    TooltipModule
+    TooltipModule,
+    NgClass
   ],
   providers: [
     ToastService,
@@ -81,14 +84,11 @@ export class OrderComponent extends BaseComponent implements OnInit,AfterViewIni
   public methodShippingValue!: {name: string, code: string,price: number};
   public selectedPayMethod!: {name: string, key: string, logo: string};
 
-  payMethod: {
-    name: string,
-    key: string,
-    logo: string
-  }[] = [
+  public paymentMethods = [
     { name: 'Thanh toán khi nhận hàng', key: 'Cash', logo: 'assets/images/payment-icons/cash.svg' },
     { name: 'Chuyển khoản ngân hàng', key: 'Banking', logo: 'assets/images/payment-icons/bank.svg' },
     { name: 'Thanh toán bằng thẻ Visa/Mastercard', key: 'Stripe', logo: 'assets/images/payment-icons/stripe.svg' },
+    { name: 'Thanh toán qua VNPAY', key: 'VNPAY', logo: 'assets/images/payment-icons/vnpay.svg' }
   ];
 
   // Stripe payment properties
@@ -103,7 +103,8 @@ export class OrderComponent extends BaseComponent implements OnInit,AfterViewIni
     private commonService: CommonService,
     private router: Router,
     private productService: ProductService,
-    private voucherService: VoucherService
+    private voucherService: VoucherService,
+    private vnpayService: VnpayService
   ) {
     super();
     this.inforShipForm = this.fb.group({
@@ -136,7 +137,11 @@ export class OrderComponent extends BaseComponent implements OnInit,AfterViewIni
       {name: 'Hỏa tốc', code: 'HT', price: 60000}
     ];
     this.methodShippingValue = this.methodShipping[0];
-    this.selectedPayMethod = this.payMethod[0];
+    this.selectedPayMethod = this.paymentMethods[0];
+  }
+
+  selectPaymentMethod(method: {name: string, key: string, logo: string}) {
+    this.selectedPayMethod = method;
   }
 
   ngAfterViewInit(): void {
@@ -191,9 +196,10 @@ export class OrderComponent extends BaseComponent implements OnInit,AfterViewIni
     if (this.inforShipForm.invalid){
       this.toastService.fail("Vui lòng nhập đầy đủ thông tin giao hàng");
     } else {
-      // Check if Stripe payment is selected
       if (this.selectedPayMethod.key === 'Stripe') {
         this.processStripeOrder();
+      } else if (this.selectedPayMethod.key === 'VNPAY') {
+        this.processVnpayOrder();
       } else {
         this.processRegularOrder();
       }
@@ -283,6 +289,62 @@ export class OrderComponent extends BaseComponent implements OnInit,AfterViewIni
         this.blockUi();
         console.error('Order creation error:', err);
         this.toastService.fail("Đặt hàng thất bại: " + (err.error?.message || err.message));
+        return of(err);
+      }),
+      takeUntil(this.destroyed$)
+    ).subscribe();
+  }
+
+  private processVnpayOrder(): void {
+    this.blockUi();
+
+    const userInfor = JSON.parse(localStorage.getItem("userInfor") || '{}');
+    const userId = userInfor.id;
+    
+    const orderData = {
+      ...(userId && { user_id: Number(userId) }),
+      fullname: this.inforShipForm.value.fullName,
+      email: this.inforShipForm.value.email,
+      phone_number: this.inforShipForm.value.phoneNumber,
+      address: this.inforShipForm.value.address,
+      note: this.inforShipForm.value.note || '',
+      shipping_method: this.methodShippingValue.name,
+      payment_method: this.selectedPayMethod.key,
+      cart_items: this.productOrder.map(item => ({
+        product_id: Number(item.product_id),
+        quantity: Number(item.quantity),
+        size: Number(item.size)
+      })),
+      total_money: Math.round(this.finalCost),
+      ...(this.isVoucherApplied && { voucher_code: this.voucherCode })
+    };
+
+    // First, create the order in our system
+    this.orderService.postOrder(orderData).pipe(
+      switchMap((orderInfor: any) => {
+        this.orderId = orderInfor.id;
+        const orderInfoForVnpay = `Thanh toan don hang ${this.orderId}`;
+        const paymentData = {
+          amount: Math.round(this.finalCost + this.methodShippingValue.price),
+          order_info: orderInfoForVnpay,
+          order_id: this.orderId
+        };
+        // Then, create the VNPAY payment URL
+        return this.vnpayService.createVnpayPayment(paymentData);
+      }),
+      tap((vnpayResponse: VnpayPaymentResponse) => {
+        if (vnpayResponse.url) {
+          // Redirect to VNPAY payment gateway
+          window.location.href = vnpayResponse.url;
+        } else {
+          this.toastService.fail('Không thể lấy URL thanh toán VNPAY.');
+          this.blockUi();
+        }
+      }),
+      catchError((err) => {
+        this.blockUi();
+        console.error('Order or VNPAY payment creation error:', err);
+        this.toastService.fail("Lỗi khi tạo đơn hàng hoặc thanh toán VNPAY: " + (err.error?.message || err.message));
         return of(err);
       }),
       takeUntil(this.destroyed$)

@@ -83,9 +83,16 @@
                   <p-button label="Trả hàng" icon="pi pi-replay" styleClass="p-button-sm p-button-text p-button-success" (click)="requestReturn(order.id)"></p-button>
                 }
                 
-                @if (order.status === 'payment_failed' && order.payment_method === 'Stripe') {
-                  <p-button label="Thanh toán lại" icon="pi pi-credit-card" styleClass="p-button-sm p-button-text p-button-danger" (click)="retryPayment(order)"></p-button>
-                }
+                <div class="order-actions">
+                  @if(order.status === 'payment_failed'){
+                    @if(order.payment_method === 'Stripe'){
+                      <p-button label="Thanh toán lại" icon="pi pi-credit-card" styleClass="p-button-sm p-button-text p-button-danger" (click)="retryPayment(order)"></p-button>
+                    }
+                    @if(order.payment_method === 'VNPAY'){
+                      <button pButton type="button" label="Thanh toán lại" class="p-button-danger" (click)="retryVnpayPayment(order)"></button>
+                    }
+                  }
+                </div>
               </div>
             </div>
           </div>

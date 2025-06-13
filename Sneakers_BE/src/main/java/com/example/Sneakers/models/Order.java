@@ -60,6 +60,9 @@ public class Order {
     @Column(name = "payment_intent_id")
     private String paymentIntentId;
 
+    @Column(name = "vnp_TxnRef")
+    private String vnpTxnRef;
+
     @Column(name = "active")
     private Boolean active;
 

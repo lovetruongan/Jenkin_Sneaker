@@ -14,6 +14,14 @@ export interface AdminReturnAction {
   admin_notes: string;
 }
 
+export interface VnpayRefundRequest {
+  return_request_id: number;
+  order_id: number;
+  amount: number;
+  order_info: string;
+  create_by: string;
+}
+
 export interface ReturnRequestResponse {
   id: number;
   order_id: number;
@@ -76,5 +84,10 @@ export class ReturnService {
 
   completeRefund(id: number, actionData: AdminReturnAction): Observable<ReturnRequestResponse> {
     return this.http.put<ReturnRequestResponse>(`${this.apiUrl}/admin/${id}/complete-refund`, actionData, { headers: this.getHeaders() });
+  }
+
+  refundVnpay(refundData: VnpayRefundRequest): Observable<any> {
+    const vnpayApiUrl = `${environment.apiUrl}/vnpay`;
+    return this.http.post(`${vnpayApiUrl}/refund`, refundData, { headers: this.getHeaders() });
   }
 }

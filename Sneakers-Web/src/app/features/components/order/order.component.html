@@ -111,23 +111,27 @@
       <div class="info-card">
         <h2 class="section-title">Phương thức thanh toán</h2>
         <div class="payment-methods">
-          @for (item of payMethod; track item) {
+          @for (item of paymentMethods; track item) {
           <div class="payment-option">
-            <p-radioButton name="paymentMethod" [value]="item" [(ngModel)]="selectedPayMethod" [inputId]="item.key"></p-radioButton>
-            <img [src]="item.logo" [alt]="item.name" class="payment-logo">
-            <label [for]="item.key">{{item.name}}</label>
+              <p-radioButton name="paymentMethod" [value]="item" [(ngModel)]="selectedPayMethod" [inputId]="item.key"></p-radioButton>
+              <img [src]="item.logo" [alt]="item.name" class="payment-logo">
+              <label [for]="item.key" class="p-radiobutton-label">{{item.name}}</label>
           </div>
           }
         </div>
-        
+      </div>
+      
+      <!-- Order Action Button -->
+      <div class="order-action">
         <p-button 
-            (click)="order()" 
-            [label]="selectedPayMethod.key === 'Stripe' ? 'Tiến hành thanh toán' : 'Đặt hàng'" 
-            class="order-btn"
-            icon="pi pi-check"
-            [loading]="blockedUi">
+          label="Hoàn tất đặt hàng" 
+          icon="pi pi-check" 
+          (click)="order()" 
+          styleClass="p-button-lg w-full"
+          [disabled]="inforShipForm.invalid">
         </p-button>
       </div>
+
     </div>
   </div>
 </div>

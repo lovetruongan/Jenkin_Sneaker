@@ -84,24 +84,27 @@ public class ReturnService implements IReturnService {
         }
 
         Order order = returnRequest.getOrder();
+        String paymentMethod = order.getPaymentMethod();
 
         // Handle refund based on payment method
-        if ("Thanh toán thẻ thành công".equals(order.getPaymentMethod()) && order.getPaymentIntentId() != null) {
+        if ("Thanh toán thẻ thành công".equals(paymentMethod) || "Stripe".equalsIgnoreCase(paymentMethod)) {
+            // Auto-refund for Stripe
             stripeService.refund(order.getPaymentIntentId());
             returnRequest.setAdminNotes("Refunded via Stripe. " + actionDTO.getAdminNotes());
             returnRequest.setStatus("REFUNDED");
-            order.setStatus("canceled"); // Chuyển trạng thái đơn hàng thành đã hủy
+            order.setStatus("canceled");
+        } else if ("VNPAY".equalsIgnoreCase(paymentMethod)) {
+            // For VNPAY, just approve it. The admin will trigger the refund manually.
+            returnRequest.setAdminNotes("Approved for VNPAY refund. " + actionDTO.getAdminNotes());
+            returnRequest.setStatus("APPROVED");
+            // The order status remains unchanged until the VNPAY refund is confirmed.
         } else {
-            // For COD or Bank Transfer, mark for manual refund
+            // For COD or other methods, mark for manual refund
             returnRequest.setAdminNotes("Manual refund required. " + actionDTO.getAdminNotes());
             returnRequest.setStatus("AWAITING_REFUND");
             order.setStatus("awaiting_refund");
         }
-
-        // If it's not Stripe payment, just mark as approved (for manual processing)
-        if (!"Thanh toán thẻ thành công".equals(order.getPaymentMethod())) {
-            returnRequest.setStatus("APPROVED");
-        }
+        
         orderRepository.save(order);
         return returnRequestRepository.save(returnRequest);
     }
@@ -163,6 +166,23 @@ public class ReturnService implements IReturnService {
         returnRequest.setStatus("REFUNDED");
         returnRequest.setAdminNotes("Manual refund completed. " + actionDTO.getAdminNotes());
         order.setStatus("canceled"); // Chuyển trạng thái đơn hàng thành đã hủy
+
+        orderRepository.save(order);
+        return returnRequestRepository.save(returnRequest);
+    }
+
+    @Override
+    @Transactional
+    public ReturnRequest processVnpayRefund(Long requestId) throws Exception {
+        ReturnRequest returnRequest = findReturnRequestById(requestId);
+        if(!"APPROVED".equals(returnRequest.getStatus())){
+            throw new Exception("Return request is not in an approved state for VNPAY refund.");
+        }
+
+        Order order = returnRequest.getOrder();
+        returnRequest.setStatus("REFUNDED");
+        returnRequest.setAdminNotes("Refund successfully processed via VNPAY.");
+        order.setStatus("canceled");
 
         orderRepository.save(order);
         return returnRequestRepository.save(returnRequest);

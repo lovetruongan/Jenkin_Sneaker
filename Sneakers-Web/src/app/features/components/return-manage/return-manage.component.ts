@@ -1,7 +1,12 @@
 import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ReturnService, ReturnRequestResponse, AdminReturnAction } from '../../../core/services/return.service';
+import {
+  ReturnService,
+  ReturnRequestResponse,
+  AdminReturnAction,
+  VnpayRefundRequest
+} from '../../../core/services/return.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { MessageService } from 'primeng/api';
 
@@ -34,6 +39,7 @@ export class ReturnManageComponent implements OnInit {
   
   // Dialog
   displayActionDialog = false;
+  displayVnpayRefundDialog = false; // For VNPAY refund
   currentAction: 'approve' | 'reject' | null = null;
   currentRequest: ReturnRequestResponse | null = null;
   adminNotes = '';
@@ -120,6 +126,57 @@ export class ReturnManageComponent implements OnInit {
     this.currentAction = action;
     this.adminNotes = '';
     this.displayActionDialog = true;
+  }
+
+  showVnpayRefundDialog(request: ReturnRequestResponse): void {
+    this.currentRequest = request;
+    this.adminNotes = 'Refund for order ' + request.order_id; // Default note
+    this.displayVnpayRefundDialog = true;
+  }
+
+  confirmVnpayRefund(): void {
+    if (!this.currentRequest) {
+      this.toastService.fail('No request selected for refund.');
+      return;
+    }
+
+    if (!this.adminNotes.trim()) {
+        this.toastService.fail('Admin notes are required for VNPAY refund.');
+        return;
+    }
+    
+    this.isSubmitting = true;
+
+    // TODO: Replace 'admin' with the actual logged-in admin's username
+    const refundData: VnpayRefundRequest = {
+      return_request_id: this.currentRequest.id,
+      order_id: this.currentRequest.order_id,
+      amount: this.currentRequest.refund_amount,
+      order_info: this.adminNotes,
+      create_by: 'admin'
+    };
+
+    this.returnService.refundVnpay(refundData).subscribe({
+      next: (response) => {
+        this.isSubmitting = false;
+        this.displayVnpayRefundDialog = false;
+        this.toastService.success('VNPAY refund processed successfully!');
+        
+        // Update the local request list
+        const index = this.allRequests.findIndex(r => r.id === this.currentRequest?.id);
+        if (index > -1) {
+            // Assuming the backend doesn't return the updated request, we update it manually
+            this.allRequests[index].status = 'REFUNDED';
+            this.allRequests[index].admin_notes = this.adminNotes;
+            this.allRequests = [...this.allRequests]; // Trigger change detection
+            this.calculateStats();
+        }
+      },
+      error: (err) => {
+        this.isSubmitting = false;
+        this.toastService.fail('VNPAY refund failed: ' + (err.error?.message || err.message));
+      }
+    });
   }
 
   confirmAction(): void {

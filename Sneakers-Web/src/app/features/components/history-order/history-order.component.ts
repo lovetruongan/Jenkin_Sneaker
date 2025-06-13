@@ -2,12 +2,14 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule, DatePipe, CurrencyPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { DialogService } from 'primeng/dynamicdialog';
 
 // DTOs and Services
 import { OrderHistoryResponse } from '../../../core/responses/order-history.response';
 import { OrderService } from '../../../core/services/order.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { environment } from '../../../../environments/environment';
+import { VnpayService } from '../../../core/services/vnpay.service';
 
 // PrimeNG Modules
 import { PaginatorModule, PaginatorState } from 'primeng/paginator';
@@ -43,7 +45,7 @@ import { StripePaymentComponent } from '../stripe-payment/stripe-payment.compone
     DialogModule,
     StripePaymentComponent
   ],
-  providers: [MessageService, ToastService],
+  providers: [MessageService, ToastService, DialogService],
   templateUrl: './history-order.component.html',
   styleUrls: ['./history-order.component.scss']
 })
@@ -69,6 +71,7 @@ export class HistoryOrderComponent implements OnInit {
 
   // Pagination
   rows: number = 8;
+  currentPage: number = 0;
 
   // Stripe Payment
   showStripeDialog: boolean = false;
@@ -77,7 +80,9 @@ export class HistoryOrderComponent implements OnInit {
   constructor(
     private orderService: OrderService,
     private router: Router,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private dialogService: DialogService,
+    private vnpayService: VnpayService
   ) {}
 
   ngOnInit(): void {
@@ -208,5 +213,30 @@ export class HistoryOrderComponent implements OnInit {
   onStripePaymentCancel(): void {
     this.showStripeDialog = false;
     this.toastService.fail('Bạn đã hủy phiên thanh toán.');
+  }
+
+  retryVnpayPayment(order: OrderHistoryResponse): void {
+    const paymentData = {
+      amount: Math.round(order.total_money),
+      order_info: `Thanh toan lai don hang ${order.id}`,
+      order_id: order.id
+    };
+
+    this.vnpayService.createVnpayPayment(paymentData).subscribe({
+      next: (response) => {
+        if (response.url) {
+          window.location.href = response.url;
+        } else {
+          this.toastService.fail('Không thể tạo link thanh toán VNPAY.');
+        }
+      },
+      error: (err) => {
+        this.toastService.fail(`Lỗi khi tạo thanh toán VNPAY: ${err.error?.message || 'Lỗi không xác định'}`);
+      }
+    });
+  }
+
+  onPageChange(event: any) {
+    this.currentPage = event.page;
   }
 }

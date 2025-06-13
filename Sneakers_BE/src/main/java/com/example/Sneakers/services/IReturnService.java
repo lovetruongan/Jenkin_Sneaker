@@ -19,4 +19,6 @@ public interface IReturnService {
     ReturnRequest rejectReturnRequest(Long requestId, AdminReturnActionDTO actionDTO) throws DataNotFoundException;
 
     ReturnRequest completeRefund(Long requestId, AdminReturnActionDTO actionDTO) throws Exception;
+
+    ReturnRequest processVnpayRefund(Long requestId) throws Exception;
 } 

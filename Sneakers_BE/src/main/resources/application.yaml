@@ -53,3 +53,10 @@ stripe:
   api:
     secret-key: sk_test_51RYEK0RoKh7pvaZex5vQJVXSpDURybrQqfp63OQ6bhwPLY0OXQVdfJNegHjea1y7ZXSKJ8NZ2chPBVLA5MHDxWUM00vCyGDa1x
     publishable-key: pk_test_51RYEK0RoKh7pvaZeTzq1TjxJXE4Rfr5xwKIP6uL1kJDET3mb78shODbWhYyL1znUhqyanmoPV18g8zGCTkDUuok6003ObawJA1
+
+# VNPAY Configuration (Test Mode)
+vnpay:
+  tmnCode: "R5QX2TZO" # Replace with your TmnCode
+  hashSecret: "FT254A9XGNV0X8WQR7PK2YTI5HI3SPNA" # Replace with your HashSecret
+  url: "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"
+  returnUrl: "http://localhost:4200/vnpay-payment"
