@@ -34,8 +34,8 @@ public class OrderHistoryResponse {
     @JsonProperty("total_products")
     private int totalProducts;
 
-    @JsonProperty("buyer_name")
-    private String buyerName;
+    @JsonProperty("fullname")
+    private String fullname;
 
     @JsonProperty("phone_number")
     private String phoneNumber;
@@ -50,7 +50,7 @@ public class OrderHistoryResponse {
                 .status(order.getStatus())
                 .totalMoney(order.getTotalMoney())
                 .orderDate(order.getOrderDate())
-                .buyerName(order.getFullName())
+                .fullname(order.getFullName())
                 .phoneNumber(order.getPhoneNumber())
                 .paymentMethod(order.getPaymentMethod());
 

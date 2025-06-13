@@ -28,8 +28,8 @@ public class OrderResponse {
     @JsonProperty("user_id")
     private Long userId;
 
-    @JsonProperty("buyer_name")
-    private String buyerName;
+    @JsonProperty("fullname")
+    private String fullname;
 
     @JsonProperty("phone_number")
     private String phoneNumber;
@@ -97,7 +97,7 @@ public class OrderResponse {
         OrderResponse orderResponse = OrderResponse.builder()
                 .id(order.getId())
                 .userId(order.getUser().getId())
-                .buyerName(order.getFullName())
+                .fullname(order.getFullName())
                 .phoneNumber(order.getPhoneNumber())
                 .email(order.getEmail())
                 .address(order.getAddress())

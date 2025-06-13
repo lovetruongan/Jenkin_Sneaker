@@ -113,7 +113,7 @@ export class HistoryOrderComponent implements OnInit {
       orders = orders.filter(order =>
         order.id.toString().includes(lowercasedTerm) ||
         order.product_name.toLowerCase().includes(lowercasedTerm) ||
-        order.buyer_name.toLowerCase().includes(lowercasedTerm)
+        order.fullname.toLowerCase().includes(lowercasedTerm)
       );
     }
     

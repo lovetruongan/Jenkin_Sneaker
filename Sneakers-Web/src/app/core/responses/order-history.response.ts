@@ -1,6 +1,6 @@
 export interface OrderHistoryResponse {
   id: number;
-  buyer_name: string;
+  fullname: string;
   order_date: string;
   total_money: number;
   status: string;

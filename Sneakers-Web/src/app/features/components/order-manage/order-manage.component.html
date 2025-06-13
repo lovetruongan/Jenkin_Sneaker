@@ -89,11 +89,9 @@
                 <ng-template pTemplate="body" let-order>
                     <tr>
                         <td data-label="Mã ĐH">#{{ order.id }}</td>
-                        <td data-label="Người mua">{{ order.buyer_name }}</td>
-                        <td data-label="Email / SĐT">
-                            <div>{{ order.email }}</div>
-                            <div>{{ order.phone_number }}</div>
-                        </td>
+                        <td data-label="Người mua">{{ order.fullname }}</td>
+                        <td data-label="Email">{{ order.email }}</td>
+                        <td data-label="SĐT">{{ order.phone_number }}</td>
                         <td data-label="Phương thức TT">
                             <span [ngClass]="getPaymentMethodClass(order.payment_method)">
                                 {{ order.payment_method }}

@@ -5,7 +5,7 @@ import { catchError, filter, of, switchMap, tap } from 'rxjs';
 import { OrderService } from '../../../core/services/order.service';
 import { InfoOrderDto } from '../../../core/dtos/InfoOrder.dto';
 import { OrderDetailDto } from '../../../core/dtos/OrderDetail.dto';
-import { CurrencyPipe,DatePipe,NgSwitch,NgSwitchCase } from '@angular/common';
+import { CurrencyPipe,DatePipe,NgClass } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { environment } from '../../../../environments/environment.development';
 
@@ -15,8 +15,7 @@ import { environment } from '../../../../environments/environment.development';
   imports: [
     CurrencyPipe,
     DatePipe,
-    NgSwitch,
-    NgSwitchCase
+    NgClass
   ],
   templateUrl: './order-detail.component.html',
   styleUrl: './order-detail.component.scss'
@@ -96,5 +95,9 @@ export class OrderDetailComponent extends BaseComponent implements OnInit {
         return of(err)
       }),
     ).subscribe();
+  }
+
+  printInvoice(): void {
+    window.print();
   }
 }

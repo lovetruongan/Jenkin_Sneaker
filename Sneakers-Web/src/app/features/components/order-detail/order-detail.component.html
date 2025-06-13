@@ -1,101 +1,116 @@
 @if(orderInfor){
-    <div class="order-detail">
-        <div class="container">
-            <div class="row">
-                <div class="col-8 col-lg-8 offset-lg-2 infor-wrapper">
-                    <div class="app-logo-detail justify-content-center">
-                       <img src="../../../../assets/images/logo.jpg" alt="" class="img-fluid">
-                    </div>
-                    <h3>Thông tin đơn hàng</h3>
-                    <p>Xin chào {{orderInfor.fullname}}</p>
-                    <span>Xin vui lòng để ý điện thoại với số: {{orderInfor.phone_number}}</span>
-                    <p>Đơn hàng của bạn sẽ được giao trong thời gian sớm nhất</p>
-                    <div class="d-flex">
-                        <p style="margin-right: 6px;">Trạng thái giao hàng: </p>
-                        <div class="font-bold" [ngSwitch]="orderInfor.status">  
-                            <p *ngSwitchCase="'pending'">Đang chờ</p>
-                            <p *ngSwitchCase="'success'">Đã giao hàng</p>
-                            <p *ngSwitchCase="'cancelled'">Đã hủy</p>
-                            <p *ngSwitchCase="'processing'">Đang xử lý</p>
-                            <p *ngSwitchCase="'delivered'">Đã được giao</p>
-                            <p *ngSwitchCase="'shipped'">Đang được giao</p>
-                        </div>
-                    </div>
-                    <div class="row basic-info-wrapper">
-                        <div class="col-lg-3">
-                            <p>Ngày đặt hàng</p>
-                            <span class="font-bold">{{orderInfor.order_date | date: 'dd/MM/yyyy'}}</span>
-                        </div>
-                        <div class="col-lg-3">
-                            <p>Mã đơn</p>
-                            <span class="font-bold">{{orderInfor.id}}</span>
-                        </div>
-                        <div class="col-lg-3">
-                            <p>Hình thức</p>
-                            <span class="font-bold">{{orderInfor.shipping_method}}</span>
-                        </div>
-                        <div class="col-lg-3">
-                            <p>Địa chỉ</p>
-                            <span class="font-bold">{{orderInfor.address}}</span>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <ul class="order-product-list">
-                            @for(item of productOrderd; track item){
-                                <li class="d-flex row order-product-item">
-                                    <div class="col-3 col-lg-3">
-                                        <img [src]="apiImage + item.product?.thumbnail" alt="Giày">
-                                    </div>
-                                    <div class="col-6 col-lg-6 name-product-wrapper">
-                                        <div>
-                                            <span class="font-bold name-product">{{item.product?.name}}</span>
-                                            <span>x{{item.number_of_products}}</span>
-                                        </div>
-                                        <span class="font-bold">Size: {{item.size}}</span>
-                                    </div>
-                                    <div class="col-3 col-lg-3">
-                                        <p class="font-bold">{{item.total_money| currency:'VND':'symbol':'1.0-0'}}</p>
-                                    </div>
-                                </li>
-                            }
-                        </ul>
-                    </div>
-                    <div class="row">
-                        <span>Ghi chú: </span>
-                        <span class="font-bold">{{notion}}</span>
-                    </div>
-                    <div class="row">
-                        <div class="col-lg-4 offset-8">
-                            <div class="d-flex">
-                                <p style="flex: 1;">Tổng tiền hàng</p>
-                                <p class="font-bold">{{totalMoney | currency:'VND':'symbol':'1.0-0'}}</p>
-                            </div>
-                            @if (voucherInfo) {
-                                <div class="d-flex">
-                                    <p style="flex: 1;">Mã giảm giá</p>
-                                    <p class="font-bold">{{voucherInfo.code}} (-{{voucherInfo.percentage}}%)</p>
-                                </div>
-                                <div class="d-flex">
-                                    <p style="flex: 1;">Giảm giá</p>
-                                    <p class="font-bold text-danger">-{{discountAmount | currency:'VND':'symbol':'1.0-0'}}</p>
-                                </div>
-                            }
-                            <div class="d-flex">
-                                <p style="flex: 1;">Phí vận chuyển</p>
-                                <p class="font-bold">{{shipCost | currency:'VND':'symbol':'1.0-0'}}</p>
-                            </div>
-                            <div class="d-flex">
-                                <p style="flex: 1;">Tổng thanh toán</p>
-                                <p class="font-bold text-primary">{{finalTotal | currency:'VND':'symbol':'1.0-0'}}</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <p>Chúng tôi đã gửi thông tin đến email cho bạn</p>
-                        <p>Cảm ơn đã mua hàng tại Sneaker Store</p>
-                    </div>
-                </div>
+  <div class="order-detail-container">
+    <div class="container py-5">
+      <div class="row justify-content-center">
+        <div class="col-lg-10">
+          <div class="invoice-card" id="printable-area">
+            <!-- Invoice Header -->
+            <div class="invoice-header">
+              <div class="invoice-branding">
+                <img src="assets/images/logo.jpg" alt="Sneaker Store Logo" class="invoice-logo">
+              </div>
+              <div class="invoice-actions">
+                <button (click)="printInvoice()" class="print-btn">
+                  <i class="bi bi-printer-fill"></i>
+                  <span>In Hóa Đơn</span>
+                </button>
+              </div>
             </div>
+
+            <!-- Customer & Order Info -->
+            <div class="customer-order-info">
+              <div class="info-section">
+                <h5 class="section-title">Thông tin khách hàng:</h5>
+                <p><strong>Họ tên:</strong> {{ orderInfor.fullname }}</p>
+                <p><strong>Số điện thoại:</strong> {{ orderInfor.phone_number }}</p>
+                <p><strong>Email:</strong> {{ orderInfor.email }}</p>
+                <p><strong>Địa chỉ:</strong> {{ orderInfor.address }}</p>
+              </div>
+              <div class="info-section text-end">
+                <h5 class="section-title">Chi tiết hóa đơn:</h5>
+                <p><strong>Mã hóa đơn:</strong> {{ orderInfor.id }}</p>
+                <p><strong>Ngày đặt:</strong> {{ orderInfor.order_date | date: 'dd/MM/yyyy' }}</p>
+                <p><strong>Phương thức thanh toán:</strong> {{ orderInfor.payment_method }}</p>
+                <div class="order-status" [ngClass]="'status-' + orderInfor.status">
+                  @if (orderInfor.status === 'pending') { <span>Đang chờ</span> }
+                  @if (orderInfor.status === 'processing') { <span>Đang xử lý</span> }
+                  @if (orderInfor.status === 'shipped') { <span>Đang giao hàng</span> }
+                  @if (orderInfor.status === 'delivered' || orderInfor.status === 'success') { <span>Đã giao</span> }
+                  @if (orderInfor.status === 'cancelled') { <span>Đã hủy</span> }
+                  @if (orderInfor.status === 'payment_failed') { <span>Thanh toán thất bại</span> }
+                </div>
+              </div>
+            </div>
+
+            <!-- Order Items Table -->
+            <div class="order-items-table">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Sản phẩm</th>
+                    <th>Kích cỡ</th>
+                    <th>Số lượng</th>
+                    <th class="text-end">Tổng cộng</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for(item of productOrderd; track item){
+                    <tr>
+                      <td>
+                        <div class="product-info">
+                          <img [src]="apiImage + item.product?.thumbnail" alt="{{ item.product?.name }}" class="product-thumbnail">
+                          <span class="product-name">{{ item.product?.name }}</span>
+                        </div>
+                      </td>
+                      <td>{{ item.size }}</td>
+                      <td>{{ item.number_of_products }}</td>
+                      <td class="text-end">{{ item.total_money | currency:'VND':'symbol':'1.0-0' }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Order Summary -->
+            <div class="order-summary">
+              <div class="summary-details">
+                <div class="summary-item">
+                  <span>Tạm tính</span>
+                  <span class="font-bold">{{ totalMoney | currency:'VND':'symbol':'1.0-0' }}</span>
+                </div>
+                @if (voucherInfo) {
+                  <div class="summary-item">
+                    <span>Giảm giá ({{ voucherInfo.code }} - {{ voucherInfo.percentage }}%)</span>
+                    <span class="font-bold text-danger">-{{ discountAmount | currency:'VND':'symbol':'1.0-0' }}</span>
+                  </div>
+                }
+                <div class="summary-item">
+                  <span>Phí vận chuyển</span>
+                  <span class="font-bold">{{ shipCost | currency:'VND':'symbol':'1.0-0' }}</span>
+                </div>
+                <div class="summary-item total">
+                  <span>Tổng thanh toán</span>
+                  <span class="font-bold text-primary">{{ finalTotal | currency:'VND':'symbol':'1.0-0' }}</span>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Notes & Footer -->
+            <div class="invoice-footer">
+              @if(notion){
+                <div class="notes-section">
+                  <h6>Ghi chú:</h6>
+                  <p>{{ notion }}</p>
+                </div>
+              }
+              <div class="thank-you-message">
+                <p>Cảm ơn bạn đã mua hàng tại Sneaker Store!</p>
+                <p>Chúng tôi đã gửi thông tin xác nhận đến email của bạn.</p>
+              </div>
+            </div>
+          </div>
         </div>
+      </div>
     </div>
+  </div>
 }

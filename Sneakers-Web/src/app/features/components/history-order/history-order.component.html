@@ -58,7 +58,7 @@
               </div>
               <div class="product-info">
                 <p class="product-name">{{ order.product_name }}</p>
-                <p class="buyer-info">Người nhận: {{ order.buyer_name }}</p>
+                <p class="buyer-info">Người nhận: {{ order.fullname }}</p>
                 <p class="payment-method">
                   HT thanh toán: 
                   <span [ngSwitch]="order.payment_method">

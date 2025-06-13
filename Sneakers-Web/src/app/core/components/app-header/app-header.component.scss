@@ -30,15 +30,11 @@
     gap: 1rem;
     
     .logo-img {
-      width: 40px;
-      height: 40px;
-      border-radius: 8px;
-      object-fit: cover;
-      border: 2px solid #333;
+      max-height: 50px;
+      width: auto;
       transition: all 0.3s ease;
       
       &:hover {
-        border-color: #fff;
         transform: scale(1.05);
       }
     }
