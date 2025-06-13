@@ -249,7 +249,7 @@ How can I help you find the perfect sneakers today?`;
   private checkAIStatus(): void {
     // Check if AI index is initialized
     const apiUrl = environment.apiUrl;
-    this.httpClient.get<{success: boolean; status: string; documentCount: number}>(`${apiUrl}ai/initialize/status`)
+    this.httpClient.get<{success: boolean; status: string; documentCount: number}>(`${apiUrl}/ai/initialize/status`)
       .subscribe({
         next: (response) => {
           if (response.success && response.status === 'not_initialized') {
@@ -267,7 +267,7 @@ How can I help you find the perfect sneakers today?`;
     this.addMessage('Initializing AI database with all products...', 'bot');
     
     const apiUrl = environment.apiUrl;
-    this.httpClient.post<{success: boolean; message: string}>(`${apiUrl}ai/initialize/index-all`, {})
+    this.httpClient.post<{success: boolean; message: string}>(`${apiUrl}/ai/initialize/index-all`, {})
       .pipe(finalize(() => this.isLoading.set(false)))
       .subscribe({
         next: (response) => {

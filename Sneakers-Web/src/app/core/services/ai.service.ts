@@ -40,12 +40,12 @@ export class AiService {
 
   // Text chat with AI
   chatWithText(message: string): Observable<ChatResponse> {
-    return this.httpClient.post<ChatResponse>(`${this.apiUrl}ai/chat/text`, { message });
+    return this.httpClient.post<ChatResponse>(`${this.apiUrl}/ai/chat/text`, { message });
   }
 
   // Chat with product assistant
   productAssistant(query: string): Observable<ChatResponse> {
-    return this.httpClient.post<ChatResponse>(`${this.apiUrl}ai/chat/product-assistant`, { query });
+    return this.httpClient.post<ChatResponse>(`${this.apiUrl}/ai/chat/product-assistant`, { query });
   }
 
   // Chat with image
@@ -55,32 +55,32 @@ export class AiService {
     formData.append('prompt', prompt);
 
     // Don't set Content-Type header - let Angular set it automatically with boundary
-    return this.httpClient.post<ChatResponse>(`${this.apiUrl}ai/chat/image`, formData);
+    return this.httpClient.post<ChatResponse>(`${this.apiUrl}/ai/chat/image`, formData);
   }
 
   // Search products using vector search
   searchProducts(query: string, topK: number = 10): Observable<SearchResponse> {
-    return this.httpClient.get<SearchResponse>(`${this.apiUrl}ai/search/products?query=${encodeURIComponent(query)}&topK=${topK}`);
+    return this.httpClient.get<SearchResponse>(`${this.apiUrl}/ai/search/products?query=${encodeURIComponent(query)}&topK=${topK}`);
   }
 
   // Search products by category
   searchProductsByCategory(query: string, category: string, topK: number = 10): Observable<SearchResponse> {
     return this.httpClient.get<SearchResponse>(
-      `${this.apiUrl}ai/search/products/category?query=${encodeURIComponent(query)}&category=${encodeURIComponent(category)}&topK=${topK}`
+      `${this.apiUrl}/ai/search/products/category?query=${encodeURIComponent(query)}&category=${encodeURIComponent(category)}&topK=${topK}`
     );
   }
 
   // Search products by price range
   searchProductsByPriceRange(query: string, minPrice: number, maxPrice: number, topK: number = 10): Observable<SearchResponse> {
     return this.httpClient.get<SearchResponse>(
-      `${this.apiUrl}ai/search/products/price-range?query=${encodeURIComponent(query)}&minPrice=${minPrice}&maxPrice=${maxPrice}&topK=${topK}`
+      `${this.apiUrl}/ai/search/products/price-range?query=${encodeURIComponent(query)}&minPrice=${minPrice}&maxPrice=${maxPrice}&topK=${topK}`
     );
   }
 
   // Search products with scores
   searchProductsWithScores(query: string, topK: number = 10, minScore: number = 0.7): Observable<SearchResponse> {
     return this.httpClient.get<SearchResponse>(
-      `${this.apiUrl}ai/search/products/with-scores?query=${encodeURIComponent(query)}&topK=${topK}&minScore=${minScore}`
+      `${this.apiUrl}/ai/search/products/with-scores?query=${encodeURIComponent(query)}&topK=${topK}&minScore=${minScore}`
     );
   }
 } 

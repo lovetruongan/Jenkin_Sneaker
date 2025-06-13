@@ -46,7 +46,14 @@ export class AuthGuardService {
         },
         error: (error: any) => {
           console.error('Error checking account status:', error);
-          resolve(true);
+          // If token is invalid, clear storage and allow navigation to login
+          if (error.status === 401 || error.status === 403) {
+            localStorage.removeItem('token');
+            localStorage.removeItem('userInfor');
+            resolve(false); // This will trigger redirect to login
+          } else {
+            resolve(true); // Other errors, allow access
+          }
         }
       });
     });
@@ -56,7 +63,7 @@ export class AuthGuardService {
     const headers = {
       'Authorization': `Bearer ${token}`
     };
-    return this.http.get<UserDto>(`${environment.apiUrl}/users/me`, { headers });
+    return this.http.get<UserDto>(`${environment.apiUrl}/users/details`, { headers });
   }
 
   isAccountActive(): boolean {

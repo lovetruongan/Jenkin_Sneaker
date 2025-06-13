@@ -76,7 +76,7 @@ public class WebSecurityConfig {
 
                                                         .requestMatchers(GET,
                                                                         String.format("%s/users/details", apiPrefix))
-                                                        .permitAll()
+                                                        .authenticated()
 
                                                         .requestMatchers(GET,
                                                                         String.format("%s/users/getAll", apiPrefix))
@@ -201,22 +201,33 @@ public class WebSecurityConfig {
                                                                         String.format("%s/top-product-sold**",
                                                                                         apiPrefix))
                                                         .permitAll()
+                                                        // AI endpoints - fix missing slash
                                                         .requestMatchers(GET,
-                                                                        String.format("%s/ai/initialize/index-all",
-                                                                                        apiPrefix))
+                                                                        String.format("%sai/**", apiPrefix))
                                                         .permitAll()
                                                         .requestMatchers(POST,
-                                                                        String.format("%s/ai/initialize/index-all",
-                                                                                        apiPrefix))
+                                                                        String.format("%sai/**", apiPrefix))
                                                         .permitAll()
                                                         .requestMatchers(GET,
-                                                                        String.format("%s/ai/**",
-                                                                                        apiPrefix))
+                                                                        String.format("%s/ai/**", apiPrefix))
                                                         .permitAll()
                                                         .requestMatchers(POST,
-                                                                        String.format("%s/ai/**",
-                                                                                        apiPrefix))
+                                                                        String.format("%s/ai/**", apiPrefix))
                                                         .permitAll()
+
+                                                        // Voucher endpoints
+                                                        .requestMatchers(GET,
+                                                                        String.format("%s/vouchers/**", apiPrefix))
+                                                        .permitAll()
+                                                        .requestMatchers(POST,
+                                                                        String.format("%s/vouchers**", apiPrefix))
+                                                        .hasRole(Role.ADMIN)
+                                                        .requestMatchers(PUT,
+                                                                        String.format("%s/vouchers**", apiPrefix))
+                                                        .hasRole(Role.ADMIN)
+                                                        .requestMatchers(DELETE,
+                                                                        String.format("%s/vouchers**", apiPrefix))
+                                                        .hasRole(Role.ADMIN)
 
                                                         .anyRequest().authenticated();
                                         // .anyRequest().permitAll();
