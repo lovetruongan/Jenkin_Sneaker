@@ -10,16 +10,16 @@ import { CommonModule } from '@angular/common';
       <div class="modal-content" (click)="$event.stopPropagation()">
         <div class="modal-header">
           <div class="warning-icon">⚠️</div>
-          <h2>Tài khoản bị khóa</h2>
+          <h2>Tài khoản của bạn đã bị khóa</h2>
         </div>
         
         <div class="modal-body">
-          <p class="main-message">Tài khoản của bạn đã bị khóa do vi phạm chính sách của hệ thống.</p>
+          <p class="main-message">Tài khoản của bạn đã bị khóa do vi phạm chính sách mua hàng của hệ thống, hệ thống sẽ đăng xuất tài khoản và bạn sẽ không thể đăng nhập lại cho đến khi được hỗ trợ.</p>
           <div class="details">
             <ul>
-              <li>Vui lòng liên hệ với quản trị viên để được hỗ trợ</li>
+              <li>Vui lòng liên hệ với shop để được hỗ trợ</li> 
               <li>Email: elearn&#64;hoctot.com</li>
-              <li>Hotline: 1900-1000</li>
+              <li>Email: anhcz&#64;yahoo.com</li>
             </ul>
           </div>
         </div>
