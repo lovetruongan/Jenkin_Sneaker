@@ -256,7 +256,10 @@ export class DetailProductComponent extends BaseComponent implements OnInit,Afte
     this.productService.deleteProduct(this.mainProduct.id.toString()).pipe(
       tap(() => {
         this.toastService.success("Xóa sản phẩm thành công");
-        this.router.navigate(["/all-product"]);
+        // Đợi một chút để thông báo hiển thị trước khi chuyển trang
+        setTimeout(() => {
+          this.router.navigate(["/allProduct"]);
+        }, 1500);
       }),
       catchError((err) => {
         // Attempt to parse the error response
