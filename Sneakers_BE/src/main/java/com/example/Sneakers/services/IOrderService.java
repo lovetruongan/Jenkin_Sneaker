@@ -26,7 +26,10 @@ public interface IOrderService {
     List<OrderHistoryResponse> findByUserId(String token) throws Exception;
     List<OrderHistoryResponse> getAllOrders();
     Page<Order> getOrdersByKeyword(String keyword, String status, LocalDate startDate, LocalDate endDate, Pageable pageable);
-    Order updateOrderStatus(Long orderId, String status) throws Exception;
+    Order updateOrderStatus(Long orderId, String status) throws DataNotFoundException;
     Long getTotalRevenue();
     DashboardStatsDTO getDashboardStats();
+    List<Order> findByUserId(Long userId);
+    long countOrders();
+    List<Order> getOrdersByDateRange(LocalDate startDate, LocalDate endDate);
 }

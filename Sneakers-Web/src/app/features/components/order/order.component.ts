@@ -260,36 +260,29 @@ export class OrderComponent extends BaseComponent implements OnInit,AfterViewIni
       address: this.inforShipForm.value.address,
       note: this.inforShipForm.value.note || '',
       shipping_method: this.methodShippingValue.name,
-      payment_method: this.selectedPayMethod.name,
+      payment_method: this.selectedPayMethod.key,
       cart_items: this.productOrder.map(item => ({
         product_id: Number(item.product_id),
         quantity: Number(item.quantity),
         size: Number(item.size)
       })),
-      total_money: Math.round(this.finalCost),
+      total_money: Math.round(this.finalCost + this.methodShippingValue.price),
       ...(this.isVoucherApplied && { voucher_code: this.voucherCode })
     };
 
     this.orderService.postOrder(orderData).pipe(
-      tap((orderInfor: any) => {
-        this.orderId = orderInfor.id;
-        this.commonService.orderId.next(orderInfor.id);
-      }),
-      switchMap(() => {
-        this.productOrderLocalStorage = JSON.parse(localStorage.getItem("productOrder")!);
-        const fncDel = this.productOrderLocalStorage.map((po) => this.productService.deleteProductFromCart(po.id))
-        return forkJoin(fncDel);
-      }),
-      tap(() => {
+      tap((newOrder: any) => {
+        this.orderId = newOrder.id;
+        this.toastService.success("Đặt hàng thành công!");
         this.commonService.intermediateObservable.next(true);
         localStorage.removeItem("productOrder");
-        this.blockUi();
         this.router.navigate([`/order-detail/${this.orderId}`]);
+        this.blockUi();
       }),
       catchError((err) => {
         this.blockUi();
         console.error('Order creation error:', err);
-        this.toastService.fail("Đặt hàng không thành công: " + (err.error?.message || err.message));
+        this.toastService.fail("Đặt hàng thất bại: " + (err.error?.message || err.message));
         return of(err);
       }),
       takeUntil(this.destroyed$)
@@ -297,23 +290,20 @@ export class OrderComponent extends BaseComponent implements OnInit,AfterViewIni
   }
 
   onStripePaymentSuccess(paymentIntent: any): void {
-    // Clear cart and redirect to order detail
-    this.productOrderLocalStorage = JSON.parse(localStorage.getItem("productOrder")!);
-    const fncDel = this.productOrderLocalStorage.map((po) => this.productService.deleteProductFromCart(po.id));
-    
-    forkJoin(fncDel).pipe(
+    // Payment successful, update order status on backend
+    this.blockUi();
+    this.orderService.updateOrderStatus(this.orderId, 'Paid').pipe(
       tap(() => {
+        this.showStripeDialog = false;
+        this.toastService.success("Thanh toán và đặt hàng thành công!");
         this.commonService.intermediateObservable.next(true);
         localStorage.removeItem("productOrder");
-        this.showStripeDialog = false;
-        this.toastService.success("Thanh toán thành công!");
         this.router.navigate([`/order-detail/${this.orderId}`]);
+        this.blockUi();
       }),
       catchError((err) => {
-        console.error('Error clearing cart:', err);
-        // Still redirect even if cart clearing fails
-        this.showStripeDialog = false;
-        this.router.navigate([`/order-detail/${this.orderId}`]);
+        this.blockUi();
+        this.toastService.fail('Cập nhật trạng thái đơn hàng thất bại. Vui lòng liên hệ hỗ trợ.');
         return of(err);
       }),
       takeUntil(this.destroyed$)

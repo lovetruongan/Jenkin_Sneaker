@@ -302,9 +302,9 @@ public class OrderService implements IOrderService {
     }
 
     @Override
-    public Order updateOrderStatus(Long orderId, String status) throws Exception {
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new Exception("Cannot find order with id = " + orderId));
+    public Order updateOrderStatus(Long orderId, String status) throws DataNotFoundException {
+        Order order = orderRepository.findById(orderId).orElseThrow(() ->
+                new DataNotFoundException("Cannot find order with id: " + orderId));
         order.setStatus(status);
         return orderRepository.save(order);
     }
@@ -320,5 +320,20 @@ public class OrderService implements IOrderService {
         Long totalProductsSold = orderRepository.countTotalProductsSold();
 
         return new DashboardStatsDTO(totalRevenue, todayOrders, totalProductsSold);
+    }
+
+    @Override
+    public List<Order> findByUserId(Long userId) {
+        return orderRepository.findByUserId(userId);
+    }
+
+    @Override
+    public long countOrders() {
+        return orderRepository.count();
+    }
+
+    @Override
+    public List<Order> getOrdersByDateRange(LocalDate startDate, LocalDate endDate) {
+        return orderRepository.findByOrderDateBetween(startDate, endDate);
     }
 }

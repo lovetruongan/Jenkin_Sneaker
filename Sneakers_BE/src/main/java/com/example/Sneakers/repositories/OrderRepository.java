@@ -109,4 +109,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
            "WHERE o.status IN ('pending', 'shipped', 'delivered') AND o.active = true",
            nativeQuery = true)
     Long countTotalProductsSold();
+
+    @Query("SELECT o FROM Order o WHERE o.orderDate BETWEEN :startDate AND :endDate")
+    List<Order> findByOrderDateBetween(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
 }

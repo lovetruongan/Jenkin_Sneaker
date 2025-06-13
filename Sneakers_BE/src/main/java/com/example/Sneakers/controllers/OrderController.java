@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @RequestMapping("${api.prefix}/orders")
 @RestController
@@ -128,9 +129,26 @@ public class OrderController {
         }
     }
 
+    @PutMapping("/status/{id}")
+    public ResponseEntity<?> updateOrderStatus(
+            @PathVariable Long id,
+            @RequestBody Map<String, String> body,
+            @RequestHeader("Authorization") String authorizationHeader) {
+        try {
+            String status = body.get("status");
+            if (status == null || status.isEmpty()) {
+                return ResponseEntity.badRequest().body("Status is required");
+            }
+            Order updatedOrder = orderService.updateOrderStatus(id, status);
+            return ResponseEntity.ok(OrderResponse.fromOrder(updatedOrder));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteOrder(@Valid @PathVariable Long id){
-        //Xoá mềm => Cập nhật trường active = false
+    public ResponseEntity<String> deleteOrder(@PathVariable Long id) {
+        //xoa mem => Cập nhật active = false
         orderService.deleteOrder(id);
         return ResponseEntity.ok(localizationUtils.getLocalizedMessage(MessageKeys.DELETE_ORDER_SUCCESSFULLY));
     }
