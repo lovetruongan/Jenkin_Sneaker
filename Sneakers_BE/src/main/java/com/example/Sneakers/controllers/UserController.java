@@ -20,6 +20,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
+import com.example.Sneakers.dtos.ForgotPasswordDTO;
+import com.example.Sneakers.dtos.ResetPasswordDTO;
+import com.example.Sneakers.dtos.ChangePasswordDTO;
 
 import java.util.List;
 import java.util.Objects;
@@ -60,24 +63,32 @@ public class UserController {
         }
     }
     @PostMapping("/login")
-    public ResponseEntity<?>login(
-            @Valid @RequestBody UserLoginDTO userLoginDTO){
+    public ResponseEntity<LoginResponse> login(
+            @Valid @RequestBody UserLoginDTO userLoginDTO,
+            BindingResult bindingResult
+    ) {
         try {
-            String token = userService.login(
-                    userLoginDTO.getPhoneNumber(),
-                    userLoginDTO.getPassword());
-
-            return ResponseEntity.ok(LoginResponse
-                    .builder()
+            if (bindingResult.hasErrors()) {
+                List<String> errorMessages = bindingResult.getFieldErrors()
+                        .stream()
+                        .map(FieldError::getDefaultMessage)
+                        .toList();
+                return ResponseEntity.badRequest().body(
+                        LoginResponse.builder()
+                                .message(String.join("; ", errorMessages))
+                                .build());
+            }
+            String token = userService.login(userLoginDTO.getPhoneNumber(), userLoginDTO.getPassword(), userLoginDTO.getRoleId());
+            return ResponseEntity.ok(LoginResponse.builder()
                     .message(localizationUtils.getLocalizedMessage(MessageKeys.LOGIN_SUCCESSFULLY))
                     .token(token)
                     .build());
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(
-                    LoginResponse
-                            .builder()
-                            .message(localizationUtils.getLocalizedMessage(MessageKeys.LOGIN_FAILED,e.getMessage()))
-                            .build());
+                    LoginResponse.builder()
+                            .message(localizationUtils.getLocalizedMessage(MessageKeys.LOGIN_FAILED, e.getMessage()))
+                            .build()
+            );
         }
     }
     @GetMapping("/getAll")
@@ -184,6 +195,51 @@ public class UserController {
                     .build());
         }
         catch (Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@Valid @RequestBody ForgotPasswordDTO forgotPasswordDTO) {
+        try {
+            System.out.println("Forgot password request for email: " + forgotPasswordDTO.getEmail());
+            userService.forgotPassword(forgotPasswordDTO.getEmail());
+            return ResponseEntity.ok(RegisterResponse.builder()
+                    .message("Password reset link sent to your email.")
+                    .build());
+        } catch (Exception e) {
+            System.err.println("Error in forgot password: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body(RegisterResponse.builder()
+                    .message(e.getMessage())
+                    .build());
+        }
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordDTO resetPasswordDTO) {
+        try {
+            userService.resetPassword(resetPasswordDTO.getToken(), resetPasswordDTO.getNewPassword());
+            return ResponseEntity.ok(RegisterResponse.builder()
+                    .message("Password has been reset successfully.")
+                    .build());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/change-password")
+    public ResponseEntity<?> changePassword(
+            @Valid @RequestBody ChangePasswordDTO changePasswordDTO,
+            @RequestHeader("Authorization") String authorizationHeader
+    ) {
+        try {
+            String extractedToken = authorizationHeader.substring(7); // Remove "Bearer " prefix
+            userService.changePassword(extractedToken, changePasswordDTO.getCurrentPassword(), changePasswordDTO.getNewPassword());
+            return ResponseEntity.ok(RegisterResponse.builder()
+                    .message("Password has been changed successfully.")
+                    .build());
+        } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }

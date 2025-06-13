@@ -15,8 +15,13 @@ import { AccountMonitorService } from './account-monitor.service';
   providedIn: 'root'
 })
 export class UserService {
-  private readonly apiUrl = environment.apiUrl;
+  private apiUrl = `${environment.apiUrl}/users`;
   private readonly isBrowser: boolean;
+  private apiRegister = `${environment.apiUrl}/users/register`;
+  private apiLogin = `${environment.apiUrl}/users/login`;
+  private apiUserDetails = `${environment.apiUrl}/users/details`;
+  private apiForgotPassword = `${environment.apiUrl}/users/forgot-password`;
+  private apiResetPassword = `${environment.apiUrl}/users/reset-password`;
 
   constructor(
     private readonly httpClient: HttpClient,
@@ -55,16 +60,16 @@ export class UserService {
     });
   }
 
-  login(loginObject: loginReq) {
-    return this.httpClient.post<loginDetailDto>(`${this.apiUrl}/users/login`, loginObject);
+  login(loginData: loginReq): Observable<loginDetailDto> {
+    return this.httpClient.post<loginDetailDto>(`${this.apiUrl}/login`, loginData);
   }
 
-  register(registerValue: registerReq) {
-    return this.httpClient.post<registerDto>(`${this.apiUrl}/users/register`, registerValue);
+  register(registerData: registerReq): Observable<registerDto> {
+    return this.httpClient.post<registerDto>(`${this.apiUrl}/register`, registerData);
   }
 
   getInforUser(token?: string | null) {
-    return this.httpClient.get<UserDto>(`${this.apiUrl}/users/details`, {
+    return this.httpClient.get<UserDto>(`${this.apiUrl}/details`, {
       headers: this.getHeaders(token)
     }).pipe(
       tap((userInfo: UserDto) => {
@@ -75,20 +80,20 @@ export class UserService {
   }
 
   getAllUser() {
-    return this.httpClient.get<UserDto[]>(`${this.apiUrl}/users/getAll`, {
+    return this.httpClient.get<UserDto[]>(`${this.apiUrl}/getAll`, {
       headers: this.getHeaders()
     });
   }
 
   deleteUser(id: number) {
-    return this.httpClient.delete<{ users: UserDto[], message: string }>(`${this.apiUrl}/users/delete/${id}`, {
+    return this.httpClient.delete<{ users: UserDto[], message: string }>(`${this.apiUrl}/delete/${id}`, {
       headers: this.getHeaders()
     });
   }
 
   changeRoleUser(roleId: number, userId: number) {
     return this.httpClient.put<{ users: UserDto[], message: string }>(
-      `${this.apiUrl}/users/changeRole/${userId}`, 
+      `${this.apiUrl}/changeRole/${userId}`, 
       { roleId },
       {
         headers: this.getHeaders()
@@ -100,7 +105,7 @@ export class UserService {
     const params = new HttpParams().set('activeUser', activeUser.toString());
 
     return this.httpClient.put<UserDto>(
-      `${this.apiUrl}/users/change-active/${userId}`,
+      `${this.apiUrl}/change-active/${userId}`,
       {}, // không có body
       {
         params,
@@ -112,15 +117,10 @@ export class UserService {
   /**
    * Cập nhật thông tin người dùng
    * @param userData - Dữ liệu người dùng cần cập nhật
-   * @returns Observable containing updated user data or users list
-   */
-  /**
-   * Cập nhật thông tin người dùng
-   * @param userData - Dữ liệu người dùng cần cập nhật
    * @returns Observable containing updated user data
    */
   updateUser(userData: any): Observable<UserDto> {
-    const url = `${this.apiUrl}/users/details/${userData.id}`;
+    const url = `${this.apiUrl}/details/${userData.id}`;
     
     // Chuẩn bị dữ liệu theo format UpdateUserDTO
     const requestBody = {
@@ -137,6 +137,40 @@ export class UserService {
     };
 
     return this.httpClient.put<UserDto>(url, requestBody, { 
+      headers: this.getHeaders()
+    });
+  }
+
+  getUserDetail(token: string): Observable<UserDto> {
+    return this.httpClient.post<UserDto>(`${this.apiUrl}/details`, {}, {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      })
+    });
+  }
+
+  updateUserDetail(userId: number, token: string, userData: any): Observable<UserDto> {
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    });
+    return this.httpClient.put<UserDto>(`${this.apiUrl}/details/${userId}`, userData, { headers });
+  }
+
+  forgotPassword(email: string): Observable<any> {
+    return this.httpClient.post<any>(`${this.apiUrl}/forgot-password`, { email });
+  }
+
+  resetPassword(token: string, newPassword: string): Observable<any> {
+    return this.httpClient.post<any>(`${this.apiUrl}/reset-password`, { token, newPassword });
+  }
+
+  changePassword(currentPassword: string, newPassword: string): Observable<any> {
+    return this.httpClient.post<any>(`${this.apiUrl}/change-password`, { 
+      currentPassword, 
+      newPassword 
+    }, {
       headers: this.getHeaders()
     });
   }

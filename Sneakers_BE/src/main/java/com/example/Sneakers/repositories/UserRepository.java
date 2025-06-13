@@ -14,9 +14,13 @@ public interface UserRepository extends JpaRepository<User,Long> {
 
     Optional<User> findByPhoneNumber(String phoneNumber);
 
+    Optional<User> findByEmail(String email);
+
+    Optional<User> findByResetPasswordToken(String token);
+
     @Modifying
     @Transactional
-    @Query("UPDATE User u SET u.isActive = :active WHERE u.id = :id")
+    @Query("UPDATE User u SET u.active = :active WHERE u.id = :id")
     int updateActiveUserByPhoneNumber(boolean active, Long id);
 
 }

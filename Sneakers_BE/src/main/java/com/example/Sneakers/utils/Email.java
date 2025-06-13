@@ -1,5 +1,7 @@
 package com.example.Sneakers.utils;
 
+import org.springframework.stereotype.Component;
+
 import java.util.Date;
 import java.util.Properties;
 import javax.mail.Authenticator;
@@ -10,6 +12,7 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
+@Component
 public class Email {
 	public static final String from = "ducanh21112003@gmail.com";
 	//Mật khẩu ứng dụng được google cung cấp

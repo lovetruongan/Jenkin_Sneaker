@@ -338,7 +338,7 @@ export class OrderComponent extends BaseComponent implements OnInit,AfterViewIni
           window.location.href = vnpayResponse.url;
         } else {
           this.toastService.fail('Không thể lấy URL thanh toán VNPAY.');
-          this.blockUi();
+        this.blockUi();
         }
       }),
       catchError((err) => {

@@ -1,12 +1,14 @@
 package com.example.Sneakers.models;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -43,7 +45,7 @@ public class User extends BaseEntity implements UserDetails {
     private String password;
 
     @Column(name = "is_active")
-    private boolean isActive;
+    private boolean active;
 
     @Column(name = "date_of_birth")
     // @JsonFormat(pattern="MM/dd/yyyy")
@@ -55,9 +57,18 @@ public class User extends BaseEntity implements UserDetails {
     @Column(name = "google_account_id")
     private int googleAccountId;
 
+    @Column(name = "reset_password_token")
+    private String resetPasswordToken;
+
+    @Column(name = "reset_password_token_expiry")
+    private LocalDateTime resetPasswordTokenExpiry;
+
     @ManyToOne
     @JoinColumn(name = "role_id")
     private Role role;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonManagedReference
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

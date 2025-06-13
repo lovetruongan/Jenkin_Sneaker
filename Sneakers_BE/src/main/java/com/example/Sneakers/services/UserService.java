@@ -12,6 +12,7 @@ import com.example.Sneakers.models.User;
 import com.example.Sneakers.repositories.RoleRepository;
 import com.example.Sneakers.repositories.UserRepository;
 import com.example.Sneakers.responses.UserResponse;
+import com.example.Sneakers.utils.Email;
 import com.example.Sneakers.utils.MessageKeys;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -22,8 +23,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -35,6 +38,8 @@ public class UserService implements IUserService{
     private final JwtTokenUtils jwtTokenUtil;
     private final AuthenticationManager authenticationManager;
     private final LocalizationUtils localizationUtils;
+    private final Email email;
+
     @Override
     public User createUser(UserDTO userDTO) throws Exception {
         //register user
@@ -65,10 +70,10 @@ public class UserService implements IUserService{
                 .dateOfBirth(userDTO.getDateOfBirth())
                 .facebookAccountId(userDTO.getFacebookAccountId())
                 .googleAccountId(userDTO.getGoogleAccountId())
+                .active(true)
                 .build();
 
         newUser.setRole(role);
-        newUser.setActive(true);
         // Kiểm tra nếu có accountId, không yêu cầu password
         if (userDTO.getFacebookAccountId() == 0 && userDTO.getGoogleAccountId() == 0) {
             String password = userDTO.getPassword();
@@ -79,7 +84,7 @@ public class UserService implements IUserService{
     }
 
     @Override
-    public String login(String phoneNumber, String password) throws Exception {
+    public String login(String phoneNumber, String password, Long roleId) throws Exception {
         Optional<User> optionalUser = userRepository.findByPhoneNumber(phoneNumber);
         if(optionalUser.isEmpty()) {
             throw new DataNotFoundException(localizationUtils.getLocalizedMessage(MessageKeys.WRONG_PHONE_PASSWORD));
@@ -95,6 +100,10 @@ public class UserService implements IUserService{
             if(!passwordEncoder.matches(password, existingUser.getPassword())) {
                 throw new BadCredentialsException(localizationUtils.getLocalizedMessage(MessageKeys.WRONG_PHONE_PASSWORD));
             }
+        }
+        // Only check role if roleId is provided and not null
+        if (roleId != null && existingUser.getRole().getId() != roleId) {
+            throw new BadCredentialsException("Role does not match");
         }
         //Thông tin xác thực
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
@@ -207,5 +216,67 @@ public class UserService implements IUserService{
     @Override
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
+    }
+
+    @Override
+    public void forgotPassword(String userEmail) throws Exception {
+        Optional<User> userOptional = userRepository.findByEmail(userEmail);
+        if (userOptional.isEmpty()) {
+            throw new DataNotFoundException("User not found");
+        }
+        User user = userOptional.get();
+
+        String token = UUID.randomUUID().toString();
+        user.setResetPasswordToken(token);
+        user.setResetPasswordTokenExpiry(LocalDateTime.now().plusMinutes(15)); // Token expires in 15 minutes
+        userRepository.save(user);
+
+        String resetLink = "http://localhost:4200/reset-password?token=" + token;
+        String subject = "Password Reset Request";
+        String content = "<h1>Password Reset Request</h1>"
+                + "<p>Hi " + user.getFullName() + ",</p>"
+                + "<p>You requested to reset your password. Click the link below to reset it:</p>"
+                + "<a href=\"" + resetLink + "\">Reset Password</a>"
+                + "<p>This link will expire in 15 minutes.</p>"
+                + "<p>If you did not request a password reset, please ignore this email.</p>";
+
+        email.sendEmail(userEmail, subject, content);
+    }
+
+    @Override
+    public void resetPassword(String token, String newPassword) throws Exception {
+        Optional<User> userOptional = userRepository.findByResetPasswordToken(token);
+        if (userOptional.isEmpty()) {
+            throw new DataNotFoundException("Invalid or expired password reset token.");
+        }
+        User user = userOptional.get();
+
+        if (user.getResetPasswordTokenExpiry().isBefore(LocalDateTime.now())) {
+            throw new Exception("Password reset token has expired.");
+        }
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        user.setResetPasswordToken(null);
+        user.setResetPasswordTokenExpiry(null);
+        userRepository.save(user);
+    }
+
+    @Override
+    public void changePassword(String token, String currentPassword, String newPassword) throws Exception {
+        User user = getUserDetailsFromToken(token);
+        
+        // Verify current password
+        if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
+            throw new BadCredentialsException("Current password is incorrect.");
+        }
+        
+        // Check if new password is different from current password
+        if (passwordEncoder.matches(newPassword, user.getPassword())) {
+            throw new Exception("New password must be different from current password.");
+        }
+        
+        // Update password
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
     }
 }

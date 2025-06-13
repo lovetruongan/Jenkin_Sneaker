@@ -25,6 +25,10 @@ import { ADMIN_ROUTES } from './features/admin/admin.routes';
 import { VoucherManageComponent } from './features/components/voucher-manage/voucher-manage.component';
 import { ReturnRequestComponent } from './features/components/return-request/return-request.component';
 import { MyReturnsComponent } from './features/components/my-returns/my-returns.component';
+import { ReturnManageComponent } from './features/components/return-manage/return-manage.component';
+import { ForgotPasswordComponent } from './features/components/forgot-password/forgot-password.component';
+import { ResetPasswordComponent } from './features/components/reset-password/reset-password.component';
+import { ChangePasswordComponent } from './features/components/change-password/change-password.component';
 
 export const routes: Routes = [
   {
@@ -129,7 +133,26 @@ export const routes: Routes = [
         path: 'voucherManage',
         component: VoucherManageComponent,
         canActivate: [RoleGuard]
+      },
+      {
+        path: 'admin/returns',
+        component: ReturnManageComponent,
+        canActivate: [RoleGuard]
+      },
+      {
+        path: 'forgot-password',
+        component: ForgotPasswordComponent
+      },
+      {
+        path: 'reset-password',
+        component: ResetPasswordComponent
+      },
+      {
+        path: 'change-password',
+        component: ChangePasswordComponent,
+        canActivate: [AuthGuard]
       }
     ]
-  }
+  },
+  { path: '**', redirectTo: '' }
 ];

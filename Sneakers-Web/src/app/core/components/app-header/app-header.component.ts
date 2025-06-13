@@ -148,6 +148,13 @@ export class AppHeaderComponent extends BaseComponent implements AfterViewInit,O
         }
       },
       {
+        label: 'Đổi mật khẩu',
+        icon: 'pi pi-key',
+        command: () => {
+          this.goToChangePassword();
+        }
+      },
+      {
         label: 'Sign out',
         icon: 'pi pi-power-off',
         command: () => {
@@ -240,5 +247,9 @@ export class AppHeaderComponent extends BaseComponent implements AfterViewInit,O
 
   goToMyReturns(){
     this.router.navigate(['/my-returns']);
+  }
+
+  goToChangePassword() {
+    this.router.navigate(['/change-password']);
   }
 }
