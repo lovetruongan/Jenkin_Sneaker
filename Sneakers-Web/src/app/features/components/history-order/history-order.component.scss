@@ -376,3 +376,32 @@
     }
   }
 }
+
+.order-footer .actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.order-footer .p-button-danger {
+  background-color: #ef4444 !important;
+  border-color: #ef4444 !important;
+  color: #fff !important;
+  font-size: 0.85rem;
+  padding: 0.35rem 1.1rem;
+  border-radius: 6px;
+  min-width: 110px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+}
+
+.order-footer .p-button-sm.p-button-text {
+  font-size: 0.85rem;
+  padding: 0.35rem 1.1rem;
+  min-width: 110px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+}
