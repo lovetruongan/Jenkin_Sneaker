@@ -79,6 +79,12 @@ export class ProductService {
     });
   }
 
+  deleteAllProductsFromCart(){
+    return this.httpClient.delete(`${this.apiUrl}/carts`, {
+      headers: this.getAuthHeaders()
+    });
+  }
+
   getRelatedProduct(id: string){
     return this.httpClient.get<AllProductDto>(`${this.apiUrl}/products/related/${id}`)
   }

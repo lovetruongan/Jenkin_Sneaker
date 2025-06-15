@@ -53,15 +53,11 @@ import { VnpayPaymentResponse } from '../../../core/responses/vnpay-payment.resp
     TooltipModule,
     NgClass
   ],
-  providers: [
-    ToastService,
-    MessageService
-  ],
   templateUrl: './order.component.html',
   styleUrl: './order.component.scss'
 })
 export class OrderComponent extends BaseComponent implements OnInit,AfterViewInit {
-  public inforShipForm: FormGroup;
+  public inforShipForm !: FormGroup;
   public productToOrder!: ProductsInCartDto[];
   public productOrder: ProductToCartDto[] = [];
   public totalCost: number = 0;
@@ -281,7 +277,9 @@ export class OrderComponent extends BaseComponent implements OnInit,AfterViewIni
         this.orderId = newOrder.id;
         this.toastService.success("Đặt hàng thành công!");
         this.commonService.intermediateObservable.next(true);
-        localStorage.removeItem("productOrder");
+      }),
+      switchMap(() => this.productService.deleteAllProductsFromCart()),
+      tap(() => {
         this.router.navigate([`/order-detail/${this.orderId}`]);
         this.blockUi();
       }),

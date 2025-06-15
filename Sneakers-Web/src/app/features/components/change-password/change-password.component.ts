@@ -22,7 +22,6 @@ import { DividerModule } from 'primeng/divider';
     CardModule, InputTextModule, ButtonModule, ProgressSpinnerModule, 
     PasswordModule, DividerModule
   ],
-  providers: [MessageService, ToastService],
   template: `
     <div class="change-password-container">
       <div class="change-password-wrapper">
@@ -115,6 +114,16 @@ import { DividerModule } from 'primeng/divider';
                 <li>Không sử dụng thông tin cá nhân dễ đoán</li>
                 <li>Thay đổi mật khẩu định kỳ</li>
               </ul>
+            </div>
+
+            <div *ngIf="errorMessage" class="error-message-box">
+              <i class="pi pi-exclamation-triangle"></i>
+              <span>{{ errorMessage }}</span>
+            </div>
+            
+            <div *ngIf="successMessage" class="success-message">
+              <i class="pi pi-check-circle"></i>
+              <span>{{ successMessage }}</span>
             </div>
           </div>
           
@@ -239,6 +248,40 @@ import { DividerModule } from 'primeng/divider';
     .field-label i {
       color: #667eea;
       font-size: 1.1rem;
+    }
+
+    .error-message-box {
+      background-color: #fff1f2;
+      color: #be123c;
+      border: 1px solid #fda4af;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-top: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-weight: 500;
+    }
+
+    .error-message-box i {
+      font-size: 1.2rem;
+    }
+
+    .success-message {
+      background-color: #d1fae5;
+      color: #065f46;
+      border: 1px solid #6ee7b7;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-top: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-weight: 500;
+    }
+
+    .success-message i {
+      font-size: 1.2rem;
     }
 
     ::ng-deep .password-field {
@@ -403,6 +446,8 @@ export class ChangePasswordComponent {
   confirmPassword = '';
   isLoading = false;
   isSubmitted = false;
+  successMessage: string | null = null;
+  errorMessage: string | null = null;
 
   constructor(
     private userService: UserService,
@@ -415,6 +460,8 @@ export class ChangePasswordComponent {
 
   onSubmit(): void {
     this.isSubmitted = true;
+    this.successMessage = null;
+    this.errorMessage = null;
 
     if (!this.currentPassword || !this.newPassword || !this.confirmPassword) {
       this.toastService.fail('Vui lòng điền đầy đủ thông tin.');
@@ -440,18 +487,16 @@ export class ChangePasswordComponent {
     this.userService.changePassword(this.currentPassword, this.newPassword).subscribe({
       next: (response) => {
         this.isLoading = false;
-        this.toastService.success(
-          response.message || 
-          'Đổi mật khẩu thành công.'
-        );
+        this.successMessage = response.message || 'Đổi mật khẩu thành công.';
         this.resetForm();
       },
       error: (err) => {
         this.isLoading = false;
-        this.toastService.fail(
-          err.error?.message || 
-          'Đã xảy ra lỗi. Vui lòng thử lại.'
-        );
+        if (err.status === 400) {
+          this.errorMessage = 'Mật khẩu hiện tại không chính xác.';
+        } else {
+          this.errorMessage = err.error?.message || 'Đã xảy ra lỗi không xác định. Vui lòng thử lại.';
+        }
       }
     });
   }

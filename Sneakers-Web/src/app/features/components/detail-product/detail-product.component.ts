@@ -52,11 +52,6 @@ import { ProductUploadReq } from '../../../core/requestType/UploadProducts';
     RouterModule,
     TabViewModule
   ],
-  providers: [
-    MessageService,
-    ToastService,
-    ConfirmationService
-  ],
   templateUrl: './detail-product.component.html',
   styleUrl: './detail-product.component.scss'
 })

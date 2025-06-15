@@ -6,6 +6,7 @@ import { Subscription } from 'rxjs';
 import { AccountMonitorService } from './core/services/account-monitor.service';
 import { AccountBlockedModalComponent } from './shared/components/account-blocked-modal/account-blocked-modal.component';
 import { ToastModule } from 'primeng/toast';
+import { MessageService, ConfirmationService } from 'primeng/api';
 
 @Component({
   selector: 'app-root',
@@ -16,6 +17,7 @@ import { ToastModule } from 'primeng/toast';
     AccountBlockedModalComponent,
     ToastModule
   ],
+  providers: [MessageService, ConfirmationService],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })

@@ -20,7 +20,6 @@ import { DividerModule } from 'primeng/divider';
     CommonModule, FormsModule, RouterModule,
     CardModule, InputTextModule, ButtonModule, ProgressSpinnerModule, DividerModule
   ],
-  providers: [MessageService, ToastService],
   template: `
     <div class="forgot-password-container">
       <div class="forgot-password-wrapper">
@@ -319,7 +318,7 @@ export class ForgotPasswordComponent {
         this.isLoading = false;
         this.toastService.success(
           response.message || 
-          'Liên kết đặt lại mật khẩu đã được gửi thành công. Vui lòng kiểm tra email của bạn.'
+          'Gửi email thành công. Vui lòng kiểm tra email của bạn.'
         );
         this.email = '';
         this.isSubmitted = false;

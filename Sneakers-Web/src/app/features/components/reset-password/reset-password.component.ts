@@ -22,7 +22,6 @@ import { DividerModule } from 'primeng/divider';
     CardModule, InputTextModule, ButtonModule, ProgressSpinnerModule, 
     PasswordModule, DividerModule
   ],
-  providers: [MessageService, ToastService],
   template: `
     <div class="reset-password-container">
       <div class="reset-password-wrapper">

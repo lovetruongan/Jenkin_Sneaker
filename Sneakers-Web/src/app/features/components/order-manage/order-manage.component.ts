@@ -66,7 +66,9 @@ export class OrderManageComponent extends BaseComponent implements OnInit {
     { label: 'Đang xử lý', value: 'processing' },
     { label: 'Đang được giao', value: 'shipped' },
     { label: 'Đã được giao', value: 'delivered' },
-    { label: 'Đã hủy', value: 'canceled' }
+    { label: 'Đã hủy', value: 'canceled' },
+    { label: 'Thanh toán thành công', value: 'paid' },
+    { label: 'Thanh toán thất bại', value: 'payment_failed' }
   ];
   public searchForm: FormGroup;
   public totalRecords: number = 0;
