@@ -10,10 +10,16 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 public class OrderIdResponse {
+    @JsonProperty("id")
     private Long id;
+
+    @JsonProperty("total_money")
+    private Long totalMoney;
+
     public static OrderIdResponse fromOrder(Order order){
         return OrderIdResponse.builder()
                 .id(order.getId())
+                .totalMoney(order.getTotalMoney())
                 .build();
     }
 }

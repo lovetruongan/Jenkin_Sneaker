@@ -42,6 +42,9 @@ public class OrderDTO {
     @Min(value = 0, message = "Total money must be >= 0")
     private Long totalMoney;
 
+    @JsonProperty("sub_total")
+    private Long subTotal;
+
     @JsonProperty("shipping_method")
     private String shippingMethod;
 

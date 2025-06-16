@@ -29,6 +29,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { environment } from '../../../../environments/environment.development';
 import { VnpayService } from '../../../core/services/vnpay.service';
 import { VnpayPaymentResponse } from '../../../core/responses/vnpay-payment.response';
+import { CreateVnpayPaymentDto } from '../../../core/dtos/create-vnpay-payment.dto';
 
 @Component({
   selector: 'app-order',
@@ -53,11 +54,15 @@ import { VnpayPaymentResponse } from '../../../core/responses/vnpay-payment.resp
     TooltipModule,
     NgClass
   ],
+  providers: [
+    ToastService,
+    MessageService
+  ],
   templateUrl: './order.component.html',
   styleUrl: './order.component.scss'
 })
 export class OrderComponent extends BaseComponent implements OnInit,AfterViewInit {
-  public inforShipForm !: FormGroup;
+  public inforShipForm: FormGroup;
   public productToOrder!: ProductsInCartDto[];
   public productOrder: ProductToCartDto[] = [];
   public totalCost: number = 0;
@@ -203,10 +208,7 @@ export class OrderComponent extends BaseComponent implements OnInit,AfterViewIni
   }
 
   private processStripeOrder(): void {
-    // Create order first, then show Stripe payment dialog
     this.blockUi();
-    
-    // Get user info from localStorage (optional, as backend uses token)
     const userInfor = JSON.parse(localStorage.getItem("userInfor") || '{}');
     const userId = userInfor.id;
 
@@ -224,7 +226,8 @@ export class OrderComponent extends BaseComponent implements OnInit,AfterViewIni
         quantity: Number(item.quantity),
         size: Number(item.size)
       })),
-      total_money: Math.round(this.finalCost),
+      sub_total: Math.round(this.totalCost),
+      total_money: Math.round(this.finalCost + this.methodShippingValue.price),
       ...(this.isVoucherApplied && { voucher_code: this.voucherCode })
     };
 
@@ -249,8 +252,6 @@ export class OrderComponent extends BaseComponent implements OnInit,AfterViewIni
 
   private processRegularOrder(): void {
     this.blockUi();
-    
-    // Get user info from localStorage (optional, as backend uses token)
     const userInfor = JSON.parse(localStorage.getItem("userInfor") || '{}');
     const userId = userInfor.id;
 
@@ -268,6 +269,7 @@ export class OrderComponent extends BaseComponent implements OnInit,AfterViewIni
         quantity: Number(item.quantity),
         size: Number(item.size)
       })),
+      sub_total: Math.round(this.totalCost),
       total_money: Math.round(this.finalCost + this.methodShippingValue.price),
       ...(this.isVoucherApplied && { voucher_code: this.voucherCode })
     };
@@ -277,9 +279,7 @@ export class OrderComponent extends BaseComponent implements OnInit,AfterViewIni
         this.orderId = newOrder.id;
         this.toastService.success("Đặt hàng thành công!");
         this.commonService.intermediateObservable.next(true);
-      }),
-      switchMap(() => this.productService.deleteAllProductsFromCart()),
-      tap(() => {
+        localStorage.removeItem("productOrder");
         this.router.navigate([`/order-detail/${this.orderId}`]);
         this.blockUi();
       }),
@@ -295,10 +295,9 @@ export class OrderComponent extends BaseComponent implements OnInit,AfterViewIni
 
   private processVnpayOrder(): void {
     this.blockUi();
-
     const userInfor = JSON.parse(localStorage.getItem("userInfor") || '{}');
     const userId = userInfor.id;
-    
+  
     const orderData = {
       ...(userId && { user_id: Number(userId) }),
       fullname: this.inforShipForm.value.fullName,
@@ -313,36 +312,32 @@ export class OrderComponent extends BaseComponent implements OnInit,AfterViewIni
         quantity: Number(item.quantity),
         size: Number(item.size)
       })),
-      total_money: Math.round(this.finalCost),
+      sub_total: Math.round(this.totalCost),
+      total_money: Math.round(this.finalCost + this.methodShippingValue.price),
       ...(this.isVoucherApplied && { voucher_code: this.voucherCode })
     };
-
-    // First, create the order in our system
+  
     this.orderService.postOrder(orderData).pipe(
       switchMap((orderInfor: any) => {
         this.orderId = orderInfor.id;
-        const orderInfoForVnpay = `Thanh toan don hang ${this.orderId}`;
-        const paymentData = {
+        const vnpayData: CreateVnpayPaymentDto = {
+          order_id: orderInfor.id,
           amount: Math.round(this.finalCost + this.methodShippingValue.price),
-          order_info: orderInfoForVnpay,
-          order_id: this.orderId
+          order_info: `Thanh toan don hang ${orderInfor.id}`
         };
-        // Then, create the VNPAY payment URL
-        return this.vnpayService.createVnpayPayment(paymentData);
+        
+        return this.vnpayService.createVnpayPayment(vnpayData);
       }),
       tap((vnpayResponse: VnpayPaymentResponse) => {
-        if (vnpayResponse.url) {
-          // Redirect to VNPAY payment gateway
+        if (vnpayResponse.status.toLowerCase() === 'ok' && vnpayResponse.url) {
           window.location.href = vnpayResponse.url;
         } else {
-          this.toastService.fail('Không thể lấy URL thanh toán VNPAY.');
-        this.blockUi();
+          this.toastService.fail('Không thể tạo thanh toán VNPAY. Vui lòng thử lại.');
         }
       }),
       catchError((err) => {
+        this.toastService.fail('Không thể tạo đơn hàng hoặc thanh toán: ' + err.error?.message);
         this.blockUi();
-        console.error('Order or VNPAY payment creation error:', err);
-        this.toastService.fail("Lỗi khi tạo đơn hàng hoặc thanh toán VNPAY: " + (err.error?.message || err.message));
         return of(err);
       }),
       takeUntil(this.destroyed$)

@@ -67,8 +67,8 @@ public class OrderService implements IOrderService {
         };
 
         // Calculate base total
-        Long baseTotal = orderDTO.getTotalMoney();
-        Long finalTotal = baseTotal + shippingCost;
+        Long baseTotal = orderDTO.getSubTotal();
+        Long finalTotal = orderDTO.getTotalMoney();
         Voucher appliedVoucher = null;
         Long discountAmount = 0L;
 

@@ -5,7 +5,7 @@ import { ProductDto } from '../dtos/product.dto';
 import { AllProductDto } from '../dtos/AllProduct.dto';
 import { ProductToCartDto } from '../dtos/productToCart.dto';
 import { ProductFromCartDto } from '../dtos/ProductFromCart.dto';
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { ProductUploadReq } from '../requestType/UploadProducts';
 
 @Injectable({
@@ -13,6 +13,7 @@ import { ProductUploadReq } from '../requestType/UploadProducts';
 })
 export class ProductService {
   private apiUrl: string = environment.apiUrl;
+  public isOrder = new Subject<boolean>();
 
   constructor(
     private httpClient: HttpClient

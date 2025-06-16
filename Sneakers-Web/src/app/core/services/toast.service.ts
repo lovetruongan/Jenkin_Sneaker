@@ -18,6 +18,10 @@ export class ToastService {
     this.messageService.add({ severity: 'error', summary: 'Thất bại', detail: content});
   }
 
+  warn(content: string) {
+    this.messageService.add({ severity: 'warn', summary: 'Cảnh báo', detail: content });
+  }
+
   accountBlocked(content : string){
     this.messageService.add({ 
       severity: 'error', 
