@@ -306,6 +306,8 @@ export class DetailProductComponent extends BaseComponent implements OnInit,Afte
       return;
     }
 
+    this.loadingService.loading = true;
+
     const updatedProductData: ProductUploadReq = {
       name: this.productForm.value.productName,
       price: this.productForm.value.price,
@@ -315,35 +317,36 @@ export class DetailProductComponent extends BaseComponent implements OnInit,Afte
       quantity: this.productForm.value.quantity,
     };
 
+    // Start the update process
     this.productService.updateProduct(updatedProductData, this.mainProduct.id).pipe(
-      tap(() => {
-        if (fileUpload.files.length > 0) {
+      switchMap(() => {
+        // After product update, handle image upload if necessary
+        if (fileUpload && fileUpload.files.length > 0) {
           const formData = new FormData();
           fileUpload.files.forEach(file => {
             formData.append('files', file);
           });
-          
-          this.productService.uploadImageProduct(formData, this.mainProduct.id).pipe(
-            tap(() => {
-              this.toastService.success('Cập nhật sản phẩm và tải lên ảnh thành công!');
-              fileUpload.clear();
-              this.ngOnInit(); // Refresh component data
-            }),
-            catchError((err) => {
-              this.toastService.fail(`Tải lên ảnh thất bại: ${err.error?.message || 'Lỗi không xác định'}`);
-              return of(err);
-            })
-          ).subscribe();
+          return this.productService.uploadImageProduct(formData, this.mainProduct.id);
         } else {
-          this.toastService.success('Cập nhật sản phẩm thành công!');
-          this.ngOnInit(); // Refresh component data
+          // If no files to upload, just pass through
+          return of(null);
         }
+      }),
+      tap(() => {
+        // This will run after both product and images (if any) are updated successfully
+        this.toastService.success('Cập nhật sản phẩm thành công!');
+        fileUpload.clear();
+        this.ngOnInit(); // Refresh component data
       }),
       catchError((err) => {
         const errorMessage = err.error?.message || 'Cập nhật sản phẩm thất bại. Vui lòng thử lại.';
         this.toastService.fail(errorMessage);
-        return of(err);
-      })
+       return of(err); // Return observable to complete the stream
+      }),
+      finalize(() => {
+        this.loadingService.loading = false;
+      }),
+      takeUntil(this.destroyed$)
     ).subscribe();
   }
 }

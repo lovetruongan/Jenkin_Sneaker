@@ -10,7 +10,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { DropdownModule } from 'primeng/dropdown';
 import { CardModule } from 'primeng/card';
-import { MenuItem, MessageService } from 'primeng/api';
+import { MenuItem } from 'primeng/api';
 import { CategoriesService } from '../../../core/services/categories.service';
 import { catchError, of, switchMap, tap } from 'rxjs';
 import { CategoriesDto } from '../../../core/dtos/categories.dto';
@@ -37,10 +37,6 @@ import { ProductUploadReq } from '../../../core/requestType/UploadProducts';
     DropdownModule,
     CardModule,
     ToastModule
-  ],
-  providers: [
-    MessageService,
-    ToastService,
   ],
   templateUrl: './upload-product.component.html',
   styleUrl: './upload-product.component.scss'

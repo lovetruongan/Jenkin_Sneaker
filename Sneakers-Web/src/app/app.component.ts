@@ -17,7 +17,6 @@ import { MessageService, ConfirmationService } from 'primeng/api';
     AccountBlockedModalComponent,
     ToastModule
   ],
-  providers: [MessageService, ConfirmationService],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
