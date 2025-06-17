@@ -230,9 +230,25 @@ public class ProductService implements IProductService {
     @Transactional
     public void updateProductThumbnail(Long productId, String thumbnailUrl) throws Exception {
         Product existingProduct = getProductById(productId);
-        if (existingProduct != null) {
-            existingProduct.setThumbnail(thumbnailUrl);
-            productRepository.save(existingProduct);
+        existingProduct.setThumbnail(thumbnailUrl);
+        productRepository.save(existingProduct);
+    }
+
+    @Override
+    @Transactional
+    public void deleteProductImage(Long id) throws Exception {
+        Optional<ProductImage> productImageOptional = productImageRepository.findById(id);
+        if (productImageOptional.isPresent()) {
+            ProductImage productImage = productImageOptional.get();
+            // Ensure the image belongs to a product to avoid unintended deletions
+            if (productImage.getProduct() != null) {
+                productImageRepository.deleteById(id);
+                // Future enhancement: Add logic here to delete the actual file from storage
+            } else {
+                throw new DataNotFoundException("Image with id " + id + " is not associated with any product.");
+            }
+        } else {
+            throw new DataNotFoundException("Cannot find product image with id: " + id);
         }
     }
 }

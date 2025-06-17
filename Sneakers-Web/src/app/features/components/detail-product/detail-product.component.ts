@@ -289,13 +289,25 @@ export class DetailProductComponent extends BaseComponent implements OnInit,Afte
 
   deleteImage(imageId: number): void {
     this.confirmationService.confirm({
-      message: 'Bạn có chắc chắn muốn xóa ảnh này? Chức năng này chỉ xóa ảnh khỏi giao diện, bạn cần Cập nhật sản phẩm để lưu thay đổi.',
+      message: 'Bạn có chắc chắn muốn xóa vĩnh viễn ảnh này?',
       header: 'Xác nhận xóa ảnh',
       icon: 'pi pi-exclamation-triangle',
       accept: () => {
-        // Since there is no dedicated backend endpoint, we just remove it from the view.
-        this.images = this.images.filter(img => img.id !== imageId);
-        this.toastService.success('Đã xóa ảnh khỏi danh sách. Nhấn "Cập nhật sản phẩm" để lưu thay đổi.');
+        this.loadingService.loading = true;
+        this.productService.deleteProductImage(imageId).pipe(
+          tap(() => {
+            this.toastService.success('Đã xóa ảnh thành công.');
+            this.images = this.images.filter(img => img.id !== imageId);
+          }),
+          catchError((err) => {
+            this.toastService.fail('Xóa ảnh thất bại. Vui lòng thử lại.');
+            console.error('Error deleting image:', err);
+            return of(err);
+          }),
+          finalize(() => {
+            this.loadingService.loading = false;
+          })
+        ).subscribe();
       }
     });
   }

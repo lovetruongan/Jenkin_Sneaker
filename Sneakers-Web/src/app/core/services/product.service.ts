@@ -103,15 +103,26 @@ export class ProductService {
     })
   }
 
-  uploadImageProduct(files : FormData,id: number){
-    return this.httpClient.post<{message: string}>(`${this.apiUrl}/products/uploads/${id}`, files, {
-      headers: this.getFileUploadHeaders()
-    })
+  uploadImageProduct(files : FormData, id: number){
+    const token = localStorage.getItem('token');
+    // Do NOT set Content-Type header manually for FormData.
+    // The browser will do it automatically with the correct boundary.
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+    return this.httpClient.post<{message: string}>(`${this.apiUrl}/products/uploads/${id}`, files, { headers: headers });
   }
   
   updateProduct(product: ProductUploadReq, id: number){
     return this.httpClient.put<{message: string}>(`${this.apiUrl}/products/${id}`, product, {
       headers: this.getAuthHeaders()
     })
+  }
+
+  deleteProductImage(id: number): Observable<any> {
+    return this.httpClient.delete(`${this.apiUrl}/products/images/${id}`, {
+      headers: this.getAuthHeaders(),
+      responseType: 'text' // Expect a text response ("...deleted successfully")
+    });
   }
 }

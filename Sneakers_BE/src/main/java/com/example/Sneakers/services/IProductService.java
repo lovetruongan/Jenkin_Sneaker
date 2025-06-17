@@ -41,4 +41,6 @@ public interface IProductService {
     ListProductResponse getRelatedProducts(Long productId) throws Exception;
 
     void updateProductThumbnail(Long productId, String thumbnailUrl) throws Exception;
+
+    void deleteProductImage(Long id) throws Exception;
 }

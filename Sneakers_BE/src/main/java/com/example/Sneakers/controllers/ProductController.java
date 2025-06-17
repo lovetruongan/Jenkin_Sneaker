@@ -307,6 +307,20 @@ public class ProductController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+    @DeleteMapping("/images/{id}")
+    //@PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<String> deleteProductImage(
+            @PathVariable Long id,
+            @RequestHeader("Authorization") String authorizationHeader) {
+        try {
+            productService.deleteProductImage(id);
+            return ResponseEntity.ok("Product image with id = " + id + " deleted successfully");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
     // @PostMapping("generateFakeProducts")
     // private ResponseEntity<String> genereateFakeProducts(){
     // Faker faker = new Faker();
