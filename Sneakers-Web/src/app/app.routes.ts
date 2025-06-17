@@ -29,6 +29,7 @@ import { ReturnManageComponent } from './features/components/return-manage/retur
 import { ForgotPasswordComponent } from './features/components/forgot-password/forgot-password.component';
 import { ResetPasswordComponent } from './features/components/reset-password/reset-password.component';
 import { ChangePasswordComponent } from './features/components/change-password/change-password.component';
+import { UserProfileComponent } from './features/components/user-profile/user-profile.component';
 
 export const routes: Routes = [
   {
@@ -150,6 +151,11 @@ export const routes: Routes = [
       {
         path: 'change-password',
         component: ChangePasswordComponent,
+        canActivate: [AuthGuard]
+      },
+      {
+        path: 'user-profile',
+        component: UserProfileComponent,
         canActivate: [AuthGuard]
       }
     ]

@@ -1,0 +1,99 @@
+.profile-container {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+  .profile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: -0.5rem; // Adjust to align with hr
+  }
+
+  h2 {
+    font-size: 24px;
+    margin-bottom: 0.5rem;
+  }
+
+  p {
+    color: #6c757d;
+    margin-bottom: 1.5rem;
+  }
+
+  .form-row {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .form-group {
+    flex: 1;
+    label {
+      display: block;
+      margin-bottom: .5rem;
+      font-weight: 500;
+    }
+  
+    .form-control {
+      width: 100%;
+      padding: .75rem;
+      border: 1px solid #ced4da;
+      border-radius: .25rem;
+  
+      &[readonly] {
+        background-color: #e9ecef;
+      }
+    }
+  }
+
+  .form-actions {
+    margin-top: 1.5rem;
+    display: flex;
+    gap: 1rem;
+  }
+
+  .btn-primary, .btn-secondary, .btn-light {
+    padding: .75rem 1.5rem;
+    border: none;
+    border-radius: .25rem;
+    cursor: pointer;
+    transition: background-color .2s;
+    font-weight: 500;
+  }
+
+  .btn-primary {
+    background-color: #007bff;
+    color: white;
+
+    &:hover {
+      background-color: #0056b3;
+    }
+
+    &:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
+    }
+  }
+  
+  .btn-secondary {
+    background-color: #6c757d;
+    color: white;
+
+    &:hover {
+      background-color: #5a6268;
+    }
+  }
+
+  .btn-light {
+    background-color: #f8f9fa;
+    color: #212529;
+    border: 1px solid #dee2e6;
+
+    &:hover {
+      background-color: #e2e6ea;
+    }
+  }
+} 

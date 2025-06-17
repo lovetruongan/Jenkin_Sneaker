@@ -51,3 +51,14 @@
     box-sizing: border-box;
   }
 }
+
+.layout-header-section {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  transition: top 0.3s ease-in-out;
+
+  &.header-hidden {
+    top: -200px; /* Adjust this value to be greater than the header's total height */
+  }
+}

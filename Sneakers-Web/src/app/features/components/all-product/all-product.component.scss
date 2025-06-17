@@ -686,3 +686,29 @@
     }
   }
 }
+
+@media screen and (max-width: 576px) {
+  .product-card {
+    .product-name {
+      font-size: 1rem;
+      min-height: 3em; // Ensure consistent height
+    }
+
+    .product-price {
+      font-size: 1.1rem;
+    }
+
+    .original-price {
+      font-size: 0.9rem;
+    }
+
+    .btn-view-detail {
+      padding: 0.75rem 0.5rem;
+      font-size: 0.9rem;
+    }
+  }
+
+  .filter-sidebar {
+    padding: 1rem;
+  }
+}

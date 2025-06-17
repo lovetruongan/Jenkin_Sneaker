@@ -68,6 +68,7 @@ export class AppHeaderComponent extends BaseComponent implements AfterViewInit,O
   public searchSuggestions: ProductDto[] = [];
   public showSuggestions: boolean = false;
   private searchSubject = new Subject<string>();
+  public isMenuOpen = false;
 
   constructor(
     private userService : UserService,
@@ -131,7 +132,10 @@ export class AppHeaderComponent extends BaseComponent implements AfterViewInit,O
     this.itemsMenuAvatar = [
       {
         label: 'Hồ sơ',
-        icon: 'pi pi-user'
+        icon: 'pi pi-fw pi-user',
+        command: () => {
+          this.router.navigate(['/user-profile']);
+        }
       },
       {
         label: 'Lịch sử mua',
@@ -251,5 +255,49 @@ export class AppHeaderComponent extends BaseComponent implements AfterViewInit,O
 
   goToChangePassword() {
     this.router.navigate(['/change-password']);
+  }
+
+  toggleMenu() {
+    this.isMenuOpen = !this.isMenuOpen;
+  }
+
+  initMenu() {
+    this.itemsMenuAvatar = [
+      {
+        label: 'Hồ sơ',
+        icon: 'pi pi-fw pi-user',
+        command: () => {
+          this.router.navigate(['/user-profile']);
+        }
+      },
+      {
+        label: 'Lịch sử mua',
+        icon: 'pi pi-history',
+        command: () => {
+          this.goToHistory();
+        }
+      },
+      {
+        label: 'Trả hàng của tôi',
+        icon: 'pi pi-replay',
+        command: () => {
+          this.goToMyReturns();
+        }
+      },
+      {
+        label: 'Đổi mật khẩu',
+        icon: 'pi pi-key',
+        command: () => {
+          this.goToChangePassword();
+        }
+      },
+      {
+        label: 'Sign out',
+        icon: 'pi pi-power-off',
+        command: () => {
+          this.signOut();
+        }
+      }
+    ]   
   }
 }

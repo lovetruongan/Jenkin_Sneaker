@@ -117,12 +117,14 @@ export class AllProductComponent extends BaseComponent implements OnInit, AfterV
     // Tải danh mục sản phẩm
     this.categoriesService.getCategories().pipe(
       tap((categories) => {
-        this.categoriesOptions = categories.map((item: CategoriesDto) => {
-          return {
-            label: item.name,
-            value: item.id.toString()
-          }
-        })
+        const categoryItems = categories.map((item: CategoriesDto) => ({
+          label: item.name,
+          value: item.id.toString()
+        }));
+        this.categoriesOptions = [
+          { label: 'Tất cả', value: 'all' },
+          ...categoryItems
+        ];
       })
     ).subscribe();
 
@@ -201,6 +203,11 @@ export class AllProductComponent extends BaseComponent implements OnInit, AfterV
   }
 
   onCategoryChange(event: any){
+    if (event.value === 'all') {
+      this.filterPrice();
+      return;
+    }
+
     this.isLoading = true;
     this.categoriesService.getAllProductByCategory(event.value).pipe(
       takeUntil(this.destroyed$),

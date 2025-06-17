@@ -1,10 +1,8 @@
 <div class="layout-main">
-  <div class="layout-topbar">
+  <div class="layout-header-section" [class.header-hidden]="isHeaderHidden">
     <app-app-header></app-app-header>
   </div>
-  <div class="layout-navbar">
-    <app-app-navbar></app-app-navbar>
-  </div>
+  
   <div class="layout-main-content">
     <router-outlet></router-outlet>
   </div>
