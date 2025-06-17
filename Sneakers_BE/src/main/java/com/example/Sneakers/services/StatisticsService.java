@@ -2,6 +2,7 @@ package com.example.Sneakers.services;
 
 import com.example.Sneakers.dtos.DailyRevenueDTO;
 import com.example.Sneakers.dtos.MonthlyRevenueDTO;
+import com.example.Sneakers.dtos.TodayOverviewDTO;
 import com.example.Sneakers.dtos.YearlyRevenueDTO;
 import com.example.Sneakers.dtos.ProductStatisticsDTO;
 import com.example.Sneakers.dtos.BrandSoldStatisticsDTO;
@@ -217,7 +218,14 @@ public class StatisticsService {
         }
     }
 
+    public TodayOverviewDTO getTodayOverview() {
+        LocalDate today = LocalDate.now(); // Server's date is the single source of truth
+        long orders = orderRepository.countOrdersByDate(today);
+        Double revenue = orderRepository.getDailyRevenue(today);
+        return new TodayOverviewDTO(orders, revenue != null ? revenue : 0.0);
+    }
+
     public Long getOrdersToday() {
-        return orderRepository.countOrdersToday();
+        return orderRepository.countOrdersByDate(LocalDate.now());
     }
 }

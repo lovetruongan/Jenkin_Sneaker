@@ -8,6 +8,11 @@ export interface DailyRevenue {
   revenue: number;
 }
 
+export interface TodayOverview {
+  ordersToday: number;
+  revenueToday: number;
+}
+
 export interface MonthlyRevenue {
   month: string;
   revenue: number;
@@ -45,11 +50,12 @@ export class StatisticsService {
 
   constructor(private http: HttpClient) {}
 
-  getDailyRevenue(): Observable<number> {
-    const today = new Date().toISOString().split('T')[0];
-    return this.http.get<any>(`${this.apiUrl}/statistics/daily-revenue/${today}`).pipe(
-      map(response => response.revenue)
-    );
+  getTodayOverview(): Observable<TodayOverview> {
+    return this.http.get<TodayOverview>(`${this.apiUrl}/statistics/today-overview`);
+  }
+
+  getDailyRevenue(date: string): Observable<DailyRevenue> {
+    return this.http.get<DailyRevenue>(`${this.apiUrl}/statistics/daily-revenue/${date}`);
   }
 
   getRevenueByDateRange(startDate: string, endDate: string): Observable<DailyRevenue[]> {

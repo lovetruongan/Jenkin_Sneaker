@@ -745,50 +745,27 @@ export class AdminDashboardComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    // Set PrimeNG calendar locale
     this.primeNGConfig.setTranslation(this.calendarConfig);
-    
-    // Initialize date ranges
-    const today = new Date();
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(today.getDate() - 30);
-    
-    this.dateRange = [thirtyDaysAgo, today];
-    this.monthRange = [new Date(today.getFullYear(), 0, 1), today];
-    this.yearRange = [new Date(today.getFullYear() - 5, 0, 1), today];
-
-    // Load initial data
     this.loadDashboardData();
-    this.onDateRangeSelect();
-    this.onMonthRangeSelect();
-    this.onYearRangeSelect();
   }
 
   private loadDashboardData() {
+    // Fetch today's overview stats in one call
+    this.statisticsService.getTodayOverview().subscribe(overview => {
+      this.ordersToday = overview.ordersToday;
+      this.dailyRevenue = overview.revenueToday;
+    });
+
     // Load dashboard stats
     this.orderService.getDashboardStats().subscribe({
       next: (stats) => {
         this.totalRevenue = stats.totalRevenue;
-        this.ordersToday = stats.todayOrders;
         this.soldProducts = stats.totalProductsSold;
       },
       error: (error) => {
         console.error('Error loading dashboard stats:', error);
         this.totalRevenue = 0;
-        this.ordersToday = 0;
         this.soldProducts = 0;
-      }
-    });
-
-    // Load daily revenue for today
-    const today = new Date();
-    this.statisticsService.getDailyRevenue().subscribe({
-      next: (revenue) => {
-        this.dailyRevenue = revenue;
-      },
-      error: (error) => {
-        console.error('Error loading daily revenue:', error);
-        this.dailyRevenue = 0;
       }
     });
 
@@ -804,6 +781,20 @@ export class AdminDashboardComponent implements OnInit {
         this.availableProducts = 0;
       }
     });
+
+    // Initialize date ranges
+    const today = new Date();
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(today.getDate() - 30);
+    
+    this.dateRange = [thirtyDaysAgo, today];
+    this.monthRange = [new Date(today.getFullYear(), 0, 1), today];
+    this.yearRange = [new Date(today.getFullYear() - 5, 0, 1), today];
+
+    // Load initial data
+    this.onDateRangeSelect();
+    this.onMonthRangeSelect();
+    this.onYearRangeSelect();
   }
 
   onDateRangeSelect() {

@@ -6,6 +6,7 @@ import com.example.Sneakers.dtos.YearlyRevenueDTO;
 import com.example.Sneakers.dtos.ProductStatisticsDTO;
 import com.example.Sneakers.dtos.BrandSoldStatisticsDTO;
 import com.example.Sneakers.dtos.ProductSoldStatisticsDTO;
+import com.example.Sneakers.dtos.TodayOverviewDTO;
 import com.example.Sneakers.services.StatisticsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -97,6 +98,11 @@ public class StatisticsController {
         } else {
             return ResponseEntity.ok(statisticsService.getTopBrandsSold(topN));
         }
+    }
+
+    @GetMapping("/today-overview")
+    public ResponseEntity<TodayOverviewDTO> getTodayOverview() {
+        return ResponseEntity.ok(statisticsService.getTodayOverview());
     }
 
     @GetMapping("/orders-today")

@@ -324,7 +324,7 @@ public class OrderService implements IOrderService {
 
     public DashboardStatsDTO getDashboardStats() {
         Long totalRevenue = orderRepository.calculateTotalRevenue();
-        Long todayOrders = orderRepository.countOrdersToday();
+        Long todayOrders = orderRepository.countOrdersByDate(LocalDate.now());
         Long totalProductsSold = orderRepository.countTotalProductsSold();
 
         return new DashboardStatsDTO(totalRevenue, todayOrders, totalProductsSold);

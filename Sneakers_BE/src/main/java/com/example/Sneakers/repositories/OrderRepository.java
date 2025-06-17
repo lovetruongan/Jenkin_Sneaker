@@ -48,10 +48,10 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             Pageable pageable
     );
     
-    @Query(value = "SELECT COALESCE(SUM(o.total_money - COALESCE(o.discount_amount, 0)), 0) " +
+    @Query(value = "SELECT COALESCE(SUM(o.total_money), 0) " +
            "FROM orders o " +
            "WHERE DATE(o.order_date) = :date " +
-           "AND o.status IN ('pending', 'shipped', 'delivered') AND o.active = true",
+           "AND o.status IN ('paid', 'delivered') AND o.active = true",
             nativeQuery = true)
     Double getDailyRevenue(@Param("date") LocalDate date);
 
@@ -90,11 +90,11 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             @Param("startYear") int startYear,
             @Param("endYear") int endYear);
 
-    // Đếm số đơn hàng trong ngày
-    @Query(value = "SELECT COUNT(*) FROM orders WHERE DATE(order_date) = CURRENT_DATE " +
-           "AND status IN ('pending', 'shipped', 'delivered') AND active = true",
+    // Đếm số đơn hàng trong ngày (chỉ tính đơn đã thanh toán hoặc đã giao)
+    @Query(value = "SELECT COUNT(*) FROM orders o WHERE DATE(o.order_date) = :date " +
+           "AND o.status IN ('paid', 'delivered') AND o.active = true",
            nativeQuery = true)
-    Long countOrdersToday();
+    Long countOrdersByDate(@Param("date") LocalDate date);
 
     // Tính tổng doanh thu từ các đơn hàng đã hoàn thành
     @Query(value = "SELECT COALESCE(SUM(total_money - COALESCE(discount_amount, 0)), 0) " +
