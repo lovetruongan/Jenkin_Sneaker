@@ -30,6 +30,7 @@ import { environment } from '../../../../environments/environment.development';
 import { VnpayService } from '../../../core/services/vnpay.service';
 import { VnpayPaymentResponse } from '../../../core/responses/vnpay-payment.response';
 import { CreateVnpayPaymentDto } from '../../../core/dtos/create-vnpay-payment.dto';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-order',
@@ -275,29 +276,28 @@ export class OrderComponent extends BaseComponent implements OnInit,AfterViewIni
     };
 
     this.orderService.postOrder(orderData).pipe(
-      tap((newOrder: any) => {
-        this.orderId = newOrder.id;
-        this.toastService.success("Đặt hàng thành công!");
-        this.commonService.intermediateObservable.next(true);
-        localStorage.removeItem("productOrder");
-        this.router.navigate([`/order-detail/${this.orderId}`]);
+      switchMap(() => this.productService.deleteAllProductsFromCart())
+    ).subscribe({
+      next: () => {
         this.blockUi();
-      }),
-      catchError((err) => {
+        this.toastService.success("Đặt hàng thành công");
+        this.clearCart();
+        this.router.navigate(['/history']);
+      },
+      error: (err) => {
         this.blockUi();
         console.error('Order creation error:', err);
-        this.toastService.fail("Đặt hàng thất bại: " + (err.error?.message || err.message));
-        return of(err);
-      }),
-      takeUntil(this.destroyed$)
-    ).subscribe();
+        this.toastService.fail("Không thể tạo đơn hàng: " + (err.error?.message || err.message));
+      }
+    });
   }
 
   private processVnpayOrder(): void {
     this.blockUi();
     const userInfor = JSON.parse(localStorage.getItem("userInfor") || '{}');
     const userId = userInfor.id;
-  
+    let createdOrderId: number;
+
     const orderData = {
       ...(userId && { user_id: Number(userId) }),
       fullname: this.inforShipForm.value.fullName,
@@ -316,28 +316,29 @@ export class OrderComponent extends BaseComponent implements OnInit,AfterViewIni
       total_money: Math.round(this.finalCost + this.methodShippingValue.price),
       ...(this.isVoucherApplied && { voucher_code: this.voucherCode })
     };
-  
+
     this.orderService.postOrder(orderData).pipe(
-      switchMap((orderInfor: any) => {
-        this.orderId = orderInfor.id;
-        const vnpayData: CreateVnpayPaymentDto = {
-          order_id: orderInfor.id,
+      tap((orderInfor: any) => {
+        createdOrderId = orderInfor.id;
+      }),
+      switchMap(() => this.clearCart()),
+      switchMap(() => {
+        const vnpayDto: CreateVnpayPaymentDto = {
+          order_id: createdOrderId,
           amount: Math.round(this.finalCost + this.methodShippingValue.price),
-          order_info: `Thanh toan don hang ${orderInfor.id}`
+          order_info: `Thanh toán cho đơn hàng ${createdOrderId}`
         };
-        
-        return this.vnpayService.createVnpayPayment(vnpayData);
+        return this.vnpayService.createVnpayPayment(vnpayDto);
       }),
       tap((vnpayResponse: VnpayPaymentResponse) => {
-        if (vnpayResponse.status.toLowerCase() === 'ok' && vnpayResponse.url) {
+        if(vnpayResponse.url) {
           window.location.href = vnpayResponse.url;
-        } else {
-          this.toastService.fail('Không thể tạo thanh toán VNPAY. Vui lòng thử lại.');
         }
       }),
       catchError((err) => {
-        this.toastService.fail('Không thể tạo đơn hàng hoặc thanh toán: ' + err.error?.message);
         this.blockUi();
+        console.error('VNPay process error:', err);
+        this.toastService.fail("Không thể tạo thanh toán VNPay: " + (err.error?.message || err.message));
         return of(err);
       }),
       takeUntil(this.destroyed$)
@@ -345,30 +346,30 @@ export class OrderComponent extends BaseComponent implements OnInit,AfterViewIni
   }
 
   onStripePaymentSuccess(paymentIntent: any): void {
-    // Payment successful, update order status on backend
-    this.blockUi();
-    this.orderService.updateOrderStatus(this.orderId, 'paid').pipe(
-      tap(() => {
-        this.showStripeDialog = false;
-        this.toastService.success("Thanh toán và đặt hàng thành công!");
-        this.commonService.intermediateObservable.next(true);
-        localStorage.removeItem("productOrder");
-        this.router.navigate([`/order-detail/${this.orderId}`]);
-        this.blockUi();
-      }),
-      catchError((err) => {
-        this.blockUi();
-        this.toastService.fail('Cập nhật trạng thái đơn hàng thất bại. Vui lòng liên hệ hỗ trợ.');
-        return of(err);
-      }),
-      takeUntil(this.destroyed$)
-    ).subscribe();
+    if (paymentIntent.status === 'succeeded') {
+      this.orderService.updateOrderStatus(this.orderId, 'paid').pipe(
+        switchMap(() => this.productService.deleteAllProductsFromCart())
+      ).subscribe({
+        next: () => {
+          this.toastService.success("Thanh toán thành công. Đơn hàng của bạn đã được xác nhận.");
+          this.clearCart();
+          this.router.navigate(['/history']);
+        },
+        error: (err) => {
+          console.error('Error in Stripe success flow:', err);
+          this.toastService.warn("Thanh toán thành công nhưng có lỗi khi hoàn tất đơn hàng.");
+          this.router.navigate(['/history']);
+        }
+      });
+    } else {
+      this.onStripePaymentError("Thanh toán không thành công. Vui lòng thử lại.");
+    }
+    this.showStripeDialog = false;
   }
 
   onStripePaymentError(error: string): void {
     this.showStripeDialog = false;
     this.toastService.fail(`Thanh toán thất bại: ${error}`);
-    // Update order status to 'payment_failed'
     this.orderService.updateOrderStatus(this.orderId, 'payment_failed').pipe(
         catchError((err) => {
             console.error('Failed to update order status to payment_failed', err);
@@ -378,15 +379,17 @@ export class OrderComponent extends BaseComponent implements OnInit,AfterViewIni
   }
 
   onStripePaymentCancel(): void {
-    this.showStripeDialog = false;
-    this.toastService.fail('Thanh toán đã bị hủy.');
-    // Update order status to 'cancelled'
     this.orderService.updateOrderStatus(this.orderId, 'cancelled').pipe(
-        catchError((err) => {
-            console.error('Failed to update order status to cancelled', err);
-            return of(err);
-        })
+      takeUntil(this.destroyed$)
     ).subscribe();
+    this.toastService.warn("Thanh toán đã bị hủy. Đơn hàng của bạn chưa được xác nhận.");
+    this.showStripeDialog = false;
+  }
+
+  private clearCart(): Observable<any> {
+    localStorage.removeItem('productOrder');
+    this.commonService.intermediateObservable.next(true);
+    return this.productService.deleteAllProductsFromCart();
   }
 
   blockUi() {

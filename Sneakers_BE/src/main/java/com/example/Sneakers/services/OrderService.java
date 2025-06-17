@@ -120,10 +120,18 @@ public class OrderService implements IOrderService {
             appliedVoucher = voucher;
         }
 
+        // Xác định trạng thái ban đầu dựa trên phương thức thanh toán
+        String initialStatus;
+        if ("Cash".equalsIgnoreCase(orderDTO.getPaymentMethod())) {
+            initialStatus = OrderStatus.PROCESSING; // Đơn COD vào thẳng trạng thái xử lý
+        } else {
+            initialStatus = OrderStatus.PAYMENT_FAILED; // Đơn online cần thanh toán
+        }
+
         Order order = Order.builder()
                 .user(user)
                 .orderDate(LocalDate.now())
-                .status(OrderStatus.PENDING)
+                .status(initialStatus) // Sử dụng trạng thái đã xác định
                 .fullName(orderDTO.getFullName())
                 .email(orderDTO.getEmail())
                 .phoneNumber(orderDTO.getPhoneNumber())

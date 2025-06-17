@@ -11,6 +11,8 @@ import { environment } from '../../../../environments/environment.development';
 import { ToastService } from '../../../core/services/toast.service';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
+import { ProductService } from '../../../core/services/product.service';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-order-detail',
@@ -42,7 +44,8 @@ export class OrderDetailComponent extends BaseComponent implements OnInit {
     private orderService: OrderService,
     private activatedRouter: ActivatedRoute,
     private router: Router,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private productService: ProductService
   ) {
     super();
   }
@@ -71,30 +74,45 @@ export class OrderDetailComponent extends BaseComponent implements OnInit {
 
   handleVnpayReturn(status: string, orderId: string): void {
     const orderIdNum = parseInt(orderId, 10);
-    const statusToUpdate = status === '00' ? 'paid' : 'payment_failed';
     
-    this.orderService.updateOrderStatus(orderIdNum, statusToUpdate).subscribe({
-      next: () => {
-        if (status === '00') {
-          this.toastService.success('Thanh toán VNPAY thành công!');
-        } else {
-          this.toastService.fail('Thanh toán VNPAY thất bại hoặc đã bị hủy.');
-        }
-        this.loadOrderDetail(orderId);
-      },
-      error: (err) => {
-        this.toastService.fail('Có lỗi xảy ra khi cập nhật trạng thái đơn hàng.');
-        this.loadOrderDetail(orderId);
-      },
-      complete: () => {
-        // Clean up URL
-        this.router.navigate([], {
-          relativeTo: this.activatedRouter,
-          queryParams: {},
-          replaceUrl: true
-        });
-      }
+    // Clean URL query params immediately to prevent re-triggering
+    this.router.navigate([], {
+      relativeTo: this.activatedRouter,
+      queryParams: {},
+      replaceUrl: true
     });
+    
+    if (status === '00') {
+      this.orderService.updateOrderStatus(orderIdNum, 'paid').pipe(
+        switchMap(() => this.productService.deleteAllProductsFromCart())
+      ).subscribe({
+        next: () => {
+          this.toastService.success('Thanh toán thành công! Giỏ hàng đã được xóa.');
+          localStorage.removeItem('productOrder');
+          this.commonService.intermediateObservable.next(true);
+
+          // Force reload after a short delay to ensure state is fresh
+          setTimeout(() => {
+            window.location.reload();
+          }, 1000);
+        },
+        error: (err) => {
+          this.toastService.fail('Có lỗi xảy ra khi hoàn tất đơn hàng. Vui lòng liên hệ hỗ trợ.');
+          this.loadOrderDetail(orderId);
+        }
+      });
+    } else {
+      this.orderService.updateOrderStatus(orderIdNum, 'payment_failed').subscribe({
+        next: () => {
+          this.toastService.fail('Thanh toán VNPAY thất bại hoặc đã bị hủy.');
+          this.loadOrderDetail(orderId);
+        },
+        error: (err) => {
+          this.toastService.fail('Có lỗi xảy ra khi cập nhật trạng thái đơn hàng.');
+          this.loadOrderDetail(orderId);
+        }
+      });
+    }
   }
 
   loadOrderDetail(orderId: string): void {

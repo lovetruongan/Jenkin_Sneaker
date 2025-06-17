@@ -62,7 +62,7 @@
                 <p class="payment-method">
                   HT thanh toán: 
                   <span [ngSwitch]="order.payment_method">
-                    <ng-container *ngSwitchCase="'Cash'">Thanh toán khi nhận hàng</ng-container>
+                    <ng-container *ngSwitchCase="'cod'">Thanh toán khi nhận hàng</ng-container>
                     <ng-container *ngSwitchCase="'Stripe'">Thẻ Visa/Mastercard</ng-container>
                     <ng-container *ngSwitchDefault>{{ order.payment_method }}</ng-container>
                   </span>

@@ -44,20 +44,45 @@ public class StripeService implements IStripeService {
                     .orElseThrow(() -> new DataNotFoundException("Order not found with id: " + request.getOrderId()));
             
             Long shippingCost = getShippingCost(order.getShippingMethod());
-            Long totalAmount = request.getAmount() + shippingCost;
-            // Create payment intent
-            PaymentIntentCreateParams params = PaymentIntentCreateParams.builder()
-                    .setAmount(totalAmount) // Amount in VND (base unit)
-                    .setCurrency(request.getCurrency())
-                    .setAutomaticPaymentMethods(
-                            PaymentIntentCreateParams.AutomaticPaymentMethods.builder()
-                                    .setEnabled(true)
-                                    .build()
-                    )
-                    .putMetadata("orderId", request.getOrderId().toString())
-                    .putMetadata("customerEmail", request.getCustomerEmail() != null ? request.getCustomerEmail() : "")
-                    .putMetadata("customerName", request.getCustomerName() != null ? request.getCustomerName() : "")
-                    .build();
+            Long totalAmountVND = request.getAmount() + shippingCost;
+            
+            final long VND_MAX_AMOUNT = 99_999_999L;
+            final double USD_VND_EXCHANGE_RATE = 25000.0;
+
+            PaymentIntentCreateParams params;
+
+            if (totalAmountVND > VND_MAX_AMOUNT) {
+                // Convert to USD and charge in cents
+                long totalAmountUSD = Math.round(totalAmountVND / USD_VND_EXCHANGE_RATE);
+                long totalAmountCents = totalAmountUSD * 100;
+
+                params = PaymentIntentCreateParams.builder()
+                        .setAmount(totalAmountCents)
+                        .setCurrency("usd")
+                        .setAutomaticPaymentMethods(
+                                PaymentIntentCreateParams.AutomaticPaymentMethods.builder()
+                                        .setEnabled(true)
+                                        .build()
+                        )
+                        .putMetadata("orderId", request.getOrderId().toString())
+                        .putMetadata("customerEmail", request.getCustomerEmail() != null ? request.getCustomerEmail() : "")
+                        .putMetadata("customerName", request.getCustomerName() != null ? request.getCustomerName() : "")
+                        .build();
+            } else {
+                // Use VND for amounts under the limit
+                params = PaymentIntentCreateParams.builder()
+                        .setAmount(totalAmountVND) // Amount in VND (base unit)
+                        .setCurrency(request.getCurrency())
+                        .setAutomaticPaymentMethods(
+                                PaymentIntentCreateParams.AutomaticPaymentMethods.builder()
+                                        .setEnabled(true)
+                                        .build()
+                        )
+                        .putMetadata("orderId", request.getOrderId().toString())
+                        .putMetadata("customerEmail", request.getCustomerEmail() != null ? request.getCustomerEmail() : "")
+                        .putMetadata("customerName", request.getCustomerName() != null ? request.getCustomerName() : "")
+                        .build();
+            }
 
             PaymentIntent intent = PaymentIntent.create(params);
 

@@ -3,6 +3,7 @@ package com.example.Sneakers.controllers;
 import com.example.Sneakers.dtos.CreateVnpayPaymentDTO;
 import com.example.Sneakers.dtos.VnpayRefundRequestDTO;
 import com.example.Sneakers.models.Order;
+import com.example.Sneakers.models.OrderStatus;
 import com.example.Sneakers.repositories.OrderRepository;
 import com.example.Sneakers.responses.PaymentResponse;
 import com.example.Sneakers.services.IOrderService;
@@ -113,21 +114,23 @@ public class VnpayController {
                 redirectUrl = "http://localhost:4200/order-detail/" + order.getId();
 
                 if ("00".equals(status)) {
-                    order.setStatus("paid");
+                    order.setStatus(OrderStatus.PAID);
                     order.setVnpTransactionNo(transactionNo);
-                    log.info("Payment successful - Order {} updated with transactionNo: {}", order.getId(), transactionNo);
+                    log.info("Payment successful for order {}. Status updated to PAID. TransactionNo: {}", order.getId(), transactionNo);
                 } else {
-                    order.setStatus("payment_failed");
-                    log.warn("Payment failed for order: {}", order.getId());
+                    order.setStatus(OrderStatus.PAYMENT_FAILED);
+                    log.warn("Payment failed or was cancelled for order {}. Status updated to PAYMENT_FAILED. VNPAY response code: {}", order.getId(), status);
                 }
                 orderRepository.save(order);
             } else {
-                log.error("Order not found for TxnRef: {}", txnRef);
-                redirectUrl = "http://localhost:4200/history?payment_status=not_found";
+                log.error("Order not found for VNPAY TxnRef: {}", txnRef);
+                String errorMessage = URLEncoder.encode("Không tìm thấy đơn hàng với mã giao dịch: " + txnRef, StandardCharsets.UTF_8);
+                redirectUrl = "http://localhost:4200/history?payment_status=not_found&error=" + errorMessage;
             }
         } catch (Exception e) {
-            log.error("Error in payment callback: ", e);
-            redirectUrl = "http://localhost:4200/history?payment_status=error";
+            log.error("Critical error in VNPAY payment callback for TxnRef: {}. Error: {}", txnRef, e.getMessage(), e);
+            String errorMessage = URLEncoder.encode("Đã xảy ra lỗi khi xử lý thanh toán. Vui lòng thử lại.", StandardCharsets.UTF_8);
+            redirectUrl = "http://localhost:4200/history?payment_status=error&error=" + errorMessage;
         }
 
         response.sendRedirect(redirectUrl);
