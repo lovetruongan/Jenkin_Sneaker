@@ -1,0 +1,27 @@
+.history-order {
+    margin-bottom: 80px;
+    margin-top: 90px;
+    .history-order-header {
+        margin-bottom: 32px;
+    }
+    .history-order-main-info {
+        img {
+            margin-right: 24px;
+        }
+    }
+
+    .history-order-image {
+        max-height: 75px;
+        margin-left: -20px;
+    }
+    .history-order-view-deatail {
+        background-color: #b80b0b;
+        border: none;
+        border-radius: 4px;
+        color: #fff;
+        height: 40px;
+        &:hover {
+            opacity: 0.8;
+        }
+    }
+}

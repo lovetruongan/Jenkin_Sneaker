@@ -1,0 +1,66 @@
+<div class="payment-result-container">
+  <div class="result-content" *ngIf="!loading">
+    <!-- Success -->
+    <div class="result-success" *ngIf="isSuccess">
+      <i class="pi pi-check-circle success-icon"></i>
+      <h2>Thanh toán thành công!</h2>
+      <p>Đơn hàng #{{ paymentStatus.order_id }} đã được thanh toán thành công.</p>
+      
+      <div class="payment-info" *ngIf="paymentStatus">
+        <div class="info-item">
+          <span class="label">Mã giao dịch:</span>
+          <span class="value">{{ paymentStatus.transaction_id }}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">Phương thức:</span>
+          <span class="value">{{ formatPaymentMethod(paymentStatus.payment_method) }}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">Số tiền:</span>
+          <span class="value">{{ paymentStatus.amount | currency:'VND':'symbol':'1.0-0' }}</span>
+        </div>
+      </div>
+
+      <div class="action-buttons">
+        <p-button 
+          label="Xem chi tiết đơn hàng"
+          icon="pi pi-eye"
+          (click)="goToOrderDetail()">
+        </p-button>
+        <p-button 
+          label="Tiếp tục mua sắm"
+          icon="pi pi-shopping-cart"
+          [outlined]="true"
+          (click)="goToHome()">
+        </p-button>
+      </div>
+    </div>
+
+    <!-- Failure -->
+    <div class="result-failure" *ngIf="!isSuccess">
+      <i class="pi pi-times-circle error-icon"></i>
+      <h2>Thanh toán thất bại!</h2>
+      <p>{{ paymentStatus.message || 'Có lỗi xảy ra trong quá trình thanh toán.' }}</p>
+
+      <div class="action-buttons">
+        <p-button 
+          label="Thử lại"
+          icon="pi pi-refresh"
+          (click)="goToOrderDetail()">
+        </p-button>
+        <p-button 
+          label="Về trang chủ"
+          icon="pi pi-home"
+          [outlined]="true"
+          (click)="goToHome()">
+        </p-button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading-container" *ngIf="loading">
+    <p-progressSpinner></p-progressSpinner>
+    <p>Đang xử lý kết quả thanh toán...</p>
+  </div>
+</div>

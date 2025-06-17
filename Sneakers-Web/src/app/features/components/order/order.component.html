@@ -1,0 +1,105 @@
+<div class="order-page">
+    <p-toast></p-toast>
+    <div class="container">
+        <p-blockUI [blocked]="blockedUi">
+            <p-progressSpinner ariaLabel="loading"></p-progressSpinner>
+        </p-blockUI>
+        <div class="row">
+            <div class="col-6 col-lg-6">
+                <form class="order-page-form d-flex" [formGroup]="inforShipForm">
+                    <div class="d-flex input-form-container">
+                        <label class="font-bold" for="name">Tên đầy đủ</label>
+                        <input id="name" type="text" pInputText formControlName="fullName"/>
+                    </div>
+                    <div class="d-flex input-form-container">
+                        <label class="font-bold" for="name">Địa chỉ nhận hàng</label>
+                        <input id="name" type="text" pInputText formControlName="address"/>
+                    </div>
+                    <div class="d-flex input-form-container">
+                        <label class="font-bold" for="name">Số điện thoại</label>
+                        <input id="name" type="text" pInputText formControlName="phoneNumber"/>
+                    </div>
+                    <div class="d-flex input-form-container">
+                        <label class="font-bold" for="name">Địa chỉ email</label>
+                        <input id="name" type="text" pInputText formControlName="email"/>
+                    </div>
+                    <div class="d-flex input-form-container">
+                        <label class="font-bold">Ghi chú đơn hàng</label>
+                        <textarea rows="5" cols="30" pInputTextarea formControlName="note"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="col-5 col-lg-5 offset-lg-1 order-info-container d-flex">
+                <h5>ĐƠN HÀNG CỦA BẠN</h5>
+                <table>
+                    <thead>
+                        <tr>
+                            <td class="font-bold">SẢN PHẨM</td>
+                            <td class="col-right font-bold">TỔNG</td>
+                        </tr>
+                    </thead>
+                   <tbody>
+                        @for (product of productToOrder; track product) {
+                            <tr>
+                                <td>
+                                    <div class="productNameAndQuantity font-bold">{{product.products.name}}</div>
+                                    <div class="productSize">Size: {{product.size}} | Số lượng: {{product.quantity}}</div>
+                                </td>
+                                <td class="col-right">{{product.products.price * product.quantity | currency:'VND':'symbol':'1.0-0'}}</td>
+                            </tr>
+                        }
+                        <tr>
+                            <td class="font-bold">Tổng phụ</td>
+                            <td class="col-right">{{totalCost | currency:'VND':'symbol':'1.0-0'}}</td>
+                        </tr>
+                        <tr>
+                            <td class="font-bold">Mã giảm giá</td>
+                            <td class="col-right">
+                                @if (!isVoucherApplied) {
+                                    <div class="voucher-input-group d-flex align-items-center">
+                                        <input type="text" [(ngModel)]="voucherCode" pInputText placeholder="Nhập mã" style="width: 120px; margin-right: 5px;">
+                                        <button pButton type="button" label="Áp dụng" (click)="applyVoucher()" class="p-button-sm"></button>
+                                    </div>
+                                } @else {
+                                    <div class="applied-voucher d-flex align-items-center">
+                                        <span class="voucher-info">{{appliedVoucherName}} (-{{discountAmount | currency:'VND':'symbol':'1.0-0'}})</span>
+                                        <button pButton type="button" icon="pi pi-times" (click)="removeVoucher()" class="p-button-text p-button-sm"></button>
+                                    </div>
+                                }
+                            </td>
+                        </tr>
+                        @if (isVoucherApplied) {
+                            <tr>
+                                <td class="font-bold">Giảm giá</td>
+                                <td class="col-right text-danger">-{{discountAmount | currency:'VND':'symbol':'1.0-0'}}</td>
+                            </tr>
+                        }
+                        <tr>
+                            <td class="font-bold">Giao hàng</td>
+                            <td class="col-right">{{methodShippingValue.price | currency:'VND':'symbol':'1.0-0'}}</td>
+                        </tr>
+                        <tr>
+                            <td class="font-bold">Phương thức giao hàng</td>
+                            <td class="col-right">
+                                <p-dropdown [options]="methodShipping" [(ngModel)]="methodShippingValue" optionLabel="name" [showClear]="false" placeholder="Chọn phương thức giao hàng"></p-dropdown>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="font-bold">Tổng</td>
+                            <td class="col-right font-bold text-primary">{{finalCost + methodShippingValue.price | currency:'VND':'symbol':'1.0-0'}}</td>
+                        </tr>
+                   </tbody>
+                </table>
+                <ul class="payMethod-list">
+                    @for (item of payMethod; track item) {
+                        <li class="payMethod-item">
+                            <p-radioButton name="item" [value]="item" [(ngModel)]="selectedPayMethod" [inputId]="item.key"></p-radioButton>
+                            <label [for]="item.key" class="ml-2">{{item.name}}</label>
+                        </li>
+                    }
+                </ul>
+                <button (click)="order()" class="order-button">Đặt hàng</button>
+            </div> 
+        </div>
+    </div>
+</div>

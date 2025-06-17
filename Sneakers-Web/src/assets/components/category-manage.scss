@@ -1,0 +1,38 @@
+.category-manage-admin {
+    padding: 20px;
+    padding-left: 0;
+    margin-top: 90px;
+    button {
+        border-radius: 4px;
+    }
+    .add-category-wrapper {
+        margin-bottom: 36px;
+        button {
+            border-radius: 4px;
+        }
+    }
+    .p-dialog-content {
+        text-align: center;
+    }
+    .category-wrapper {
+        display: flex;
+        align-items: center;
+        margin: 12px 0;
+        label {
+            margin-right: 24px;
+        }
+        input {
+            flex: 1;
+        }
+    }
+    .button-wrapper {
+        display: flex;
+        align-items: center;
+        .update-button {
+            margin-right: 12px;
+        }
+        button {
+            border-radius: 4px;
+        }
+    }
+}

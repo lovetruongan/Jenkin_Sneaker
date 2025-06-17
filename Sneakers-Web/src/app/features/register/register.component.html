@@ -1,0 +1,37 @@
+<div class="container-fluid p-0 register">
+  <p-blockUI [blocked]="blockedUi">
+    <p-progressSpinner ariaLabel="loading"></p-progressSpinner>
+  </p-blockUI>
+  <div class="row m-0 d-flex align-items-center">
+    <div class="col-lg-3 col-sm-4 offset-lg-4 offset-sm-2 register-form-container">
+      <div class="register-form-container-content">
+        <h2 class="register-title">Đăng ký</h2>
+        <div class="form-group-container">
+          <form (keydown.enter)="formGroupSubmitSubject.next()" class="form-group" [formGroup]="registerForm">
+            <input pKeyFilter="int" type="text" placeholder="Số điện thoại" pInputText formControlName="phoneNumber" />
+            <p-password placeholder="Mật khẩu" [toggleMask]="true" formControlName="password"></p-password>
+            <p-password placeholder="Nhập lại mật khẩu" [toggleMask]="true"
+              formControlName="retypePassword"></p-password>
+            <input type="text" placeholder="Tên đầy đủ" pInputText formControlName="fullName" />
+            <input type="date" placeholder="Ngày sinh" pInputText formControlName="date" />
+            <input type="text" placeholder="Địa chỉ" pInputText formControlName="address" />
+          </form>
+        </div>
+        <p-toast></p-toast>
+        <p-button (click)="formGroupSubmitSubject.next()" class="register__button" label="Đăng ký"
+          type="submit"></p-button>
+        <div class="no-account-container">
+          <span>Đã có tài khoản <a [routerLink]="['/auth-login']">Đăng nhập</a></span>
+        </div>
+        <p>&copy; 2017–2024</p>
+      </div>
+
+      <div class="register-form-container-back">
+        <a [routerLink]="['/Home']">
+          <p>Xem sản phẩm</p>
+          <i class="pi pi-arrow-left"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>

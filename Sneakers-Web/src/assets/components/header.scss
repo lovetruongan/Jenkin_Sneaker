@@ -1,0 +1,433 @@
+.app-header {
+  background-color: $black-color;
+  color: $white-color;
+  // height: calc($header-height + 20px);
+  height: $header-height;
+
+  .header-nav-login {
+    text-decoration: none;
+    color: #ffffffb6;
+    font-size: 18px;
+    line-height: $header-height;
+
+    &:hover {
+      color: $white-color;
+    }
+  }
+
+  .header-avtar-container {
+
+    height: 100%;
+    display: flex;
+    align-items: center;
+    p-avatar {
+      position: relative;
+      display: block;
+      height: 50px;
+      text-align: left;
+
+      .p-avatar {
+        background-color: black !important;
+        position: absolute;
+        top: 50%;
+      }
+    }
+    .avatar-name-wrapper {
+      display: flex;
+      align-items: center;
+      height: 100%;
+    }
+
+    .userName {
+      margin-left: 12px;
+      margin-bottom: 0;
+    }
+    ul {
+      padding-left: 0;
+      margin-bottom: 0;
+
+      li {
+        margin: 4px 0;
+
+        a {
+          text-decoration: none;
+        }
+      }
+    }
+
+    .header-avtar-icon {
+      span {
+        font-size: 23px;
+        cursor: pointer;
+      }
+    }
+
+    p-menu {
+      .ng-trigger.ng-trigger-overlayAnimation {
+        z-index: 1002 !important;
+        transform-origin: center top !important;
+        top: 60px !important;
+        left: 22px !important;
+      }
+    }
+  }
+
+  .app-logo-header {
+    display: flex;
+    align-self: center;
+    margin-top: 18px;
+    font-size: 25px;
+    cursor: pointer;
+
+    a img {
+      z-index: 3;
+      display: block;
+      position: relative;
+      transform: translateX(10px);
+      width: 300px;
+    }
+  }
+
+  .header-search-container {
+    position: relative;
+
+    i {
+      z-index: 100;
+      margin-right: 24px;
+      margin-top: calc($header-height/2);
+      transform: translateY(-50%);
+      color: #ffffffaf;
+      font-size: 18px;
+      font-weight: 600;
+      float: right;
+      cursor: pointer;
+
+      &:hover {
+        color: $white-color;
+      }
+    }
+
+    .line-right {
+      position: absolute;
+      right: 8px;
+      width: 0;
+      border-right: 1px solid #ffffff71;
+      height: 32px;
+      margin-top: calc($header-height/2);
+      transform: translateY(-50%);
+    }
+  }
+
+  .header-cart-container-wrapper {
+    position: relative;
+    &:hover {
+      .previewCart {
+        display: block;
+      }
+    }
+    .header-cart-container {
+      font-size: 14px;
+      text-transform: uppercase;
+      color: #ffffffaf;
+      margin-top: calc($header-height/2);
+      transform: translateY(-50%);
+      width: fit-content;
+      cursor: pointer;
+      display: flex;
+      position: relative;
+      &:hover {
+        ~.previewCart {
+          display: block;
+      }
+      }
+  
+      .header-cart-text {
+        display: flex;
+        align-self: center;
+        width: fit-content;
+        margin-right: 20px;
+        font-size: 15px;
+        font-weight: 500;
+        transform: translateY(10px);
+      }
+  
+      .header-cart-icon--bag {
+        width: 26px;
+        height: 30px;
+        border: 2px solid white;
+        background-color: black;
+        position: relative;
+        transform: translateY(5px);
+      }
+  
+      .header-cart-icon--bag:after {
+        transition: height .5s ease-out;
+        bottom: 100%;
+        margin-bottom: 0;
+        margin-left: -7px;
+        height: 8px;
+        width: 14px;
+        left: 50%;
+        content: ' ';
+        position: absolute;
+        pointer-events: none;
+        border: 2px solid #ffffff;
+        border-top-left-radius: 99px;
+        border-top-right-radius: 99px;
+        border-bottom: 0;
+      }
+  
+      .header-cart-icon--bag:hover+.header-cart-icon--bag:after {
+        height: 10px;
+      }
+  
+      .header-cart-icon--bag span {
+        font-size: 16px;
+        color: white;
+        position: absolute;
+        left: 32%;
+        top: 7%;
+        z-index: 2;
+      }
+  
+      &:hover {
+        color: $white-color;
+      }
+  
+      &:hover .header-cart-icon--bag {
+        background-color: white;
+      }
+  
+      &:hover .header-cart-icon--bag span {
+        color: black;
+      }
+  
+    }
+  
+  .previewCart {
+    background-color: #fff;
+    display: none;
+    color: #000;
+    border-radius: 4px;
+    position: absolute;
+    left: -160px;
+    top: 62px;
+    z-index: 1000;
+    width: 320px;
+    .previewCart__heading {
+      margin-top: 12px;
+      margin-left: 28px;
+    }
+    .wrapper-product-list {
+      max-height: 400px;
+      margin-top: 12px;
+      overflow-x: hidden;
+      overflow-y: scroll;
+      .wrapper-product-item {
+        border-bottom: 1px solid #000;
+        margin-bottom: 12px;
+      }
+      .wrapper-info {
+        display: flex;
+        flex-direction: column;
+      }
+      .wrapper__image {
+        display: flex;
+      }
+      button {
+        border-radius: 50%;
+        width: 32px;
+        height: 32px;
+      }
+      li {
+        cursor: pointer;
+        display: flex;
+      }
+      span {
+        font-size: 12px;
+      }
+      img {
+        width: 100px;
+      }
+    }
+  }
+  }
+
+}
+
+@media only screen and (max-width: 489px) {
+  .app-logo-header a {
+    margin-top: 0px;
+    margin-left: -200px;
+  }
+
+  .userName {
+    display: none;
+  }
+
+  .header-right {
+    position: absolute;
+  }
+
+  .header-search-container {
+    position: absolute;
+  }
+
+  .header-search-container i {
+    transform: translate(-30px, -20px) !important;
+  }
+
+  .line-right {
+    display: none;
+  }
+
+  .header-cart-container {
+    position: absolute !important;
+    top: -25px;
+    right: -90%;
+    margin-top: 0 !important;
+    .header-cart-text {
+      display: none !important;
+    }
+  }
+
+  .img-fluid {
+    width: 130px !important;
+    transform: translateX(-40px) !important;
+  }
+
+  .app-header .app-logo-header a img {
+    transform: translate(0) !important;
+  }
+
+  .app-header .header-avtar-container p-avatar .p-avatar {
+    left: 20px;
+    top: 30%;
+  }
+}
+
+@media only screen and (min-width: 490px) and (max-width: 575px) {
+  .app-logo-header a {
+    margin-top: 0px;
+    margin-left: -200px;
+  }
+
+  .userName {
+    display: none;
+  }
+
+  .header-right {
+    position: absolute;
+  }
+
+  .header-search-container {
+    position: absolute;
+  }
+
+  .header-search-container i {
+    transform: translate(-40px, -20px) !important;
+  }
+
+  .line-right {
+    display: none;
+  }
+
+  .header-cart-container {
+    position: absolute !important;
+    top: -25px;
+    right: -90%;
+    margin-top: 0 !important;
+    .header-cart-text {
+      display: none !important;
+    }
+  }
+
+  .img-fluid {
+    width: 130px !important;
+    transform: translateX(-40px) !important;
+  }
+
+  .app-header .header-avtar-container p-avatar .p-avatar {
+    left: 20px;
+    top: 30%;
+  }
+
+  .banner-content--item:nth-child(3) {
+    display: none !important;
+  }
+}
+
+@media only screen and (min-width: 576px) and (max-width: 767px) {
+  .container-fluid .row {
+    transform: translateY(-10px);
+  }
+
+  .header-login-container {
+    margin-left: -10px;
+  }
+
+  .app-logo-header a {
+    margin-top: -16px;
+  }
+
+  .userName {
+    font-size: 12px;
+  }
+
+  .header-search-container i {
+    transform: translate(-110px, -5px) !important;
+  }
+
+  .line-right {
+    display: none;
+  }
+
+  .header-cart-container {
+    position: absolute !important;
+    top: 0px;
+    right: 15px;
+  }
+
+  .app-header .header-avtar-container p-avatar .p-avatar {
+    left: 50px;
+  }
+
+  .app-header .app-logo-header a img {
+    min-width: 180px !important;
+    transform: translate(20px, 25px) !important;
+  }
+}
+
+@media only screen and (min-width: 768px) and (max-width: 991px) {
+  .container-fluid .row {
+    transform: translateY(10px);
+  }
+
+  .app-logo-header {
+    margin-top: 0 !important;
+    margin-left: 120px;
+  }
+
+  .app-header .header-avtar-container p-avatar .p-avatar {
+    left: 50px;
+  }
+
+  .app-header .app-logo-header a img {
+    min-width: 200px !important;
+    transform: translate(20px, 25px) !important;
+  }
+}
+
+@media only screen and (min-width: 992px) and (max-width: 1199px) {
+  .app-header .header-avtar-container p-avatar .p-avatar {
+    left: 50px;
+  }
+
+  .app-header .app-logo-header a img {
+    min-width: 200px !important;
+  }
+}
+
+@media only screen and (min-width: 1200px) and (max-width: 1400px) {}
+
+@media only screen and (min-width: 1401px) and (max-width: 1899px) {}

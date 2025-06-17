@@ -1,0 +1,45 @@
+.container.upload-product-admin{
+    padding: 20px;
+    padding-left: 0;
+    margin-top: 90px;
+    input {
+      width: 100%;
+    }
+    span {
+      width: 100%;
+    }
+    .form-group {
+      .wrapper {
+        display: flex;
+        flex-direction: column;
+        margin: 12px 0;
+      }
+      .upload-wrapper {
+        flex-direction: row;
+        align-items: center;
+        label {
+          margin-right: 24px;
+        }
+      }
+    }
+    .button-wrapper{
+      float: right;
+      .p-button {
+        border-radius: 4px;
+      }
+    }
+    .dropdown-wrapper {
+      ul {
+        padding: 0;
+      } 
+      li {
+        height: 32px;
+        display: flex;
+        align-items: center;
+        &:hover {
+          background-color: #bf1e1e ;
+          color: #fff;
+        }
+      }
+    }
+}

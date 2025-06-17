@@ -1,0 +1,43 @@
+server:
+  port: 8089
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/shopsneaker3?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: admin
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+  messages:
+    basename: i18n/messages
+    encoding: UTF-8
+    default-locate: en
+api:
+  prefix: api/v1
+jwt:
+  expiration: 2592000
+  secretKey: U0roD0fdqXHh6yEzmYciXkhmHlFsS7v2Xa3bLVPsyLQ=
+vnpay:
+  tmn-code: ZY6H90Y5
+  secret-key: 8DCGXDUQOA7D90WHJ0M1E8FOQWFXXDEF
+  url: https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
+  return-url: http://localhost:4200/payment/result
+
+momo:
+  partner-code: MOMO
+  access-key: F8BBA842ECF85
+  secret-key: K951B6PE1waDMi640xX08PD3vg6EkVlz
+  endpoint: https://test-payment.momo.vn/v2/gateway/api/create
+  return-url: http://localhost:4200/payment/result
+  notify-url: http://localhost:8080/api/v1/payments/callback/momo
+logging.level.org.springframework.security: DEBUG

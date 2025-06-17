@@ -1,0 +1,891 @@
+{
+	"info": {
+		"_postman_id": "58f46ba3-6ac8-40ba-9a20-7d6451f53738",
+		"name": "ShopSneaker",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "33019957"
+	},
+	"item": [
+		{
+			"name": "categories",
+			"item": [
+				{
+					"name": "{{API_PREFIX_1}}categories",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Vans\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{API_PREFIX_1}}categories"
+					},
+					"response": []
+				},
+				{
+					"name": "{{API_PREFIX_1}}categories",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": ""
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "{{API_PREFIX_1}}categories"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "products",
+			"item": [
+				{
+					"name": "{{API_PREFIX_1}}products",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Giày Adidas Samba OG Cloud White Core Black\",\r\n    \"price\": 798000,\r\n    \"description\": \"Đây là mô tả\",\r\n    \"category_id\": 2\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{API_PREFIX_1}}products"
+					},
+					"response": []
+				},
+				{
+					"name": "{{API_PREFIX_1}}products/uploads/{id}",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiJ9.eyJwaG9uZU51bWJlciI6IjAxMTEyMjIzMzMiLCJzdWIiOiIwMTExMjIyMzMzIiwiZXhwIjoxNzEyNjUwNDY3fQ.1312YXOSMxJmXFSbkBhuOmxuTxJ3cj-n70Yz-T62npE"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "files",
+									"type": "file",
+									"src": [
+										"/D:/Workspace/Sneakers_BE/Sneakers/Image_upload/converse 1970 navy/converse-1970s-navy-high-replica-800x650.jpg",
+										"/D:/Workspace/Sneakers_BE/Sneakers/Image_upload/converse 1970 navy/converse-1970s-xanh-navy-co-cao-replica-4-800x650.jpg",
+										"/D:/Workspace/Sneakers_BE/Sneakers/Image_upload/converse 1970 navy/converse-1970s-xanh-navy-co-cao-replica-5-800x650.jpg",
+										"/D:/Workspace/Sneakers_BE/Sneakers/Image_upload/converse 1970 navy/converse-1970s-xanh-navy-co-cao-replica-6-800x650.jpg",
+										"/D:/Workspace/Sneakers_BE/Sneakers/Image_upload/converse 1970 navy/converse-1970s-xanh-navy-co-cao-replica-7-800x650.jpg"
+									]
+								}
+							]
+						},
+						"url": "{{API_PREFIX_1}}products/uploads/24"
+					},
+					"response": []
+				},
+				{
+					"name": "{{API_PREFIX_1}}products",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true,
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{API_PREFIX_1}}products?limit=12&keyword=&category_id=&page=1",
+							"host": [
+								"{{API_PREFIX_1}}products"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "12"
+								},
+								{
+									"key": "keyword",
+									"value": ""
+								},
+								{
+									"key": "category_id",
+									"value": ""
+								},
+								{
+									"key": "page",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "{{API_PREFIX_1}}products/all",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": "{{API_PREFIX_1}}products/all"
+					},
+					"response": []
+				},
+				{
+					"name": "{{API_PREFIX_1}}products/price",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{API_PREFIX_1}}products/price?min_price=20000000&max_price=60000000",
+							"host": [
+								"{{API_PREFIX_1}}products"
+							],
+							"path": [
+								"price"
+							],
+							"query": [
+								{
+									"key": "min_price",
+									"value": "20000000"
+								},
+								{
+									"key": "max_price",
+									"value": "60000000"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "{{API_PREFIX_1}}products/related/{productId}",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var template = `",
+									"<style type=\"text/css\">",
+									"    .tftable {font-size:14px;color:#333333;width:100%;border-width: 1px;border-color: #87ceeb;border-collapse: collapse;}",
+									"    .tftable th {font-size:18px;background-color:#87ceeb;border-width: 1px;padding: 8px;border-style: solid;border-color: #87ceeb;text-align:left;}",
+									"    .tftable tr {background-color:#ffffff;}",
+									"    .tftable td {font-size:14px;border-width: 1px;padding: 8px;border-style: solid;border-color: #87ceeb;}",
+									"    .tftable tr:hover {background-color:#e0ffff;}",
+									"</style>",
+									"",
+									"<table class=\"tftable\" border=\"1\">",
+									"    <tr>",
+									"        <th>ID</th>",
+									"        <th>Name</th>",
+									"        <th>Price</th>",
+									"        <th>Description</th>",
+									"        <th>Category ID</th>",
+									"    </tr>",
+									"    ",
+									"    {{#each response.products}}",
+									"        <tr>",
+									"            <td>{{id}}</td>",
+									"            <td>{{name}}</td>",
+									"            <td>{{price}}</td>",
+									"            <td>{{description}}</td>",
+									"            <td>{{category_id}}</td>",
+									"        </tr>",
+									"    {{/each}}",
+									"</table>",
+									"`;",
+									"",
+									"function constructVisualizerPayload() {",
+									"    return { response: pm.response.json() }",
+									"}",
+									"",
+									"pm.visualizer.set(template, constructVisualizerPayload());"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{API_PREFIX_1}}products/related/100",
+							"host": [
+								"{{API_PREFIX_1}}products"
+							],
+							"path": [
+								"related",
+								"100"
+							],
+							"query": [
+								{
+									"key": "productId",
+									"value": "11",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "{{API_PREFIX_1}}products/category/{category_id}",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": "{{API_PREFIX_1}}products/category/2"
+					},
+					"response": []
+				},
+				{
+					"name": "{{API_PREFIX_1}}products/search",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{API_PREFIX_1}}products/search?keyword=nike air",
+							"host": [
+								"{{API_PREFIX_1}}products"
+							],
+							"path": [
+								"search"
+							],
+							"query": [
+								{
+									"key": "keyword",
+									"value": "nike air"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "{{API_PREFIX_1}}products/images/{imageName}",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": "{{API_PREFIX_1}}products/images/254a91ae-3e90-4240-83c4-8f60538d4f26_Giay-New-Balance-CRT-300-Beige-Navy-800x650.jpg"
+					},
+					"response": []
+				},
+				{
+					"name": "{{API_PREFIX_1}}products/{id}",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": "{{API_PREFIX_1}}products/5"
+					},
+					"response": []
+				},
+				{
+					"name": "{{API_PREFIX_1}}products/by-ids",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{API_PREFIX_1}}products/by-ids?ids=1,3,5",
+							"host": [
+								"{{API_PREFIX_1}}products"
+							],
+							"path": [
+								"by-ids"
+							],
+							"query": [
+								{
+									"key": "ids",
+									"value": "1,3,5"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "{{API_PREFIX_1}}products",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": "{{API_PREFIX_1}}products/generateFakeProducts"
+					},
+					"response": []
+				},
+				{
+					"name": "{{API_PREFIX}}products/2 Copy",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiJ9.eyJwaG9uZU51bWJlciI6IjAxMTEyMjIzMzMiLCJ1c2VySWQiOjMsInN1YiI6IjAxMTEyMjIzMzMiLCJleHAiOjE3MTQ2NDA0NjR9.2DZqR9ZzvyPDiHU0FIRaKySIs1aQsp5mUtmY1RVNNfE"
+							}
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"name\": \"Giày Adidas Superstar trắng sọc đen\",\r\n\t\"price\": 3000000,\r\n\t\"description\": \"Giày adidas Superstar ra đời trên sân bóng rổ nhưng đã trở thành quán quân của phong cách đường phố. Bất kể bạn đang chơi bóng rổ hay chỉ đơn giản là xuống phố, đôi giày này sẽ mang đến cho bạn phong cách đơn giản mà cực cool, một item must-have thường ngày suốt năm thập kỷ qua.\",\r\n\t\"category_id\": 2,\r\n    \"discount\": 20\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{API_PREFIX_1}}products/2"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "orders",
+			"item": [
+				{
+					"name": "{{API_PREFIX_1}}orders",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiJ9.eyJwaG9uZU51bWJlciI6IjA4NjUyNDcyMzQiLCJ1c2VySWQiOjE0LCJzdWIiOiIwODY1MjQ3MjM0IiwiZXhwIjoxNzE0NjU1NzQ4fQ.OYuni3G1MgxgwGOIDhQeTNUpHdX3EwUnN9427RHl4ng"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"user_id\": 14,\r\n  \"fullname\": \"Trần Đức Anh\",\r\n  \"email\": \"lovetruongan@gmail.com\",\r\n  \"phone_number\": \"0865247234\",\r\n  \"address\": \"Sn 22, ngách 108, ngõ 68\",\r\n  \"note\": \"Hàng dễ vỡ xin nhẹ tay\",\r\n  \"total_money\": 3000000,\r\n  \"shipping_method\": \"express\",\r\n  \"shipping_address\":\"Hà Nội\",\r\n  \"payment_method\": \"cod\",\r\n  \"cart_items\": [\r\n    {\r\n      \"product_id\": 1,\r\n      \"quantity\": 2,\r\n      \"size\":43     \r\n    },\r\n    {\r\n      \"product_id\": 2,\r\n      \"quantity\": 3,\r\n      \"size\":43      \r\n    }  \r\n  ]\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{API_PREFIX_1}}orders"
+					},
+					"response": []
+				},
+				{
+					"name": "{{API_PREFIX_1}}orders/user/{user_id}",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{API_PREFIX_1}}orders/user/1"
+					},
+					"response": []
+				},
+				{
+					"name": "{{API_PREFIX_1}}orders/{id}",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{API_PREFIX_1}}orders/13"
+					},
+					"response": []
+				},
+				{
+					"name": "{{API_PREFIX_1}}orders/get-orders-by-keyword",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiJ9.eyJwaG9uZU51bWJlciI6IjAxMTEyMjIzMzMiLCJ1c2VySWQiOjMsInN1YiI6IjAxMTEyMjIzMzMiLCJleHAiOjE3MTM5NDE1MTB9.JoMMN4iK8JNPwWJDBgTtOWL5nFTqM2rqS30xhGcTJuQ"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{API_PREFIX_1}}orders/get-orders-by-keyword?page=0&limit=10&keyword=",
+							"host": [
+								"{{API_PREFIX_1}}orders"
+							],
+							"path": [
+								"get-orders-by-keyword"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "keyword",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "{{API_PREFIX_1}}orders/{id}",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiJ9.eyJwaG9uZU51bWJlciI6IjAxMTEyMjIzMzMiLCJ1c2VySWQiOjMsInN1YiI6IjAxMTEyMjIzMzMiLCJleHAiOjE3MTM5NzIwOTJ9.8CdBq-R3lphVuqbHtwaEpiX9OWgCyrgSbJH3J6pwCho"
+							}
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"user_id\" : 1,\r\n    \"fullname\" : \"Lưu Thuỳ Linh\",\r\n    \"email\" : \"chill@gmail.com\",\r\n    \"phone_number\" : \"0123456789\",\r\n    \"address\" : \"Hanoi\",\r\n    \"status\": \"shipped\",\r\n    \"note\" : \"Hàng dễ vỡ xin nhẹ tay\",\r\n    \"total_money\" : 1000001,\r\n    \"shipping_method\" : \"express\",\r\n    \"shipping_address\" : \"Hanoi\",\r\n    \"shipping_date\" : \"2024-02-19\",\r\n    \"payment_method\" : \"cod\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{API_PREFIX_1}}orders/2"
+					},
+					"response": []
+				},
+				{
+					"name": "{{API_PREFIX_1}}orders/{id}",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiJ9.eyJwaG9uZU51bWJlciI6IjAxMjM0NTY3ODkiLCJzdWIiOiIwMTIzNDU2Nzg5IiwiZXhwIjoxNzExMDM0NTY2fQ.MMq-qxoMkLz_NzGgqIVjfmBNiJtSdqrRWkYz2LbV3Eo"
+							}
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": "{{API_PREFIX_1}}orders/4"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "order_details",
+			"item": [
+				{
+					"name": "{{API_PREFIX_1}}order_details",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"order_id\" : 1,\r\n    \"product_id\" : 5,\r\n    \"price\" : 999000,\r\n    \"number_of_products\" : 3,\r\n    \"total_money\" : 1890000,\r\n    \"size\" : 42\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{API_PREFIX_1}}order_details"
+					},
+					"response": []
+				},
+				{
+					"name": "{{API_PREFIX_1}}order_details/{id}",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"order_id\" : 2,\r\n    \"product_id\" : 1,\r\n    \"price\" : 12.345,\r\n    \"number_of_products\" : 2,\r\n    \"total_money\" : 123,\r\n    \"color\" : \"ff00ff\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{API_PREFIX_1}}order_details/2"
+					},
+					"response": []
+				},
+				{
+					"name": "{{API_PREFIX_1}order_details/order/10",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{API_PREFIX_1}}order_details/order/1"
+					},
+					"response": []
+				},
+				{
+					"name": "{{API_PREFIX_1}}order_details/3",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"order_id\" : 1,\r\n    \"product_id\" : 3,\r\n    \"price\" : 990000,\r\n    \"number_of_products\" : 1,\r\n    \"total_money\" : 3000000,\r\n    \"size\" : 44\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{API_PREFIX_1}}order_details/2"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "users",
+			"item": [
+				{
+					"name": "{{API_PREFIX_1}}users/register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"fullname\": \"Hà Quang Dương\",\r\n    \"phone_number\" : \"0911725756\",\r\n    \"address\" : \"Thái Nguyên\",\r\n    \"password\" : \"1\",\r\n    \"retype_password\" : \"1\",\r\n    \"date_of_birth\" : \"2003-03-20\",\r\n    \"facebook_account_id\" : 0,\r\n    \"google_account_id\" : 0,\r\n    \"role_id\" : 1\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{API_PREFIX_1}}users/register"
+					},
+					"response": []
+				},
+				{
+					"name": "{{API_PREFIX_1}}users/login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var template = `\r",
+									"<div>\r",
+									"    <p>Message: {{response.message}}</p>\r",
+									"    <p>Token: {{response.token}}</p>\r",
+									"</div>\r",
+									"`;\r",
+									"\r",
+									"function constructVisualizerPayload() {\r",
+									"    return {response: pm.response.json()};\r",
+									"}\r",
+									"\r",
+									"pm.visualizer.set(template, constructVisualizerPayload());"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiJ9.eyJwaG9uZU51bWJlciI6IjAxMTMzNTU3NzkiLCJ1c2VySWQiOjEzLCJzdWIiOiIwMTEzMzU1Nzc5IiwiZXhwIjoxNzEzNjE0MTAxfQ.KF61_Pws2aX-1hNyIS8I5TIQ8DS3ibcRedAdIKTcWYY"
+							}
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept-Language",
+								"value": "vi",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"phone_number\" : \"0865247234\",\r\n    \"password\" : \"1\"\r\n    // \"role_id\": 2\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{API_PREFIX_1}}users/login"
+					},
+					"response": []
+				},
+				{
+					"name": "{{API_PREFIX_1}}users/details",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiJ9.eyJwaG9uZU51bWJlciI6IjA4NjUyNDcyMzQiLCJ1c2VySWQiOjE0LCJzdWIiOiIwODY1MjQ3MjM0IiwiZXhwIjoxNzE0MTQyMjgwfQ.8PwhQLaRUKlfW06hOYBvEdRHVCsLzE0cQSfLj7YUNks"
+							}
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept-Language",
+								"value": "vi",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{API_PREFIX_1}}users/details"
+					},
+					"response": []
+				},
+				{
+					"name": "{{API_PREFIX_1}}users/details/{user_id}",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiJ9.eyJwaG9uZU51bWJlciI6IjAxMTMzNTU3NzkiLCJzdWIiOiIwMTEzMzU1Nzc5IiwiZXhwIjoxNzEzNTE1Mjk3fQ.sHMHvWP65wAPMKOIYfDlDf7VCfqGOIeqOdh8gi7MVe4"
+							}
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Accept-Language",
+								"value": "vi",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"fullname\": \"Nguyễn Vũ Bảo Long\",\r\n    \"phone_number\" : \"0113355779\",\r\n    \"address\" : \"Hà Nội\",\r\n    \"password\" : \"1\",\r\n    \"retype_password\" : \"1\",\r\n    \"date_of_birth\" : \"2003-09-14\",\r\n    \"facebook_account_id\" : 0,\r\n    \"google_account_id\" : 0\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{API_PREFIX_1}}users/details/13"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "roles",
+			"item": [
+				{
+					"name": "{{API_PREFIX_1}}roles",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": ""
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "{{API_PREFIX_1}}roles"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "carts",
+			"item": [
+				{
+					"name": "{{API_PREFIX_1}}carts",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiJ9.eyJwaG9uZU51bWJlciI6IjA4NjUyNDcyMzQiLCJ1c2VySWQiOjE0LCJzdWIiOiIwODY1MjQ3MjM0IiwiZXhwIjoxNzE0MjA5MzQ4fQ.33F49mkaAQ30cnV84F-fMR_uxSez-2JCHKZuzFrszcw"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"product_id\": 2,\r\n    \"quantity\": 2,\r\n    \"size\": 38\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{API_PREFIX_1}}carts"
+					},
+					"response": []
+				},
+				{
+					"name": "{{API_PREFIX_1}}carts",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiJ9.eyJwaG9uZU51bWJlciI6IjA4NjUyNDcyMzQiLCJ1c2VySWQiOjE0LCJzdWIiOiIwODY1MjQ3MjM0IiwiZXhwIjoxNzE0NTQzMDUxfQ.agKF8VtMAOozU3eZ7BYDYn1VLXK_dnlJkF6KKmTPP1Y"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "{{API_PREFIX_1}}carts"
+					},
+					"response": []
+				},
+				{
+					"name": "{{API_PREFIX_1}}carts/{cartId}",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiJ9.eyJwaG9uZU51bWJlciI6IjA4NjUyNDcyMzQiLCJ1c2VySWQiOjE0LCJzdWIiOiIwODY1MjQ3MjM0IiwiZXhwIjoxNzE0NjcwNjE1fQ.AXV_NqW2MBUMIMTU8jcCk5HXGfDk3akERlulCjwfOt4"
+							}
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": "{{API_PREFIX_1}}carts/6"
+					},
+					"response": []
+				},
+				{
+					"name": "{{API_PREFIX_1}}carts/{cartId}",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiJ9.eyJwaG9uZU51bWJlciI6IjA4NjUyNDcyMzQiLCJ1c2VySWQiOjE0LCJzdWIiOiIwODY1MjQ3MjM0IiwiZXhwIjoxNzE0NjQxODMzfQ.xmt2DYRcXVsaPoVnmt9l2al9Xy8WH-XEfUsDk9xqVCY"
+							}
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"product_id\": 2,\r\n    \"quantity\": 1,\r\n    \"size\": 39\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{API_PREFIX_1}}carts/2"
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

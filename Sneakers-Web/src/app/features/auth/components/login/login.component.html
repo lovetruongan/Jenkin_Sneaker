@@ -1,0 +1,38 @@
+<div class="container-fluid p-0">
+  <p-blockUI [blocked]="blockedUi">
+    <p-progressSpinner ariaLabel="loading"></p-progressSpinner>
+  </p-blockUI>
+  <div class="row m-0 d-flex align-items-center">
+    <div class="col-lg-3 col-sm-4 offset-lg-4 offset-sm-2 login-form-container">
+      <!-- <img class="login-logo" src="/src/assets/images/z5126507952479_4523e39e253c486dd6fd48597dcf5a49.jpg" alt="#"> -->
+      <div class="login-form-container-content">
+        <h2 class="login-title">Đăng nhập</h2>
+        <div class="form-group-container">
+          <form (keydown.enter)="formSubmitSubject.next()" class="form-group" [formGroup]="loginForm">
+            <input pInputText pKeyFilter="int" required="" placeholder="Số điện thoại" formControlName="userName" />
+            <p-password class="login-password" required="" placeholder="Mật khẩu" [toggleMask]="true"
+              formControlName="password" [feedback]="false"></p-password>
+          </form>
+        </div>
+        <div class="remember-pass d-flex">
+          <p-checkbox class="remember-pass_checkbox" [binary]="true" inputId="binary" value="Ghi nhớ tài khoản này"
+            inputId="remember"></p-checkbox>
+          <label for="remember">Ghi nhớ tài khoản này</label>
+        </div>
+        <p-toast></p-toast>
+        <p-button (click)="formSubmitSubject.next()" class="login__button" label="Đăng nhập" type="submit"></p-button>
+        <div class="no-account-container">
+          <span>Chưa có tài khoản <a [routerLink]="['/register']">Đăng ký</a></span>
+        </div>
+        <p class="text-light display-10">&copy; 2017–2024</p>
+      </div>
+      <div class="login-form-container-back">
+        <a [routerLink]="['/Home']">
+          <p>Xem sản phẩm</p>
+          <i class="pi pi-arrow-left"></i>
+        </a>
+      </div>
+      <p>&copy; 2017–2024</p>
+    </div>
+  </div>
+</div>

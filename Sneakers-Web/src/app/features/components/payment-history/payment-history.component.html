@@ -1,0 +1,82 @@
+<div class="payment-history-container">
+  <div class="history-header">
+    <h2>Lịch sử thanh toán</h2>
+  </div>
+
+  <div class="history-content">
+    <p-table 
+      [value]="payments" 
+      [loading]="loading"
+      responsiveLayout="scroll"
+      [paginator]="true"
+      [rows]="10"
+      [rowsPerPageOptions]="[10, 20, 50]">
+      
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Đơn hàng</th>
+          <th>Phương thức</th>
+          <th>Số tiền</th>
+          <th>Trạng thái</th>
+          <th>Ngày tạo</th>
+          <th>Thao tác</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-payment>
+        <tr>
+          <td>
+            <span class="order-id">#{{ payment.order_id }}</span>
+          </td>
+          <td>
+            <div class="payment-method">
+              <i [class]="getPaymentMethodIcon(payment.payment_method)"></i>
+              <span>{{ formatPaymentMethod(payment.payment_method) }}</span>
+            </div>
+          </td>
+          <td>
+            <span class="amount">{{ payment.amount | currency:'VND':'symbol':'1.0-0' }}</span>
+          </td>
+          <td>
+            <p-tag 
+              [value]="formatPaymentStatus(payment.payment_status)"
+              [severity]="getStatusSeverity(payment.payment_status)">
+            </p-tag>
+          </td>
+          <td>
+            <span>{{ payment.created_at | date:'dd/MM/yyyy HH:mm' }}</span>
+          </td>
+          <td>
+            <div class="action-buttons">
+              <p-button 
+                icon="pi pi-eye"
+                [text]="true"
+                pTooltip="Xem chi tiết"
+                (click)="viewOrderDetail(payment.order_id)">
+              </p-button>
+              <p-button 
+                *ngIf="canCancelPayment(payment)"
+                icon="pi pi-times"
+                [text]="true"
+                severity="danger"
+                pTooltip="Hủy thanh toán"
+                (click)="cancelPayment(payment.id)">
+              </p-button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="6" class="text-center">
+            <div class="empty-state">
+              <i class="pi pi-info-circle"></i>
+              <p>Chưa có lịch sử thanh toán</p>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>

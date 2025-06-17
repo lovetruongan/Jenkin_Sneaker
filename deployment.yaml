@@ -1,0 +1,104 @@
+services:
+  mysql8-container:
+    container_name: mysql8-container
+    image: mysql:8.2.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_DATABASE: shopsneaker3  # Đã sửa để khớp với Spring Boot
+    ports:
+      - 3307:3306
+    networks:
+      - Sneaker-network
+
+  phpmyadmin8-container:
+    # Cho Intel/AMD64
+    image: phpmyadmin/phpmyadmin
+    # Cho Mac M1/M2: arm64v8/phpmyadmin
+    container_name: phpmyadmin8-container
+    restart: always
+    depends_on:
+      - mysql8-container
+    ports:
+      - "8100:80"
+    environment:
+      PMA_HOST: mysql8-container
+    networks:
+      - Sneaker-network
+
+  sneaker-spring-container:
+    container_name: sneaker-spring-container
+    build:
+      context: .
+      dockerfile: DockerfileJavaSpring
+    ports:
+      - 8089:8089
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql8-container:3306/shopsneaker3?serverTimezone=UTC&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: root
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_DATABASE: shopsneaker3
+    depends_on:
+      - mysql8-container
+    networks:
+      - Sneaker-network
+
+  jenkins-container:
+    container_name: jenkins-container
+    image: jenkins/jenkins:lts
+    restart: always
+    privileged: true
+    user: root
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - Sneaker-network
+
+  sonarqube-container:
+    container_name: sonarqube-container
+    image: sonarqube:latest
+    restart: always
+    ports:
+      - "9000:9000"
+    environment:
+      - SONARQUBE_JDBC_URL=jdbc:mysql://mysql8-container:3306/sonarqube?useUnicode=true&characterEncoding=utf8&useSSL=false
+      - SONARQUBE_JDBC_USERNAME=root
+      - SONARQUBE_JDBC_PASSWORD=admin
+    volumes:
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_extensions:/opt/sonarqube/extensions
+      - sonarqube_logs:/opt/sonarqube/logs
+    depends_on:
+      - mysql8-container
+    networks:
+      - Sneaker-network
+
+  sneaker-angular-container:
+    container_name: sneaker-angular-container
+    build:
+      context: .
+      dockerfile: DockerfileAngular
+    ports:
+      - "4200:80"
+    networks:
+      - Sneaker-network
+
+networks:
+  Sneaker-network:
+    name: Sneaker-network
+    driver: bridge
+    external: true
+
+volumes:
+  jenkins_home:
+    driver: local
+  sonarqube_data:
+    driver: local
+  sonarqube_extensions:
+    driver: local
+  sonarqube_logs:
+    driver: local

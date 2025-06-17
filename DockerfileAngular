@@ -1,0 +1,31 @@
+# Base image, even version for production
+FROM node:18-alpine AS builder
+# Set the working directory
+WORKDIR /app
+
+# Copy the package.json and yarn.lock files
+COPY ./Sneakers-Web/package.json ./package.json
+COPY ./Sneakers-Web/yarn.lock ./yarn.lock
+
+# Install dependencies using yarn
+RUN yarn install --frozen-lockfile
+
+# Copy the rest of the app's code excluding node_modules
+COPY ./Sneakers-Web/ .
+
+# Build the Angular app in production mode
+RUN yarn build
+
+# Production-ready image
+FROM nginx:1.25-alpine
+
+# Copy the built app from the builder stage
+COPY --from=builder /app/dist/sneakers-ui/browser /usr/share/nginx/html
+
+EXPOSE 80
+
+# Start Nginx
+CMD ["nginx", "-g", "daemon off;"]
+
+#docker build -t sneaker_fe:1.0.0 -f DockerfileAngular .
+#docker run -p 8080:80 sneaker_fe:1.0.0

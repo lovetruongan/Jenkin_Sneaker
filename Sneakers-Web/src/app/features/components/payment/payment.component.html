@@ -1,0 +1,80 @@
+<div class="payment-container">
+  <p-toast></p-toast>
+  
+  <div class="payment-header">
+    <h2>Thanh toán đơn hàng</h2>
+    <p-button 
+      icon="pi pi-arrow-left" 
+      label="Quay lại" 
+      [outlined]="true"
+      (click)="goBack()">
+    </p-button>
+  </div>
+
+  <div class="payment-content" *ngIf="orderInfo">
+    <!-- Order Summary -->
+    <div class="order-summary">
+      <h3>Thông tin đơn hàng #{{ orderId }}</h3>
+      <div class="order-details">
+        <div class="detail-item">
+          <span class="label">Người nhận:</span>
+          <span class="value">{{ orderInfo.fullname }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Địa chỉ:</span>
+          <span class="value">{{ orderInfo.address }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Tổng tiền:</span>
+          <span class="value total-amount">{{ orderInfo.total_money | currency:'VND':'symbol':'1.0-0' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Payment Methods -->
+    <div class="payment-methods">
+      <h3>Chọn phương thức thanh toán</h3>
+      <form [formGroup]="paymentForm">
+        <div class="method-grid">
+          <div 
+            *ngFor="let method of paymentMethods" 
+            class="payment-method-card"
+            [class.selected]="selectedMethod === method.value"
+            (click)="onPaymentMethodChange(method.value)">
+            
+            <div class="method-header">
+              <i [class]="method.icon"></i>
+              <div class="method-info">
+                <h4>{{ method.label }}</h4>
+                <p>{{ method.description }}</p>
+              </div>
+              <p-radioButton 
+                [value]="method.value" 
+                formControlName="paymentMethod"
+                [inputId]="method.value">
+              </p-radioButton>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- Payment Button -->
+    <div class="payment-actions">
+      <p-button 
+        label="Thanh toán ngay"
+        icon="pi pi-credit-card"
+        [loading]="loading"
+        [disabled]="!selectedMethod"
+        styleClass="w-full"
+        (click)="processPayment()">
+      </p-button>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading-container" *ngIf="!orderInfo">
+    <p-progressSpinner></p-progressSpinner>
+    <p>Đang tải thông tin đơn hàng...</p>
+  </div>
+</div>

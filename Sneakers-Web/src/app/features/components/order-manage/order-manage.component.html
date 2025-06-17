@@ -1,0 +1,45 @@
+<div class="order-manage">
+    <p-toast></p-toast>
+    <div class="container">
+        <div class="row history-order-header">
+            <div class="col-2 font-bold">Mã đơn hàng</div>
+            <div class="col-3 font-bold">Đơn hàng</div>
+            <div class="col-2 font-bold">Trạng thái</div>
+            <div class="col-2 font-bold">Ngày đặt</div>
+            <div class="col-2 font-bold">Tổng tiền</div>
+            <div class="col-1 font-bold"></div>
+        </div>
+        @for(order of allOrders; track order){
+            <div class="row">
+                <div class="col-2 d-flex align-items-center">{{order.id}}</div>
+                <div class="col-3 d-flex align-items-center history-order-main-info">
+                    <img class="history-order-image" [src]="apiImage + order.thumbnail" alt="Giày">
+                    <div>
+                        <p class="font-bold">{{order.product_name}}</p>
+                        @if(order.total_products > 1){
+                            <p>Còn {{order.total_products - 1}} sản phẩm <a [routerLink]="['/order-detail/', order.id]">Xem chi tiết</a></p>
+                        } @else {
+                            <a [routerLink]="['/order-detail/', order.id]">Xem chi tiết</a>
+                        }
+                    </div>
+                </div>
+                <div class="col-2 d-flex align-items-center">
+                    <div [ngSwitch]="order.status">  
+                        <p *ngSwitchCase="'pending'">Đang chờ</p>
+                        <p *ngSwitchCase="'success'">Đã giao hàng</p>
+                        <p *ngSwitchCase="'cancelled'">Đã hủy</p>
+                        <p *ngSwitchCase="'processing'">Đang xử lý</p>
+                        <p *ngSwitchCase="'delivered'">Đã được giao</p>
+                        <p *ngSwitchCase="'shipped'">Đang được giao</p>
+                    </div>
+                </div>
+                <div class="col-2 d-flex align-items-center">{{order.order_date | date: 'dd/MM/yyyy'}}</div>
+                <div class="col-2 d-flex align-items-center">{{order.total_money | currency:'VND':'symbol':'1.0-0'}}</div>
+                <div class="col-1 d-flex align-items-center">
+                    <p-dropdown [options]="orderStateOptions" [placeholder]="getPlaceholderByOrderStatus(order.status)"
+                    (onChange)="onOrderStateChange($event, order.id)"></p-dropdown> 
+                </div>
+            </div>
+        }
+    </div>
+</div>

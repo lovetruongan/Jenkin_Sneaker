@@ -1,0 +1,112 @@
+<div class="banking-payment-container">
+  <div class="banking-header">
+    <i class="pi pi-building bank-icon"></i>
+    <h2>Thanh toán chuyển khoản</h2>
+    <p>Vui lòng chuyển khoản theo thông tin bên dưới</p>
+  </div>
+
+  <div class="banking-info">
+    <div class="info-card">
+      <h3>Thông tin chuyển khoản</h3>
+      
+      <div class="bank-detail">
+        <div class="detail-row">
+          <span class="label">Ngân hàng:</span>
+          <div class="value-with-copy">
+            <span class="value">{{ bankInfo.bankName }}</span>
+            <p-button 
+              icon="pi pi-copy" 
+              [text]="true"
+              pTooltip="Sao chép"
+              (click)="copyToClipboard(bankInfo.bankName)">
+            </p-button>
+          </div>
+        </div>
+
+        <div class="detail-row">
+          <span class="label">Số tài khoản:</span>
+          <div class="value-with-copy">
+            <span class="value">{{ bankInfo.accountNumber }}</span>
+            <p-button 
+              icon="pi pi-copy" 
+              [text]="true"
+              pTooltip="Sao chép"
+              (click)="copyToClipboard(bankInfo.accountNumber)">
+            </p-button>
+          </div>
+        </div>
+
+        <div class="detail-row">
+          <span class="label">Tên tài khoản:</span>
+          <div class="value-with-copy">
+            <span class="value">{{ bankInfo.accountName }}</span>
+            <p-button 
+              icon="pi pi-copy" 
+              [text]="true"
+              pTooltip="Sao chép"
+              (click)="copyToClipboard(bankInfo.accountName)">
+            </p-button>
+          </div>
+        </div>
+
+        <div class="detail-row highlight">
+          <span class="label">Số tiền:</span>
+          <div class="value-with-copy">
+            <span class="value amount">{{ amount | currency:'VND':'symbol':'1.0-0' }}</span>
+            <p-button 
+              icon="pi pi-copy" 
+              [text]="true"
+              pTooltip="Sao chép"
+              (click)="copyToClipboard(amount.toString())">
+            </p-button>
+          </div>
+        </div>
+
+        <div class="detail-row highlight">
+          <span class="label">Nội dung chuyển khoản:</span>
+          <div class="value-with-copy">
+            <span class="value content">{{ bankInfo.transferContent }}</span>
+            <p-button 
+              icon="pi pi-copy" 
+              [text]="true"
+              pTooltip="Sao chép"
+              (click)="copyToClipboard(bankInfo.transferContent)">
+            </p-button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="qr-code-card">
+      <h4>Quét QR để chuyển khoản</h4>
+      <!-- QR Code would be generated here -->
+      <div class="qr-placeholder">
+        <i class="pi pi-qrcode"></i>
+        <p>QR Code</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="banking-note">
+    <p-messages severity="info">
+      <ng-template pTemplate>
+        <div class="note-content">
+          <strong>Lưu ý quan trọng:</strong>
+          <ul>
+            <li>Vui lòng chuyển khoản đúng số tiền và nội dung như trên</li>
+            <li>Sau khi chuyển khoản, vui lòng nhấn "Đã chuyển khoản" để xác nhận</li>
+            <li>Đơn hàng sẽ được xử lý sau khi chúng tôi nhận được tiền</li>
+          </ul>
+        </div>
+      </ng-template>
+    </p-messages>
+  </div>
+
+  <div class="banking-actions">
+    <p-button 
+      label="Đã chuyển khoản"
+      icon="pi pi-check"
+      (click)="confirmPayment()">
+    </p-button>
+  </div>
+</div>
