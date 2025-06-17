@@ -10,6 +10,8 @@ import { BlockUIModule } from 'primeng/blockui';
 import { BaseComponent } from '../../commonComponent/base.component';
 import { LoadingService } from '../../services/loading.service';
 import { takeUntil, tap } from 'rxjs';
+import { AiChatbotComponent } from '../ai-chatbot/ai-chatbot.component';
+import { ScrollToTopComponent } from '../../../shared/components/scroll-to-top/scroll-to-top.component';
 
 @Component({
   selector: 'app-app-layout',
@@ -21,7 +23,9 @@ import { takeUntil, tap } from 'rxjs';
     AppNavbarComponent,
     AppFooterComponent,
     ProgressSpinnerModule,
-    BlockUIModule
+    BlockUIModule,
+    AiChatbotComponent,
+    ScrollToTopComponent
   ],
   templateUrl: './app-layout.component.html',
   styleUrl: './app-layout.component.scss'
